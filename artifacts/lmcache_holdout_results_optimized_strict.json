@@ -1,0 +1,565 @@
+{
+  "aggregates": {
+    "real": {
+      "Group A": {
+        "commitment_survival": 1.0,
+        "sequence_accuracy": 1.0,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 2023.9
+      },
+      "Group B": {
+        "commitment_survival": 1.0,
+        "sequence_accuracy": 1.0,
+        "tamper_detection": 1.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 744.4
+      },
+      "Group C": {
+        "commitment_survival": 1.0,
+        "sequence_accuracy": 1.0,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 1376.3
+      },
+      "Group D": {
+        "commitment_survival": 0.7,
+        "sequence_accuracy": 0.7,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 43.0
+      },
+      "Group E": {
+        "commitment_survival": 0.7,
+        "sequence_accuracy": 0.7,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 1029.0
+      }
+    },
+    "synthetic": {
+      "Group A": {
+        "commitment_survival": 0.6666666666666666,
+        "sequence_accuracy": 1.0,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 280.3333333333333
+      },
+      "Group B": {
+        "commitment_survival": 0.6666666666666666,
+        "sequence_accuracy": 1.0,
+        "tamper_detection": 1.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 733.3333333333334
+      },
+      "Group C": {
+        "commitment_survival": 0.6666666666666666,
+        "sequence_accuracy": 1.0,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 149.0
+      },
+      "Group D": {
+        "commitment_survival": 0.0,
+        "sequence_accuracy": 0.0,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 43.0
+      },
+      "Group E": {
+        "commitment_survival": 0.0,
+        "sequence_accuracy": 0.0,
+        "tamper_detection": 0.0,
+        "hash_stability": 1.0,
+        "avg_size_bytes": 140.33333333333334
+      }
+    }
+  },
+  "detailed_results": {
+    "real": {
+      "09867e5c74f53656f91797020d262e3b": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 4394
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1030
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 3307
+        },
+        "Group D": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 2229
+        }
+      },
+      "0c6629b0a328cc379ad0e3a62b0353bb": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 4897
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1284
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 3538
+        },
+        "Group D": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 2474
+        }
+      },
+      "22ffaaf33001ec7197ccd612e03d428e": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 490
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 563
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 280
+        },
+        "Group D": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 251
+        }
+      },
+      "24c817382a29e399b7dac064b923c268": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 238
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 568
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 133
+        },
+        "Group D": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 117
+        }
+      },
+      "253f1bdf4cfa489d2b5801d3b46fc498": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 3262
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 649
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1897
+        },
+        "Group D": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1663
+        }
+      },
+      "299d321358d0b2fb2f6b7ca1ae4856b8": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 322
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 572
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 179
+        },
+        "Group D": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 163
+        }
+      },
+      "463fc7125362adfaa55a47dbc4ee3faf": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1918
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 649
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1113
+        },
+        "Group D": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 988
+        }
+      },
+      "4e8f1c2ec7c1fedefd38e7945416f65c": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 2982
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 911
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 2315
+        },
+        "Group D": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1523
+        }
+      },
+      "4f619f153313f676f839cd4afd8228d5": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 322
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 572
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 182
+        },
+        "Group D": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 163
+        }
+      },
+      "5cacdab43997ef46db773ba7a7d4aa13": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 1414
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 646
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 819
+        },
+        "Group D": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 719
+        }
+      }
+    },
+    "synthetic": {
+      "syn_01_checkout": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 315
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 884
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 172
+        },
+        "Group D": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 158
+        }
+      },
+      "syn_02_database": {
+        "Group A": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 280
+        },
+        "Group B": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 824
+        },
+        "Group C": {
+          "commitment_survival": 1.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 137
+        },
+        "Group D": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 140
+        }
+      },
+      "syn_03_kubernetes": {
+        "Group A": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 246
+        },
+        "Group B": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 1.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 492
+        },
+        "Group C": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 1.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 138
+        },
+        "Group D": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 43
+        },
+        "Group E": {
+          "commitment_survival": 0.0,
+          "sequence_accuracy": 0.0,
+          "tamper_detection": 0.0,
+          "hash_stability": 1.0,
+          "payload_size_bytes": 123
+        }
+      }
+    }
+  }
+}

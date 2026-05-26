@@ -1,0 +1,12 @@
+{
+  "session_id": "4f619f153313f676f839cd4afd8228d5",
+  "source": "lmcache-agent-trace",
+  "log_lines": [
+    "2025-10-16T04:09:09Z INFO ECU=USER message=I m trying to make some changes to my fl",
+    "2025-10-16T04:09:09Z INFO ECU=USER message=I m trying to make some changes to my fl",
+    "2025-10-16T04:09:08Z INFO ECU=USER message=Hi How can I help you today",
+    "2025-10-16T04:09:09Z INFO ECU=USER message=I m trying to make some changes to my fl"
+  ],
+  "expected_tool_sequence": [],
+  "expected_commitments": []
+}

@@ -1,0 +1,4 @@
+2026-05-26T12:00:00Z INFO ECU=ACM TaskA start voltage=24.1V
+2026-05-26T12:00:00Z INFO ECU=CPC TaskB start temperature=85C
+2026-05-26T12:00:05Z WARN ECU=ACM TaskA complete status=success
+2026-05-26T12:00:06Z INFO ECU=CPC TaskB complete status=success

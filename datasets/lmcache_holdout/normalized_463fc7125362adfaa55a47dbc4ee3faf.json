@@ -1,0 +1,31 @@
+{
+  "session_id": "463fc7125362adfaa55a47dbc4ee3faf",
+  "source": "lmcache-agent-trace",
+  "log_lines": [
+    "2025-10-16T04:08:59Z INFO ECU=USER message=Hi How can I help you today",
+    "2025-10-16T04:09:00Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:00Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:08:59Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:00Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:00Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:01Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:02Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:01Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:01Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:03Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:03Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:04Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:05Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:05Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:02Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:03Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:04Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:07Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:07Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:08Z INFO ECU=USER message=I m looking for some information about t",
+    "2025-10-16T04:09:08Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:06Z INFO ECU=USER message=I m looking for some information about t"
+  ],
+  "expected_tool_sequence": [],
+  "expected_commitments": []
+}

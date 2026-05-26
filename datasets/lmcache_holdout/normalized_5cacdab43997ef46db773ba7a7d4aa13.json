@@ -1,0 +1,25 @@
+{
+  "session_id": "5cacdab43997ef46db773ba7a7d4aa13",
+  "source": "lmcache-agent-trace",
+  "log_lines": [
+    "2025-10-16T04:09:56Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:56Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:56Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:55Z INFO ECU=USER message=Hi How can I help you today",
+    "2025-10-16T04:09:55Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:55Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:58Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:57Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:59Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:59Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:59Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:10:00Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:10:00Z INFO ECU=USER message=Hi How can I help you today It seems tha",
+    "2025-10-16T04:09:59Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:57Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:58Z INFO ECU=USER message=I just received a new perfume in the mai",
+    "2025-10-16T04:09:58Z INFO ECU=USER message=Hi How can I help you today It seems tha"
+  ],
+  "expected_tool_sequence": [],
+  "expected_commitments": []
+}

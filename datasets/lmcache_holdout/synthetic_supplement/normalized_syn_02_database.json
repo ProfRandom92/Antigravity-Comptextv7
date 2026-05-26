@@ -1,0 +1,20 @@
+{
+  "session_id": "syn_02_database",
+  "log_lines": [
+    "2026-05-26T12:00:00Z INFO ECU=USER message=query_db_records",
+    "2026-05-26T12:00:05Z INFO ECU=AGENT tool=db_connect db_host=prod_db_replica1",
+    "2026-05-26T12:00:10Z INFO ECU=AGENT tool=db_query table=users filter=active",
+    "2026-05-26T12:00:15Z INFO ECU=AGENT tool=db_disconnect status=clean"
+  ],
+  "expected_tool_sequence": [
+    "db_connect",
+    "db_query",
+    "db_disconnect"
+  ],
+  "expected_commitments": [
+    "prod_db_replica1",
+    "users",
+    "active"
+  ],
+  "source": "synthetic_supplement"
+}

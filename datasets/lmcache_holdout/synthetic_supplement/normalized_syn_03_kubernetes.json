@@ -1,0 +1,19 @@
+{
+  "session_id": "syn_03_kubernetes",
+  "log_lines": [
+    "2026-05-26T12:00:05Z INFO ECU=AGENT tool=k8s_authenticate cluster=eu_west_2",
+    "2026-05-26T12:00:10Z INFO ECU=AGENT tool=k8s_scale deployment=web_server replicas=5",
+    "2026-05-26T12:00:15Z INFO ECU=AGENT tool=k8s_verify deployment=web_server status=green"
+  ],
+  "expected_tool_sequence": [
+    "k8s_authenticate",
+    "k8s_scale",
+    "k8s_verify"
+  ],
+  "expected_commitments": [
+    "eu_west_2",
+    "web_server",
+    "replicas=5"
+  ],
+  "source": "synthetic_supplement"
+}

@@ -1,0 +1,106 @@
+{
+  "real_09867e5c74f53656f91797020d262e3b": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_09867e5c74f53656f91797020d262e3b.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "22386842cd3f559e54d745c5360f0af0fbdf7c0afcd9084e5b271053524ee04d",
+    "expected_tool_sequence_hash": "bf91c985fe245dbee65deedf8aeecc51f6448e0d23a49dbbef80cad203d02110",
+    "expected_commitment_hash": "078583d9c81cff0779ff19951a06d8060fd7eb1ac3a86de5ece774c956d697e4",
+    "corruption_seed": 42
+  },
+  "real_0c6629b0a328cc379ad0e3a62b0353bb": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_0c6629b0a328cc379ad0e3a62b0353bb.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "40e749ac9e8066964a0e145ffb8a92deed9a93ad7869dd74ce003c42d0e273d5",
+    "expected_tool_sequence_hash": "a91f3002527316fe6b774e074acf414167c988cc7cc5d4acb4e081a211096ef6",
+    "expected_commitment_hash": "8c5eac71b2ca7f4903cdcb618a5c249f639c7fa11c588f2769769c61d9858b95",
+    "corruption_seed": 42
+  },
+  "real_22ffaaf33001ec7197ccd612e03d428e": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_22ffaaf33001ec7197ccd612e03d428e.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "e226f7fadb8c017b6c826703a1536570f541dd85da4eddbf94ff41d25112597d",
+    "expected_tool_sequence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "expected_commitment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "corruption_seed": 42
+  },
+  "real_24c817382a29e399b7dac064b923c268": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_24c817382a29e399b7dac064b923c268.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "7ff2bbdc564ec42f63632e91c28b0b731cdf9729339df7b120218e21b50f691b",
+    "expected_tool_sequence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "expected_commitment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "corruption_seed": 42
+  },
+  "real_253f1bdf4cfa489d2b5801d3b46fc498": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_253f1bdf4cfa489d2b5801d3b46fc498.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "29eb2cbc0d5c51e07a21eade0d82ce8b5f86ee0d6a32a08f45f2071c3d58d347",
+    "expected_tool_sequence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "expected_commitment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "corruption_seed": 42
+  },
+  "real_299d321358d0b2fb2f6b7ca1ae4856b8": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_299d321358d0b2fb2f6b7ca1ae4856b8.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "0a75d10cbe4cef3907063f40585790ff5d2a449d061bd071eb1dde49cb26f941",
+    "expected_tool_sequence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "expected_commitment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "corruption_seed": 42
+  },
+  "real_463fc7125362adfaa55a47dbc4ee3faf": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_463fc7125362adfaa55a47dbc4ee3faf.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "655bf01afc3ebfda33976f1c638d4209bba757dcc4e6dd5a5e79ac99ed8d54ed",
+    "expected_tool_sequence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "expected_commitment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "corruption_seed": 42
+  },
+  "real_4e8f1c2ec7c1fedefd38e7945416f65c": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_4e8f1c2ec7c1fedefd38e7945416f65c.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "3424dd9ea86e9421a267b77e1473fa30009f37ebf13f1e5ed516c7bbcce5d838",
+    "expected_tool_sequence_hash": "22fe2077629220d8d7af678a0902525cb6e44013d855a84043d08b20d1aa5c95",
+    "expected_commitment_hash": "853b7dfc8c98768c07b1bb7552ec4b4b75f993e0548e69943291e31ad78ee8d4",
+    "corruption_seed": 42
+  },
+  "real_4f619f153313f676f839cd4afd8228d5": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_4f619f153313f676f839cd4afd8228d5.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "3247252d1e860a1cf3d8b4a61914419743cbe6be65a1fe3f9ddb6a9cbddbfea6",
+    "expected_tool_sequence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "expected_commitment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "corruption_seed": 42
+  },
+  "real_5cacdab43997ef46db773ba7a7d4aa13": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_5cacdab43997ef46db773ba7a7d4aa13.json",
+    "detected_schema": "JSONL_Session_Frame",
+    "normalized_trace_hash": "b0a7b2bd635c709ca4ae999ec0ad05970fe1fadbf2845f758955703018111b58",
+    "expected_tool_sequence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "expected_commitment_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "corruption_seed": 42
+  },
+  "synthetic_syn_01_checkout": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/synthetic_supplement/normalized_syn_01_checkout.json",
+    "detected_schema": "Synthetic_Supplement_Frame",
+    "normalized_trace_hash": "35741c88cb71a42261ad20935ac1ca17636918abeed2ef0801c2b7f9c502a685",
+    "expected_tool_sequence_hash": "7e7c3b5740838cf094e79cc66c66475b3a9d0d8736e815f8d06042bf9786921d",
+    "expected_commitment_hash": "829102e30610790dc82ea14be41f85fe42222600ec295a0a97fea6a1f711bb79",
+    "corruption_seed": 42
+  },
+  "synthetic_syn_02_database": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/synthetic_supplement/normalized_syn_02_database.json",
+    "detected_schema": "Synthetic_Supplement_Frame",
+    "normalized_trace_hash": "794997b0f26cb6fd37e1fdf51cd4b98068e9b542c447850b141de5d1c973fff2",
+    "expected_tool_sequence_hash": "0a851e9ff1fdbbe2bd5c4bb488f5bc1f454b3b96a0acfc5c44ea54b9d47cccb7",
+    "expected_commitment_hash": "c03a0519ad53904a713e8ec00a8e735585276b09e50b7caca9410ee79baac9ae",
+    "corruption_seed": 42
+  },
+  "synthetic_syn_03_kubernetes": {
+    "source_file": "/data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/synthetic_supplement/normalized_syn_03_kubernetes.json",
+    "detected_schema": "Synthetic_Supplement_Frame",
+    "normalized_trace_hash": "b2613e1a886102b2dfa7dde3c22c813add60e11a21b0e950b97e27e457d91254",
+    "expected_tool_sequence_hash": "0b859851110950886d3b268ebb328995b238882de6540f788c1857398f650720",
+    "expected_commitment_hash": "f932179c36ebb38d29772f55baf2d64983b27be5b5bc975c9ac08f7975b0739b",
+    "corruption_seed": 42
+  }
+}
