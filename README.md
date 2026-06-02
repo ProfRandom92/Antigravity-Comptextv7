@@ -53,54 +53,157 @@ CompText v7 treats agent traces as structured forensic artifacts:
 
 ## 🗺 Architecture
 
+CompText v7 is built around one hard rule: **payload compression must never destroy replay-critical state**.
+
 ```mermaid
 flowchart TD
-    A[Raw LMCache / Agent Trace] --> B{Trace Splitter}
+    raw["Raw Agent / LMCache Trace"]
 
-    B --> C[CompText v7 Payload<br/>linguistic pruning]
-    B --> D[Replay Sidecar<br/>tool order, commitments, state hashes]
+    subgraph split["KVTC Split Layer"]
+        splitter["Trace Splitter"]
+        classifier["Replay-Critical Field Classifier"]
+    end
 
-    C --> E[Compressed Transport Package]
-    D --> F[SHA-256 Integrity Anchor]
-    F --> E
+    subgraph payload["Compressible Payload Stream"]
+        text["Linguistic Payload"]
+        prune["Redundancy Pruning"]
+        compact["CompText v7 Compact Payload"]
+    end
 
-    E --> G{Runtime Path}
-    G --> H[Python Reference Engine]
-    G --> I[Rust Fast Path]
+    subgraph sidecar["Deterministic Replay Sidecar"]
+        order["Tool Order"]
+        commits["Commitment Tokens"]
+        state["State Hashes"]
+        anchors["Validation Anchors"]
+    end
 
-    H --> J[Canonical Replay Reconstruction]
-    I --> J
+    subgraph integrity["Forensic Integrity Layer"]
+        canon["Canonical Metadata Serialization"]
+        hash["SHA-256 Hash Anchor"]
+        chain["Audit Chain"]
+    end
 
-    J --> K[Strict Holdout Validator]
-    K --> L[Replay Score: 1.00]
+    subgraph replay["Replay Reconstruction"]
+        package["Compressed Transport Package"]
+        reconstruct["Canonical Reconstructor"]
+        validator["Strict Holdout Validator"]
+        result["Replay Validity"]
+    end
 
-    style A stroke-width:2px
-    style D stroke-width:2px
-    style F stroke-width:2px
-    style I stroke-width:2px
-    style L stroke-width:2px
+    raw --> splitter
+    splitter --> classifier
+
+    classifier --> text
+    text --> prune
+    prune --> compact
+
+    classifier --> order
+    classifier --> commits
+    classifier --> state
+    classifier --> anchors
+
+    order --> canon
+    commits --> canon
+    state --> canon
+    anchors --> canon
+
+    canon --> hash
+    hash --> chain
+
+    compact --> package
+    chain --> package
+
+    package --> reconstruct
+    reconstruct --> validator
+    validator --> result
 ```
 
-### Data flow
+### Replay lifecycle
 
 ```mermaid
 sequenceDiagram
-    participant Trace as Raw Trace
-    participant Split as KVTC Splitter
-    participant Text as CompText Payload
-    participant Sidecar as Replay Sidecar
-    participant Hash as SHA-256 Chain
-    participant Replay as Reconstructor
-    participant Test as Holdout Validator
+    autonumber
 
-    Trace->>Split: ingest production trace
-    Split->>Text: prune redundant language
-    Split->>Sidecar: preserve replay-critical state
-    Sidecar->>Hash: derive integrity anchor
-    Text->>Replay: compact payload
-    Hash->>Replay: verified sidecar metadata
-    Replay->>Test: canonical replay output
-    Test-->>Replay: deterministic validation result
+    participant T as Raw Trace
+    participant S as KVTC Splitter
+    participant P as Payload Compressor
+    participant R as Replay Sidecar
+    participant H as SHA-256 Chain
+    participant C as Canonical Reconstructor
+    participant V as Holdout Validator
+
+    T->>S: ingest structured agent trace
+    S->>P: route compressible linguistic payload
+    S->>R: isolate replay-critical fields
+
+    P-->>C: compact CompText payload
+    R->>H: serialize deterministic metadata
+    H-->>C: verified integrity anchor
+
+    C->>C: rebuild canonical replay trace
+    C->>V: submit reconstructed trace
+    V-->>C: deterministic replay verdict
+```
+
+### Integrity state machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> TraceIngested
+
+    TraceIngested --> SplitComplete: payload and sidecar separated
+    SplitComplete --> PayloadCompressed: redundant text reduced
+    SplitComplete --> SidecarSealed: critical replay fields preserved
+
+    SidecarSealed --> HashAnchored: SHA-256 anchor created
+    PayloadCompressed --> PackageBuilt
+    HashAnchored --> PackageBuilt
+
+    PackageBuilt --> ReplayReconstructed: canonical rebuild
+    ReplayReconstructed --> HoldoutValidated: strict validation passes
+
+    ReplayReconstructed --> ReplayRejected: tool order mismatch
+    ReplayReconstructed --> ReplayRejected: state hash mismatch
+    ReplayReconstructed --> ReplayRejected: missing commitment token
+
+    HoldoutValidated --> [*]
+    ReplayRejected --> [*]
+```
+
+### Compression contract
+
+```mermaid
+flowchart LR
+    subgraph lossy["Loss-Aware Zone"]
+        A["Natural-language trace text"]
+        B["Redundant reasoning prose"]
+        C["Verbose intermediate context"]
+    end
+
+    subgraph lossless["Lossless Zone"]
+        D["Tool sequence"]
+        E["Commitment tokens"]
+        F["State hashes"]
+        G["Replay anchors"]
+    end
+
+    subgraph output["CompText v7 Package"]
+        H["Compact payload"]
+        I["Replay sidecar"]
+        J["SHA-256 audit chain"]
+    end
+
+    A --> H
+    B --> H
+    C --> H
+
+    D --> I
+    E --> I
+    F --> I
+    G --> I
+
+    I --> J
+    H --> J
 ```
 
 ---
@@ -118,11 +221,45 @@ Rust is integrated as the performance-oriented execution path for the parts that
 Python remains useful as the reference and experimentation layer. Rust is the direction for hardened, production-grade execution.
 
 ```mermaid
-flowchart LR
-    P[Python Reference Layer] --> S[Shared KVTC Semantics]
-    R[Rust Core Layer] --> S
-    S --> V[Deterministic Replay Contract]
-    V --> C[CI / Benchmarks / Agent Runtime]
+flowchart TD
+    subgraph reference["Python Reference Layer"]
+        py_parse["Trace Parsing"]
+        py_validate["Replay Validation"]
+        py_reports["Benchmark / Report Generation"]
+    end
+
+    subgraph contract["Shared KVTC Contract"]
+        schema["Sidecar Schema"]
+        canonical["Canonical Serialization"]
+        invariants["Replay Invariants"]
+    end
+
+    subgraph rust["Rust Fast Path"]
+        rs_hash["Deterministic Hashing"]
+        rs_verify["Sidecar Verification"]
+        rs_pack["Low-Overhead Packaging"]
+    end
+
+    subgraph runtime["Execution Targets"]
+        tests["Tests"]
+        bench["Benchmarks"]
+        ci["CI / Agent Runtime"]
+    end
+
+    py_parse --> schema
+    py_validate --> invariants
+    py_reports --> bench
+
+    schema --> canonical
+    canonical --> invariants
+
+    rs_hash --> canonical
+    rs_verify --> invariants
+    rs_pack --> runtime
+
+    invariants --> tests
+    invariants --> bench
+    invariants --> ci
 ```
 
 ---
