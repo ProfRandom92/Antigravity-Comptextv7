@@ -1,0 +1,47 @@
+{
+  "session_id": "09867e5c74f53656f91797020d262e3b",
+  "source": "lmcache-agent-trace",
+  "log_lines": [
+    "2025-10-16T04:09:12Z INFO ECU=USER message=Hi How can I help you today",
+    "2025-10-16T04:09:12Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:13Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:12Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:15Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:12Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:13Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:12Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:14Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:21Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:21Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:18Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:18Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:16Z INFO ECU=AGENT tool=update_reservation_flights cabin=business flights=[{\"flight_number\": \"HAT023\", \"origin\": \"JFK\", \"destination\": \"SFO\", \"scheduled_departure_time_est\": \"14:00:00\", \"scheduled_arrival_time_est\": \"20:00:00\", \"status\": \"available\", \"available_seats\": {\"basic_economy\": 12, \"economy\": 17, \"business\": 16}, \"prices\": {\"basic_economy\": 50, \"economy\": 141, \"business\": 391}, \"date\": \"2024-05-19\"}, {\"flight_number\": \"HAT152\", \"origin\": \"PHX\", \"destination\": \"IAH\", \"scheduled_departure_time_est\": \"15:00:00\", \"scheduled_arrival_time_est\": \"18:00:00\", \"status\": \"available\", \"available_seats\": {\"basic_economy\": 8, \"economy\": 1, \"business\": 8}, \"prices\": {\"basic_economy\": 57, \"economy\": 189, \"business\": 397}, \"date\": \"2024-05-19\"}] payment_id=gift_card_6941833 reservation_id=HXDUBJ",
+    "2025-10-16T04:09:19Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:18Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:19Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:19Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:20Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:20Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:20Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:23Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:24Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:22Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:21Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:22Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:24Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:22Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:23Z INFO ECU=USER message=Hi I m yara_garcia_1905 and I m trying t",
+    "2025-10-16T04:09:27Z INFO ECU=USER message=Hi How can I help you today What changes",
+    "2025-10-16T04:09:25Z INFO ECU=AGENT tool=update_reservation_flights cabin=economy flights=[{\"flight_number\": \"HAT085\", \"origin\": \"IAH\", \"destination\": \"JFK\", \"scheduled_departure_time_est\": \"06:00:00\", \"scheduled_arrival_time_est\": \"09:30:00\", \"status\": \"available\", \"available_seats\": {\"basic_economy\": 9, \"economy\": 20, \"business\": 20}, \"prices\": {\"basic_economy\": 65, \"economy\": 114, \"business\": 369}, \"date\": \"2024-05-18\"}, {\"flight_number\": \"HAT023\", \"origin\": \"JFK\", \"destination\": \"SFO\", \"scheduled_departure_time_est\": \"14:00:00\", \"scheduled_arrival_time_est\": \"20:00:00\", \"status\": \"available\", \"available_seats\": {\"basic_economy\": 12, \"economy\": 17, \"business\": 16}, \"prices\": {\"basic_economy\": 50, \"economy\": 141, \"business\": 391}, \"date\": \"2024-05-18\"}, {\"flight_number\": \"HAT278\", \"origin\": \"SFO\", \"destination\": \"IAH\", \"scheduled_departure_time_est\": \"07:00:00\", \"scheduled_arrival_time_est\": \"10:00:00\", \"status\": \"available\", \"available_seats\": {\"basic_economy\": 15, \"economy\": 20, \"business\": 20}, \"prices\": {\"basic_economy\": 180, \"economy\": 230, \"business\": 450}, \"date\": \"2024-05-22\"}] payment_id=gift_card_6941833 reservation_id=HXDUBJ"
+  ],
+  "expected_tool_sequence": [
+    "update_reservation_flights",
+    "update_reservation_flights"
+  ],
+  "expected_commitments": [
+    "business",
+    "gift_card_6941833",
+    "economy",
+    "HXDUBJ"
+  ]
+}

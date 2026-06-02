@@ -1,0 +1,5 @@
+2026-05-26T12:00:00Z INFO ECU=CPC Loop start depth=1
+2026-05-26T12:00:01Z INFO ECU=CPC Loop start depth=2
+2026-05-26T12:00:02Z INFO ECU=CPC Nested operation executed value=42
+2026-05-26T12:00:03Z INFO ECU=CPC Loop end depth=2
+2026-05-26T12:00:04Z INFO ECU=CPC Loop end depth=1

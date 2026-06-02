@@ -1,0 +1,3 @@
+2026-05-26T12:00:00Z WARN ECU=CPC Boundary constraint limit=100
+2026-05-26T12:00:05Z ERROR ECU=CPC User command override limit=150
+2026-05-26T12:00:10Z CRITICAL ECU=CPC Safety cutoff triggered due to conflict

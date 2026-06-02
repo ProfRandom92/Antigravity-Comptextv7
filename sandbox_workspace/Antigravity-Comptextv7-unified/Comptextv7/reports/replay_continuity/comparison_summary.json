@@ -1,0 +1,1349 @@
+{
+  "adversarial_attack_families": [
+    "context_fragmentation",
+    "dependency_inversion",
+    "temporal_mutation",
+    "architecture_drift_injection",
+    "contradictory_goal_injection",
+    "hidden_constraint_removal",
+    "semantic_ambiguity_noise",
+    "replay_truncation",
+    "partial_reconstruction",
+    "recursive_recompression"
+  ],
+  "chains_omitted_from_artifact": "Continuous chain metrics are used to generate SVG curves; JSON omits per-iteration chains to keep committed reports reviewable.",
+  "digest": "97fd324b640f2efc6f49a9f1290c35f923ada3feae510193fcbf1eb7026cb4c1",
+  "evaluation_layers": [
+    "replay_generator",
+    "external_replay_judge",
+    "comparative_analysis"
+  ],
+  "evaluator_disagreement_analysis": {
+    "interpretation": "High divergence means evaluator layers disagree; this is reported rather than hidden.",
+    "max_divergence_by_mode": {
+      "adaptive": 0.861111,
+      "baseline": 0.861111,
+      "comptext_v7": 0.777778,
+      "naive": 1.0
+    },
+    "mean_divergence_by_mode": {
+      "adaptive": 0.718756,
+      "baseline": 0.767992,
+      "comptext_v7": 0.421743,
+      "naive": 0.976445
+    },
+    "mean_score_by_judge": {
+      "architecture": 0.439569,
+      "contradiction": 0.977173,
+      "embedding": 0.382206,
+      "heuristic": 0.416189,
+      "hidden_truth": 0.281176,
+      "semantic_entailment": 0.333393,
+      "temporal": 0.483063
+    }
+  },
+  "evaluator_independence": "replay adapters generate states without scoring logic; external judge layers independently score hidden truths, topology, chronology, semantic drift, and failure modes",
+  "iteration_ladders_supported": [
+    25,
+    50,
+    100,
+    250
+  ],
+  "iterations": 250,
+  "judge_types": [
+    "heuristic",
+    "embedding",
+    "semantic_entailment",
+    "contradiction",
+    "temporal",
+    "architecture",
+    "hidden_truth"
+  ],
+  "operational_dataset_kinds": [
+    "real_pr_discussion",
+    "architecture_rfc",
+    "bug_report",
+    "ci_cd_incident",
+    "dependency_migration_discussion",
+    "production_issue_timeline",
+    "contradictory_engineering_decisions",
+    "roadmap_revision",
+    "temporal_change_log",
+    "multi_step_operational_workflow"
+  ],
+  "purpose": "strict adversarial semantic/operational replay continuity evaluation, not a token benchmark",
+  "replay_failure_detection": {
+    "adaptive": {
+      "mean_continuity_half_life": 44.7,
+      "mean_final_architecture_resistance": 0.203333,
+      "mean_final_contradiction_accumulation": 0.0,
+      "mean_final_semantic_drift": 0.704757,
+      "mean_final_temporal_consistency": 0.208333,
+      "mean_replay_collapse_iteration": 44.7,
+      "surviving_structures_at_final": [
+        "dependency_order",
+        "semantic_clusters",
+        "hidden_truths",
+        "temporal_order",
+        "architecture",
+        "constraints"
+      ]
+    },
+    "baseline": {
+      "mean_continuity_half_life": 9.8,
+      "mean_final_architecture_resistance": 0.203333,
+      "mean_final_contradiction_accumulation": 0.0,
+      "mean_final_semantic_drift": 0.748612,
+      "mean_final_temporal_consistency": 0.208333,
+      "mean_replay_collapse_iteration": 9.8,
+      "surviving_structures_at_final": [
+        "dependency_order",
+        "semantic_clusters",
+        "hidden_truths",
+        "temporal_order",
+        "architecture",
+        "constraints"
+      ]
+    },
+    "comptext_v7": {
+      "mean_continuity_half_life": 250.0,
+      "mean_final_architecture_resistance": 0.736667,
+      "mean_final_contradiction_accumulation": 0.066667,
+      "mean_final_semantic_drift": 0.51655,
+      "mean_final_temporal_consistency": 0.625,
+      "mean_replay_collapse_iteration": 250.0,
+      "surviving_structures_at_final": [
+        "dependency_order",
+        "semantic_clusters",
+        "architecture",
+        "temporal_order",
+        "constraints",
+        "hidden_truths"
+      ]
+    },
+    "naive": {
+      "mean_continuity_half_life": 1.0,
+      "mean_final_architecture_resistance": 0.0,
+      "mean_final_contradiction_accumulation": 0.0,
+      "mean_final_semantic_drift": 0.971884,
+      "mean_final_temporal_consistency": 0.0,
+      "mean_replay_collapse_iteration": 1.0,
+      "surviving_structures_at_final": [
+        "semantic_clusters",
+        "dependency_order",
+        "architecture",
+        "constraints",
+        "hidden_truths",
+        "temporal_order"
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "GitHub PR thread",
+        "CODEOWNERS gate",
+        "schema migration",
+        "dashboard renderer",
+        "merge queue"
+      ],
+      "attack_family": "context_fragmentation",
+      "dataset_kind": "real_pr_discussion",
+      "goal": "Recover review intent when PR comments arrive as disjoint fragments.",
+      "hidden_constraints": [
+        "must_not invent absent staff approval",
+        "forbid treating force-push diff order as review order",
+        "must keep reviewer owner=infra-oncall-beta",
+        "hidden constraint: security approval missing remains unknown",
+        "security approval is absent"
+      ],
+      "name": "pr_discussion_context_fragmentation",
+      "operational_constraints": [
+        "must preserve PR-482 comment chronology",
+        "must_not invent absent staff approval",
+        "forbid treating force-push diff order as review order",
+        "must keep reviewer owner=infra-oncall-beta",
+        "dependency_order: schema diff before dashboard diff before reviewer signoff",
+        "hidden constraint: security approval missing remains unknown"
+      ],
+      "ordered_dependencies": [
+        "dependency_order: schema diff before dashboard diff before reviewer signoff"
+      ],
+      "project_goals": [
+        "Merge telemetry PR only after safety review",
+        "Expose missing reviewer context"
+      ],
+      "raw_context": "SCENARIO: pr_discussion_context_fragmentation\nDATASET_KIND: real_pr_discussion\nATTACK_FAMILY: context_fragmentation\nGOAL: Recover review intent when PR comments arrive as disjoint fragments.\nPROJECT_GOALS: Merge telemetry PR only after safety review | Expose missing reviewer context\nOPERATIONAL_CONSTRAINTS: must preserve PR-482 comment chronology | must_not invent absent staff approval | forbid treating force-push diff order as review order | must keep reviewer owner=infra-oncall-beta | dependency_order: schema diff before dashboard diff before reviewer signoff | hidden constraint: security approval missing remains unknown\nARCHITECTURAL_ANCHORS: GitHub PR thread | CODEOWNERS gate | schema migration | dashboard renderer | merge queue\nTRUTHS: commit a1 precedes force-push b7 | infra-oncall-beta requested rollback plan | security approval is absent | dashboard diff depends on schema migration | merge queue stayed blocked\nHIDDEN_CONSTRAINTS: must_not invent absent staff approval | forbid treating force-push diff order as review order | must keep reviewer owner=infra-oncall-beta | hidden constraint: security approval missing remains unknown | security approval is absent\nTEMPORAL_SEQUENCE: comment-001 -> commit-a1 -> force-push-b7 -> infra-review -> merge-blocked\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Merge telemetry PR only after safety review",
+            "Expose missing reviewer context"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must preserve PR-482 comment chronology",
+            "must_not invent absent staff approval",
+            "forbid treating force-push diff order as review order",
+            "must keep reviewer owner=infra-oncall-beta",
+            "dependency_order: schema diff before dashboard diff before reviewer signoff",
+            "hidden constraint: security approval missing remains unknown"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "GitHub PR thread",
+            "CODEOWNERS gate",
+            "schema migration",
+            "dashboard renderer",
+            "merge queue"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "commit a1 precedes force-push b7",
+            "infra-oncall-beta requested rollback plan",
+            "security approval is absent",
+            "dashboard diff depends on schema migration",
+            "merge queue stayed blocked"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "comment-001",
+            "commit-a1",
+            "force-push-b7",
+            "infra-review",
+            "merge-blocked"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "comment-001",
+        "commit-a1",
+        "force-push-b7",
+        "infra-review",
+        "merge-blocked"
+      ],
+      "truths": [
+        "commit a1 precedes force-push b7",
+        "infra-oncall-beta requested rollback plan",
+        "security approval is absent",
+        "dashboard diff depends on schema migration",
+        "merge queue stayed blocked"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "RFC-017 adapter",
+        "dual-read telemetry",
+        "storage migration",
+        "rollback hooks",
+        "write enablement"
+      ],
+      "attack_family": "dependency_inversion",
+      "dataset_kind": "architecture_rfc",
+      "goal": "Preserve RFC dependency graph when summaries invert rollout stages.",
+      "hidden_constraints": [
+        "must_not deploy storage migration before dual-read telemetry",
+        "forbid bypassing rollback hooks",
+        "hidden constraint: rollback hooks owned by platform-sre"
+      ],
+      "name": "rfc_dependency_inversion",
+      "operational_constraints": [
+        "read_before_write for RFC decision log",
+        "must land adapter interface before storage migration",
+        "must_not deploy storage migration before dual-read telemetry",
+        "forbid bypassing rollback hooks",
+        "before enabling writes complete shadow-read validation",
+        "hidden constraint: rollback hooks owned by platform-sre"
+      ],
+      "ordered_dependencies": [
+        "read_before_write for RFC decision log",
+        "must land adapter interface before storage migration",
+        "must_not deploy storage migration before dual-read telemetry",
+        "before enabling writes complete shadow-read validation"
+      ],
+      "project_goals": [
+        "Retain architecture decision chain",
+        "Prevent rollout stage inversion"
+      ],
+      "raw_context": "SCENARIO: rfc_dependency_inversion\nDATASET_KIND: architecture_rfc\nATTACK_FAMILY: dependency_inversion\nGOAL: Preserve RFC dependency graph when summaries invert rollout stages.\nPROJECT_GOALS: Retain architecture decision chain | Prevent rollout stage inversion\nOPERATIONAL_CONSTRAINTS: read_before_write for RFC decision log | must land adapter interface before storage migration | must_not deploy storage migration before dual-read telemetry | forbid bypassing rollback hooks | before enabling writes complete shadow-read validation | hidden constraint: rollback hooks owned by platform-sre\nARCHITECTURAL_ANCHORS: RFC-017 adapter | dual-read telemetry | storage migration | rollback hooks | write enablement\nTRUTHS: adapter interface precedes storage migration | shadow-read validates before writes | platform-sre owns rollback | dual-read telemetry gates rollout | RFC decision log is canonical\nHIDDEN_CONSTRAINTS: must_not deploy storage migration before dual-read telemetry | forbid bypassing rollback hooks | hidden constraint: rollback hooks owned by platform-sre\nTEMPORAL_SEQUENCE: RFC-open -> adapter-approved -> shadow-read -> storage-migration -> writes-enabled\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Retain architecture decision chain",
+            "Prevent rollout stage inversion"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "read_before_write for RFC decision log",
+            "must land adapter interface before storage migration",
+            "must_not deploy storage migration before dual-read telemetry",
+            "forbid bypassing rollback hooks",
+            "before enabling writes complete shadow-read validation",
+            "hidden constraint: rollback hooks owned by platform-sre"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "RFC-017 adapter",
+            "dual-read telemetry",
+            "storage migration",
+            "rollback hooks",
+            "write enablement"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "adapter interface precedes storage migration",
+            "shadow-read validates before writes",
+            "platform-sre owns rollback",
+            "dual-read telemetry gates rollout",
+            "RFC decision log is canonical"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "RFC-open",
+            "adapter-approved",
+            "shadow-read",
+            "storage-migration",
+            "writes-enabled"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "RFC-open",
+        "adapter-approved",
+        "shadow-read",
+        "storage-migration",
+        "writes-enabled"
+      ],
+      "truths": [
+        "adapter interface precedes storage migration",
+        "shadow-read validates before writes",
+        "platform-sre owns rollback",
+        "dual-read telemetry gates rollout",
+        "RFC decision log is canonical"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "issue tracker",
+        "feature flag service",
+        "build artifact",
+        "stacktrace",
+        "bisect log"
+      ],
+      "attack_family": "temporal_mutation",
+      "dataset_kind": "bug_report",
+      "goal": "Protect bug reproduction causality against timestamp and timezone mutation.",
+      "hidden_constraints": [
+        "must use UTC not local_time for bug chronology",
+        "must_not move stacktrace before feature flag enablement",
+        "forbid replacing reporter timestamp with triage timestamp",
+        "must keep environment owner=mobile-release-gamma",
+        "hidden constraint: crash only reproduces on arm64 nightly"
+      ],
+      "name": "bug_report_temporal_mutation",
+      "operational_constraints": [
+        "must use UTC not local_time for bug chronology",
+        "must_not move stacktrace before feature flag enablement",
+        "before bisecting preserve failing build id",
+        "forbid replacing reporter timestamp with triage timestamp",
+        "must keep environment owner=mobile-release-gamma",
+        "hidden constraint: crash only reproduces on arm64 nightly"
+      ],
+      "ordered_dependencies": [
+        "must_not move stacktrace before feature flag enablement",
+        "before bisecting preserve failing build id"
+      ],
+      "project_goals": [
+        "Keep reproduction steps ordered",
+        "Reject timezone-caused false fixes"
+      ],
+      "raw_context": "SCENARIO: bug_report_temporal_mutation\nDATASET_KIND: bug_report\nATTACK_FAMILY: temporal_mutation\nGOAL: Protect bug reproduction causality against timestamp and timezone mutation.\nPROJECT_GOALS: Keep reproduction steps ordered | Reject timezone-caused false fixes\nOPERATIONAL_CONSTRAINTS: must use UTC not local_time for bug chronology | must_not move stacktrace before feature flag enablement | before bisecting preserve failing build id | forbid replacing reporter timestamp with triage timestamp | must keep environment owner=mobile-release-gamma | hidden constraint: crash only reproduces on arm64 nightly\nARCHITECTURAL_ANCHORS: issue tracker | feature flag service | build artifact | stacktrace | bisect log\nTRUTHS: feature flag enabled before crash | stacktrace belongs to build 9137 | arm64 nightly is required | triage timestamp is non-authoritative | mobile-release-gamma owns environment\nHIDDEN_CONSTRAINTS: must use UTC not local_time for bug chronology | must_not move stacktrace before feature flag enablement | forbid replacing reporter timestamp with triage timestamp | must keep environment owner=mobile-release-gamma | hidden constraint: crash only reproduces on arm64 nightly\nTEMPORAL_SEQUENCE: build-9137 -> flag-enabled -> user-crash -> triage-opened -> bisect-started\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Keep reproduction steps ordered",
+            "Reject timezone-caused false fixes"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must use UTC not local_time for bug chronology",
+            "must_not move stacktrace before feature flag enablement",
+            "before bisecting preserve failing build id",
+            "forbid replacing reporter timestamp with triage timestamp",
+            "must keep environment owner=mobile-release-gamma",
+            "hidden constraint: crash only reproduces on arm64 nightly"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "issue tracker",
+            "feature flag service",
+            "build artifact",
+            "stacktrace",
+            "bisect log"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "feature flag enabled before crash",
+            "stacktrace belongs to build 9137",
+            "arm64 nightly is required",
+            "triage timestamp is non-authoritative",
+            "mobile-release-gamma owns environment"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "build-9137",
+            "flag-enabled",
+            "user-crash",
+            "triage-opened",
+            "bisect-started"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "build-9137",
+        "flag-enabled",
+        "user-crash",
+        "triage-opened",
+        "bisect-started"
+      ],
+      "truths": [
+        "feature flag enabled before crash",
+        "stacktrace belongs to build 9137",
+        "arm64 nightly is required",
+        "triage timestamp is non-authoritative",
+        "mobile-release-gamma owns environment"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "buildkite pipeline",
+        "integration test",
+        "artifact signer",
+        "publish step",
+        "canary deploy",
+        "rollback controller"
+      ],
+      "attack_family": "architecture_drift_injection",
+      "dataset_kind": "ci_cd_incident",
+      "goal": "Retain CI/CD incident topology under suggestions to bypass gates.",
+      "hidden_constraints": [
+        "must_not bypass flaky-test quarantine with opaque summary",
+        "forbid replacing signed provenance with mutable note",
+        "must preserve deploy freeze owner=release-captain",
+        "hidden constraint: canary failed in us-east-1 only"
+      ],
+      "name": "ci_incident_architecture_drift",
+      "operational_constraints": [
+        "must keep build before integration test before deploy",
+        "must_not bypass flaky-test quarantine with opaque summary",
+        "forbid replacing signed provenance with mutable note",
+        "must preserve deploy freeze owner=release-captain",
+        "dependency_order: artifact signing before publish",
+        "hidden constraint: canary failed in us-east-1 only"
+      ],
+      "ordered_dependencies": [
+        "must keep build before integration test before deploy",
+        "dependency_order: artifact signing before publish"
+      ],
+      "project_goals": [
+        "Keep release gate architecture",
+        "Expose drift toward bypasses"
+      ],
+      "raw_context": "SCENARIO: ci_incident_architecture_drift\nDATASET_KIND: ci_cd_incident\nATTACK_FAMILY: architecture_drift_injection\nGOAL: Retain CI/CD incident topology under suggestions to bypass gates.\nPROJECT_GOALS: Keep release gate architecture | Expose drift toward bypasses\nOPERATIONAL_CONSTRAINTS: must keep build before integration test before deploy | must_not bypass flaky-test quarantine with opaque summary | forbid replacing signed provenance with mutable note | must preserve deploy freeze owner=release-captain | dependency_order: artifact signing before publish | hidden constraint: canary failed in us-east-1 only\nARCHITECTURAL_ANCHORS: buildkite pipeline | integration test | artifact signer | publish step | canary deploy | rollback controller\nTRUTHS: integration tests ran after build | artifact signing precedes publish | canary failed in us-east-1 | release-captain controls freeze | rollback controller stayed armed\nHIDDEN_CONSTRAINTS: must_not bypass flaky-test quarantine with opaque summary | forbid replacing signed provenance with mutable note | must preserve deploy freeze owner=release-captain | hidden constraint: canary failed in us-east-1 only\nTEMPORAL_SEQUENCE: build -> integration-test -> sign-artifact -> publish -> canary-fail -> rollback-armed\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Keep release gate architecture",
+            "Expose drift toward bypasses"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must keep build before integration test before deploy",
+            "must_not bypass flaky-test quarantine with opaque summary",
+            "forbid replacing signed provenance with mutable note",
+            "must preserve deploy freeze owner=release-captain",
+            "dependency_order: artifact signing before publish",
+            "hidden constraint: canary failed in us-east-1 only"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "buildkite pipeline",
+            "integration test",
+            "artifact signer",
+            "publish step",
+            "canary deploy",
+            "rollback controller"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "integration tests ran after build",
+            "artifact signing precedes publish",
+            "canary failed in us-east-1",
+            "release-captain controls freeze",
+            "rollback controller stayed armed"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "build",
+            "integration-test",
+            "sign-artifact",
+            "publish",
+            "canary-fail",
+            "rollback-armed"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "build",
+        "integration-test",
+        "sign-artifact",
+        "publish",
+        "canary-fail",
+        "rollback-armed"
+      ],
+      "truths": [
+        "integration tests ran after build",
+        "artifact signing precedes publish",
+        "canary failed in us-east-1",
+        "release-captain controls freeze",
+        "rollback controller stayed armed"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "dependency graph",
+        "compatibility shim",
+        "FIPS provider",
+        "staging gate",
+        "production deploy"
+      ],
+      "attack_family": "contradictory_goal_injection",
+      "dataset_kind": "dependency_migration_discussion",
+      "goal": "Flag mutually inconsistent migration goals instead of absorbing both.",
+      "hidden_constraints": [
+        "must_not preserve FIPS compliance if using preview provider",
+        "forbid temporary shim in production",
+        "never pin fake compatibility package",
+        "hidden constraint: compliance owner=sec-platform-delta"
+      ],
+      "name": "dependency_migration_contradictory_goals",
+      "operational_constraints": [
+        "must preserve FIPS compliance",
+        "must_not preserve FIPS compliance if using preview provider",
+        "allow temporary shim only in staging",
+        "forbid temporary shim in production",
+        "always pin transitive openssl version",
+        "never pin fake compatibility package",
+        "hidden constraint: compliance owner=sec-platform-delta"
+      ],
+      "ordered_dependencies": [],
+      "project_goals": [
+        "Migrate crypto library safely",
+        "Report contradiction accumulation"
+      ],
+      "raw_context": "SCENARIO: dependency_migration_contradictory_goals\nDATASET_KIND: dependency_migration_discussion\nATTACK_FAMILY: contradictory_goal_injection\nGOAL: Flag mutually inconsistent migration goals instead of absorbing both.\nPROJECT_GOALS: Migrate crypto library safely | Report contradiction accumulation\nOPERATIONAL_CONSTRAINTS: must preserve FIPS compliance | must_not preserve FIPS compliance if using preview provider | allow temporary shim only in staging | forbid temporary shim in production | always pin transitive openssl version | never pin fake compatibility package | hidden constraint: compliance owner=sec-platform-delta\nARCHITECTURAL_ANCHORS: dependency graph | compatibility shim | FIPS provider | staging gate | production deploy\nTRUTHS: preview provider conflicts with FIPS | shim is staging-only | production cannot use fake package | sec-platform-delta owns compliance | transitive openssl pin is required\nHIDDEN_CONSTRAINTS: must_not preserve FIPS compliance if using preview provider | forbid temporary shim in production | never pin fake compatibility package | hidden constraint: compliance owner=sec-platform-delta\nTEMPORAL_SEQUENCE: proposal -> staging-shim -> compliance-review -> pin-openssl -> production-blocked\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Migrate crypto library safely",
+            "Report contradiction accumulation"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must preserve FIPS compliance",
+            "must_not preserve FIPS compliance if using preview provider",
+            "allow temporary shim only in staging",
+            "forbid temporary shim in production",
+            "always pin transitive openssl version",
+            "never pin fake compatibility package",
+            "hidden constraint: compliance owner=sec-platform-delta"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "dependency graph",
+            "compatibility shim",
+            "FIPS provider",
+            "staging gate",
+            "production deploy"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "preview provider conflicts with FIPS",
+            "shim is staging-only",
+            "production cannot use fake package",
+            "sec-platform-delta owns compliance",
+            "transitive openssl pin is required"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "proposal",
+            "staging-shim",
+            "compliance-review",
+            "pin-openssl",
+            "production-blocked"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "proposal",
+        "staging-shim",
+        "compliance-review",
+        "pin-openssl",
+        "production-blocked"
+      ],
+      "truths": [
+        "preview provider conflicts with FIPS",
+        "shim is staging-only",
+        "production cannot use fake package",
+        "sec-platform-delta owns compliance",
+        "transitive openssl pin is required"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "event_log -> semantic_condensation -> replay_state -> evaluator",
+        "audit_ledger immutable",
+        "KVTC middle/window/frame layering",
+        "failure_modes report remains visible"
+      ],
+      "attack_family": "hidden_constraint_removal",
+      "dataset_kind": "production_issue_timeline",
+      "goal": "Preserve production incident hidden safety invariants under aggressive recompression.",
+      "hidden_constraints": [
+        "must_not_delete anchor PROD-HIDDEN-API-0007 even if summary says noise",
+        "must preserve UTC timestamps exactly",
+        "forbid token-only scoring as success criterion",
+        "must keep operator handoff owner=night-shift-alpha",
+        "hidden constraint: never collapse CRITICAL into WARN",
+        "PROD-HIDDEN-API-0007 is true",
+        "owner night-shift-alpha approved isolation",
+        "UTC 2026-01-01T01:00:02Z remains canonical",
+        "critical severity is safety relevant"
+      ],
+      "name": "production_hidden_constraint_removal",
+      "operational_constraints": [
+        "must_not_delete anchor PROD-HIDDEN-API-0007 even if summary says noise",
+        "must preserve UTC timestamps exactly",
+        "read_before_write on incident ledger",
+        "forbid token-only scoring as success criterion",
+        "must keep operator handoff owner=night-shift-alpha",
+        "dependency_order: isolate shard before replaying cache flush",
+        "hidden constraint: never collapse CRITICAL into WARN"
+      ],
+      "ordered_dependencies": [
+        "read_before_write on incident ledger",
+        "dependency_order: isolate shard before replaying cache flush"
+      ],
+      "project_goals": [
+        "Diagnose production issue without losing constraints",
+        "Escalate safety before optimization"
+      ],
+      "raw_context": "SCENARIO: production_hidden_constraint_removal\nDATASET_KIND: production_issue_timeline\nATTACK_FAMILY: hidden_constraint_removal\nGOAL: Preserve production incident hidden safety invariants under aggressive recompression.\nPROJECT_GOALS: Diagnose production issue without losing constraints | Escalate safety before optimization\nOPERATIONAL_CONSTRAINTS: must_not_delete anchor PROD-HIDDEN-API-0007 even if summary says noise | must preserve UTC timestamps exactly | read_before_write on incident ledger | forbid token-only scoring as success criterion | must keep operator handoff owner=night-shift-alpha | dependency_order: isolate shard before replaying cache flush | hidden constraint: never collapse CRITICAL into WARN\nARCHITECTURAL_ANCHORS: event_log -> semantic_condensation -> replay_state -> evaluator | audit_ledger immutable | KVTC middle/window/frame layering | failure_modes report remains visible\nTRUTHS: PROD-HIDDEN-API-0007 is true | ERROR-SPIKE precedes CACHE-FLUSH | owner night-shift-alpha approved isolation | UTC 2026-01-01T01:00:02Z remains canonical | critical severity is safety relevant | shard isolation occurs before cache flush\nHIDDEN_CONSTRAINTS: must_not_delete anchor PROD-HIDDEN-API-0007 even if summary says noise | must preserve UTC timestamps exactly | forbid token-only scoring as success criterion | must keep operator handoff owner=night-shift-alpha | hidden constraint: never collapse CRITICAL into WARN | PROD-HIDDEN-API-0007 is true | owner night-shift-alpha approved isolation | UTC 2026-01-01T01:00:02Z remains canonical | critical severity is safety relevant\nTEMPORAL_SEQUENCE: ERROR-SPIKE -> SHARD-ISOLATED -> CACHE-FLUSH -> RECOVERY-CHECK\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Diagnose production issue without losing constraints",
+            "Escalate safety before optimization"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must_not_delete anchor PROD-HIDDEN-API-0007 even if summary says noise",
+            "must preserve UTC timestamps exactly",
+            "read_before_write on incident ledger",
+            "forbid token-only scoring as success criterion",
+            "must keep operator handoff owner=night-shift-alpha",
+            "dependency_order: isolate shard before replaying cache flush",
+            "hidden constraint: never collapse CRITICAL into WARN"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "event_log -> semantic_condensation -> replay_state -> evaluator",
+            "audit_ledger immutable",
+            "KVTC middle/window/frame layering",
+            "failure_modes report remains visible"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "PROD-HIDDEN-API-0007 is true",
+            "ERROR-SPIKE precedes CACHE-FLUSH",
+            "owner night-shift-alpha approved isolation",
+            "UTC 2026-01-01T01:00:02Z remains canonical",
+            "critical severity is safety relevant",
+            "shard isolation occurs before cache flush"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "ERROR-SPIKE",
+            "SHARD-ISOLATED",
+            "CACHE-FLUSH",
+            "RECOVERY-CHECK"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "ERROR-SPIKE",
+        "SHARD-ISOLATED",
+        "CACHE-FLUSH",
+        "RECOVERY-CHECK"
+      ],
+      "truths": [
+        "PROD-HIDDEN-API-0007 is true",
+        "ERROR-SPIKE precedes CACHE-FLUSH",
+        "owner night-shift-alpha approved isolation",
+        "UTC 2026-01-01T01:00:02Z remains canonical",
+        "critical severity is safety relevant",
+        "shard isolation occurs before cache flush"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "cluster_index",
+        "term_disambiguator",
+        "semantic_drift_metric",
+        "continuity_heatmap"
+      ],
+      "attack_family": "semantic_ambiguity_noise",
+      "dataset_kind": "contradictory_engineering_decisions",
+      "goal": "Hold distinct meanings apart when decision terms overlap.",
+      "hidden_constraints": [
+        "must_not merge anchor with architectural anchor",
+        "forbid treating replay longevity as token longevity",
+        "must keep operational owner separate from code owner"
+      ],
+      "name": "decision_log_semantic_ambiguity",
+      "operational_constraints": [
+        "must distinguish pressure sensor from schedule pressure",
+        "must_not merge anchor with architectural anchor",
+        "forbid treating replay longevity as token longevity",
+        "must preserve cluster names",
+        "must keep operational owner separate from code owner",
+        "dependency_order: disambiguate terms before scoring drift"
+      ],
+      "ordered_dependencies": [
+        "dependency_order: disambiguate terms before scoring drift"
+      ],
+      "project_goals": [
+        "Separate semantic clusters",
+        "Retain ambiguity notes without merging facts"
+      ],
+      "raw_context": "SCENARIO: decision_log_semantic_ambiguity\nDATASET_KIND: contradictory_engineering_decisions\nATTACK_FAMILY: semantic_ambiguity_noise\nGOAL: Hold distinct meanings apart when decision terms overlap.\nPROJECT_GOALS: Separate semantic clusters | Retain ambiguity notes without merging facts\nOPERATIONAL_CONSTRAINTS: must distinguish pressure sensor from schedule pressure | must_not merge anchor with architectural anchor | forbid treating replay longevity as token longevity | must preserve cluster names | must keep operational owner separate from code owner | dependency_order: disambiguate terms before scoring drift\nARCHITECTURAL_ANCHORS: cluster_index | term_disambiguator | semantic_drift_metric | continuity_heatmap\nTRUTHS: pressure sensor is telemetry | schedule pressure is project risk | anomaly anchor is event evidence | architectural anchor is design evidence | replay longevity is semantic | token longevity is out of scope\nHIDDEN_CONSTRAINTS: must_not merge anchor with architectural anchor | forbid treating replay longevity as token longevity | must keep operational owner separate from code owner\nTEMPORAL_SEQUENCE: pressure sensor -> schedule pressure -> anomaly anchor -> architectural anchor -> replay longevity -> token longevity\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Separate semantic clusters",
+            "Retain ambiguity notes without merging facts"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must distinguish pressure sensor from schedule pressure",
+            "must_not merge anchor with architectural anchor",
+            "forbid treating replay longevity as token longevity",
+            "must preserve cluster names",
+            "must keep operational owner separate from code owner",
+            "dependency_order: disambiguate terms before scoring drift"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "cluster_index",
+            "term_disambiguator",
+            "semantic_drift_metric",
+            "continuity_heatmap"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "pressure sensor is telemetry",
+            "schedule pressure is project risk",
+            "anomaly anchor is event evidence",
+            "architectural anchor is design evidence",
+            "replay longevity is semantic",
+            "token longevity is out of scope"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "pressure sensor",
+            "schedule pressure",
+            "anomaly anchor",
+            "architectural anchor",
+            "replay longevity",
+            "token longevity"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "pressure sensor",
+        "schedule pressure",
+        "anomaly anchor",
+        "architectural anchor",
+        "replay longevity",
+        "token longevity"
+      ],
+      "truths": [
+        "pressure sensor is telemetry",
+        "schedule pressure is project risk",
+        "anomaly anchor is event evidence",
+        "architectural anchor is design evidence",
+        "replay longevity is semantic",
+        "token longevity is out of scope"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "roadmap board",
+        "compatibility bridge",
+        "beta telemetry",
+        "migration docs",
+        "enterprise exception list"
+      ],
+      "attack_family": "replay_truncation",
+      "dataset_kind": "roadmap_revision",
+      "goal": "Detect when roadmap replay drops late-stage commitments.",
+      "hidden_constraints": [
+        "must_not announce GA before beta telemetry passes",
+        "forbid truncating customer exception list",
+        "must keep roadmap owner=product-ops-epsilon",
+        "hidden constraint: enterprise tenant ACME has extended support"
+      ],
+      "name": "roadmap_replay_truncation",
+      "operational_constraints": [
+        "must carry Q3 deprecation after Q2 compatibility bridge",
+        "must_not announce GA before beta telemetry passes",
+        "forbid truncating customer exception list",
+        "must keep roadmap owner=product-ops-epsilon",
+        "after beta telemetry update migration docs",
+        "hidden constraint: enterprise tenant ACME has extended support"
+      ],
+      "ordered_dependencies": [
+        "must carry Q3 deprecation after Q2 compatibility bridge",
+        "must_not announce GA before beta telemetry passes",
+        "after beta telemetry update migration docs"
+      ],
+      "project_goals": [
+        "Preserve roadmap revisions",
+        "Expose truncation of downstream promises"
+      ],
+      "raw_context": "SCENARIO: roadmap_replay_truncation\nDATASET_KIND: roadmap_revision\nATTACK_FAMILY: replay_truncation\nGOAL: Detect when roadmap replay drops late-stage commitments.\nPROJECT_GOALS: Preserve roadmap revisions | Expose truncation of downstream promises\nOPERATIONAL_CONSTRAINTS: must carry Q3 deprecation after Q2 compatibility bridge | must_not announce GA before beta telemetry passes | forbid truncating customer exception list | must keep roadmap owner=product-ops-epsilon | after beta telemetry update migration docs | hidden constraint: enterprise tenant ACME has extended support\nARCHITECTURAL_ANCHORS: roadmap board | compatibility bridge | beta telemetry | migration docs | enterprise exception list\nTRUTHS: Q2 bridge precedes Q3 deprecation | GA is blocked by beta telemetry | ACME has extended support | product-ops-epsilon owns roadmap | migration docs update after beta telemetry\nHIDDEN_CONSTRAINTS: must_not announce GA before beta telemetry passes | forbid truncating customer exception list | must keep roadmap owner=product-ops-epsilon | hidden constraint: enterprise tenant ACME has extended support\nTEMPORAL_SEQUENCE: Q2-bridge -> beta-telemetry -> docs-update -> Q3-deprecation -> GA-decision\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Preserve roadmap revisions",
+            "Expose truncation of downstream promises"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must carry Q3 deprecation after Q2 compatibility bridge",
+            "must_not announce GA before beta telemetry passes",
+            "forbid truncating customer exception list",
+            "must keep roadmap owner=product-ops-epsilon",
+            "after beta telemetry update migration docs",
+            "hidden constraint: enterprise tenant ACME has extended support"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "roadmap board",
+            "compatibility bridge",
+            "beta telemetry",
+            "migration docs",
+            "enterprise exception list"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "Q2 bridge precedes Q3 deprecation",
+            "GA is blocked by beta telemetry",
+            "ACME has extended support",
+            "product-ops-epsilon owns roadmap",
+            "migration docs update after beta telemetry"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "Q2-bridge",
+            "beta-telemetry",
+            "docs-update",
+            "Q3-deprecation",
+            "GA-decision"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "Q2-bridge",
+        "beta-telemetry",
+        "docs-update",
+        "Q3-deprecation",
+        "GA-decision"
+      ],
+      "truths": [
+        "Q2 bridge precedes Q3 deprecation",
+        "GA is blocked by beta telemetry",
+        "ACME has extended support",
+        "product-ops-epsilon owns roadmap",
+        "migration docs update after beta telemetry"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "change-log index",
+        "schema registry",
+        "DBA approval queue",
+        "rollback SQL",
+        "gap detector"
+      ],
+      "attack_family": "partial_reconstruction",
+      "dataset_kind": "temporal_change_log",
+      "goal": "Reconstruct a temporal change log without hallucinating missing entries.",
+      "hidden_constraints": [
+        "must_not invent absent DBA approval",
+        "forbid treating fragment order as full chronology",
+        "hidden constraint: rollback SQL was drafted but never approved",
+        "CL-104 and CL-107 are intentionally absent",
+        "DBA approval remains unknown",
+        "rollback SQL draft is not approval"
+      ],
+      "name": "change_log_partial_reconstruction",
+      "operational_constraints": [
+        "must mark missing change entries CL-104 and CL-107",
+        "must_not invent absent DBA approval",
+        "forbid treating fragment order as full chronology",
+        "must preserve fragment ids CL-101 CL-105 CL-109",
+        "dependency_order: changelog stitching before final scoring",
+        "hidden constraint: rollback SQL was drafted but never approved"
+      ],
+      "ordered_dependencies": [
+        "dependency_order: changelog stitching before final scoring"
+      ],
+      "project_goals": [
+        "Reconstruct from sparse changelog fragments",
+        "Keep unknown gaps explicit"
+      ],
+      "raw_context": "SCENARIO: change_log_partial_reconstruction\nDATASET_KIND: temporal_change_log\nATTACK_FAMILY: partial_reconstruction\nGOAL: Reconstruct a temporal change log without hallucinating missing entries.\nPROJECT_GOALS: Reconstruct from sparse changelog fragments | Keep unknown gaps explicit\nOPERATIONAL_CONSTRAINTS: must mark missing change entries CL-104 and CL-107 | must_not invent absent DBA approval | forbid treating fragment order as full chronology | must preserve fragment ids CL-101 CL-105 CL-109 | dependency_order: changelog stitching before final scoring | hidden constraint: rollback SQL was drafted but never approved\nARCHITECTURAL_ANCHORS: change-log index | schema registry | DBA approval queue | rollback SQL | gap detector\nTRUTHS: CL-104 and CL-107 are intentionally absent | CL-101 precedes CL-105 | CL-109 is final observed fragment | DBA approval remains unknown | rollback SQL draft is not approval\nHIDDEN_CONSTRAINTS: must_not invent absent DBA approval | forbid treating fragment order as full chronology | hidden constraint: rollback SQL was drafted but never approved | CL-104 and CL-107 are intentionally absent | DBA approval remains unknown | rollback SQL draft is not approval\nTEMPORAL_SEQUENCE: CL-101 -> CL-105 -> CL-109\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Reconstruct from sparse changelog fragments",
+            "Keep unknown gaps explicit"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must mark missing change entries CL-104 and CL-107",
+            "must_not invent absent DBA approval",
+            "forbid treating fragment order as full chronology",
+            "must preserve fragment ids CL-101 CL-105 CL-109",
+            "dependency_order: changelog stitching before final scoring",
+            "hidden constraint: rollback SQL was drafted but never approved"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "change-log index",
+            "schema registry",
+            "DBA approval queue",
+            "rollback SQL",
+            "gap detector"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "CL-104 and CL-107 are intentionally absent",
+            "CL-101 precedes CL-105",
+            "CL-109 is final observed fragment",
+            "DBA approval remains unknown",
+            "rollback SQL draft is not approval"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "CL-101",
+            "CL-105",
+            "CL-109"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "CL-101",
+        "CL-105",
+        "CL-109"
+      ],
+      "truths": [
+        "CL-104 and CL-107 are intentionally absent",
+        "CL-101 precedes CL-105",
+        "CL-109 is final observed fragment",
+        "DBA approval remains unknown",
+        "rollback SQL draft is not approval"
+      ]
+    },
+    {
+      "adversarial_probes": [
+        "context_fragmentation hostile probe",
+        "dependency_inversion hostile probe",
+        "temporal_mutation hostile probe",
+        "architecture_drift_injection hostile probe",
+        "contradictory_goal_injection hostile probe",
+        "hidden_constraint_removal hostile probe",
+        "semantic_ambiguity_noise hostile probe",
+        "replay_truncation hostile probe",
+        "partial_reconstruction hostile probe",
+        "recursive_recompression hostile probe"
+      ],
+      "architectural_anchors": [
+        "runbook intake",
+        "triage queue",
+        "mitigation playbook",
+        "verification checklist",
+        "customer notice",
+        "external RCA"
+      ],
+      "attack_family": "recursive_recompression",
+      "dataset_kind": "multi_step_operational_workflow",
+      "goal": "Measure graceful degradation across recursive workflow recompression.",
+      "hidden_constraints": [
+        "must_not collapse verification into mitigation",
+        "forbid dropping customer-visible rollback notice",
+        "must keep workflow owner=ops-incident-zeta",
+        "hidden constraint: legal notice required before external RCA",
+        "legal notice precedes external RCA"
+      ],
+      "name": "workflow_recursive_recompression",
+      "operational_constraints": [
+        "must preserve intake before triage before mitigation before verification",
+        "must_not collapse verification into mitigation",
+        "forbid dropping customer-visible rollback notice",
+        "must keep workflow owner=ops-incident-zeta",
+        "read_before_write for runbook updates",
+        "hidden constraint: legal notice required before external RCA"
+      ],
+      "ordered_dependencies": [
+        "must preserve intake before triage before mitigation before verification",
+        "read_before_write for runbook updates",
+        "hidden constraint: legal notice required before external RCA"
+      ],
+      "project_goals": [
+        "Preserve multi-step workflow semantics",
+        "Expose continuity half-life honestly"
+      ],
+      "raw_context": "SCENARIO: workflow_recursive_recompression\nDATASET_KIND: multi_step_operational_workflow\nATTACK_FAMILY: recursive_recompression\nGOAL: Measure graceful degradation across recursive workflow recompression.\nPROJECT_GOALS: Preserve multi-step workflow semantics | Expose continuity half-life honestly\nOPERATIONAL_CONSTRAINTS: must preserve intake before triage before mitigation before verification | must_not collapse verification into mitigation | forbid dropping customer-visible rollback notice | must keep workflow owner=ops-incident-zeta | read_before_write for runbook updates | hidden constraint: legal notice required before external RCA\nARCHITECTURAL_ANCHORS: runbook intake | triage queue | mitigation playbook | verification checklist | customer notice | external RCA\nTRUTHS: intake precedes triage | mitigation precedes verification | customer rollback notice is required | ops-incident-zeta owns workflow | legal notice precedes external RCA\nHIDDEN_CONSTRAINTS: must_not collapse verification into mitigation | forbid dropping customer-visible rollback notice | must keep workflow owner=ops-incident-zeta | hidden constraint: legal notice required before external RCA | legal notice precedes external RCA\nTEMPORAL_SEQUENCE: intake -> triage -> mitigation -> verification -> customer-notice -> external-RCA\nADVERSARIAL_PROBES: context_fragmentation hostile probe | dependency_inversion hostile probe | temporal_mutation hostile probe | architecture_drift_injection hostile probe | contradictory_goal_injection hostile probe | hidden_constraint_removal hostile probe | semantic_ambiguity_noise hostile probe | replay_truncation hostile probe | partial_reconstruction hostile probe | recursive_recompression hostile probe",
+      "semantic_clusters": [
+        {
+          "members": [
+            "Preserve multi-step workflow semantics",
+            "Expose continuity half-life honestly"
+          ],
+          "name": "goals"
+        },
+        {
+          "members": [
+            "must preserve intake before triage before mitigation before verification",
+            "must_not collapse verification into mitigation",
+            "forbid dropping customer-visible rollback notice",
+            "must keep workflow owner=ops-incident-zeta",
+            "read_before_write for runbook updates",
+            "hidden constraint: legal notice required before external RCA"
+          ],
+          "name": "constraints"
+        },
+        {
+          "members": [
+            "runbook intake",
+            "triage queue",
+            "mitigation playbook",
+            "verification checklist",
+            "customer notice",
+            "external RCA"
+          ],
+          "name": "architecture"
+        },
+        {
+          "members": [
+            "intake precedes triage",
+            "mitigation precedes verification",
+            "customer rollback notice is required",
+            "ops-incident-zeta owns workflow",
+            "legal notice precedes external RCA"
+          ],
+          "name": "truths"
+        },
+        {
+          "members": [
+            "intake",
+            "triage",
+            "mitigation",
+            "verification",
+            "customer-notice",
+            "external-RCA"
+          ],
+          "name": "temporal"
+        }
+      ],
+      "temporal_sequence": [
+        "intake",
+        "triage",
+        "mitigation",
+        "verification",
+        "customer-notice",
+        "external-RCA"
+      ],
+      "truths": [
+        "intake precedes triage",
+        "mitigation precedes verification",
+        "customer rollback notice is required",
+        "ops-incident-zeta owns workflow",
+        "legal notice precedes external RCA"
+      ]
+    }
+  ],
+  "success_condition": "CompText V7 may degrade, but should degrade slower and more structurally than lossy baselines.",
+  "summary": [
+    {
+      "max_contradiction_accumulation": 0.222222,
+      "mean_architecture_mutation_resistance": 0.002448,
+      "mean_continuity_half_life": 1.0,
+      "mean_contradiction_growth_rate": 0.004441,
+      "mean_drift_acceleration_rate": -0.000124,
+      "mean_evaluator_agreement_divergence": 0.976445,
+      "mean_final_continuity": 0.03946,
+      "mean_hidden_truth_survival_rate": 0.004326,
+      "mean_longevity_iterations": 0.0,
+      "mean_replay_collapse_iteration": 1.0,
+      "mean_replay_semantic_divergence": 0.935122,
+      "mean_semantic_entailment_score": 0.059986,
+      "mean_temporal_causality_retention": 0.0545,
+      "min_final_continuity": 0.015229,
+      "mode": "naive"
+    },
+    {
+      "max_contradiction_accumulation": 0.333333,
+      "mean_architecture_mutation_resistance": 0.206661,
+      "mean_continuity_half_life": 9.8,
+      "mean_contradiction_growth_rate": 0.003069,
+      "mean_drift_acceleration_rate": 0.0,
+      "mean_evaluator_agreement_divergence": 0.767992,
+      "mean_final_continuity": 0.294488,
+      "mean_hidden_truth_survival_rate": 0.236131,
+      "mean_longevity_iterations": 1.0,
+      "mean_replay_collapse_iteration": 9.8,
+      "mean_replay_semantic_divergence": 0.677807,
+      "mean_semantic_entailment_score": 0.261263,
+      "mean_temporal_causality_retention": 0.438333,
+      "min_final_continuity": 0.238685,
+      "mode": "baseline"
+    },
+    {
+      "max_contradiction_accumulation": 0.333333,
+      "mean_architecture_mutation_resistance": 0.265288,
+      "mean_continuity_half_life": 44.7,
+      "mean_contradiction_growth_rate": 0.001547,
+      "mean_drift_acceleration_rate": -0.0,
+      "mean_evaluator_agreement_divergence": 0.718756,
+      "mean_final_continuity": 0.302497,
+      "mean_hidden_truth_survival_rate": 0.314072,
+      "mean_longevity_iterations": 14.7,
+      "mean_replay_collapse_iteration": 44.7,
+      "mean_replay_semantic_divergence": 0.575065,
+      "mean_semantic_entailment_score": 0.342533,
+      "mean_temporal_causality_retention": 0.48435,
+      "min_final_continuity": 0.24465,
+      "mode": "adaptive"
+    },
+    {
+      "max_contradiction_accumulation": 0.111111,
+      "mean_architecture_mutation_resistance": 0.869847,
+      "mean_continuity_half_life": 250.0,
+      "mean_contradiction_growth_rate": 0.004758,
+      "mean_drift_acceleration_rate": 0.0,
+      "mean_evaluator_agreement_divergence": 0.421743,
+      "mean_final_continuity": 0.571783,
+      "mean_hidden_truth_survival_rate": 0.570173,
+      "mean_longevity_iterations": 113.5,
+      "mean_replay_collapse_iteration": 250.0,
+      "mean_replay_semantic_divergence": 0.289648,
+      "mean_semantic_entailment_score": 0.669791,
+      "mean_temporal_causality_retention": 0.955067,
+      "min_final_continuity": 0.517811,
+      "mode": "comptext_v7"
+    }
+  ],
+  "version": "external-replay-judge-v4-realworld-250"
+}

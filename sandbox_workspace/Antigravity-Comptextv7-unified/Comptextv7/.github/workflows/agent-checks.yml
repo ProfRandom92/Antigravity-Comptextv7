@@ -1,0 +1,76 @@
+name: Agent Workflow Checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  agent-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile helper scripts
+        run: python -m py_compile scripts/repo_intake.py scripts/run_checks.py scripts/validate_contracts.py scripts/generate_contract_fixtures.py scripts/validate_api_exports.py scripts/generate_project_health_report.py scripts/generate_dashboard_health_summary.py scripts/validate_replay_artifact_drift.py
+
+      - name: Generate repository intake report
+        run: python scripts/repo_intake.py
+
+      - name: Run safe local checks
+        run: python scripts/run_checks.py
+
+      - name: Validate deterministic replay artifact drift
+        run: python scripts/validate_replay_artifact_drift.py
+
+      - name: Validate contract schemas
+        run: python scripts/validate_contracts.py
+
+      - name: Generate API export contract fixtures
+        run: python scripts/generate_contract_fixtures.py
+
+      - name: Validate API export contract fixtures
+        run: python scripts/validate_api_exports.py
+
+      - name: Generate project health report
+        run: python scripts/generate_project_health_report.py
+
+      - name: Generate dashboard health summary
+        run: python scripts/generate_dashboard_health_summary.py
+
+      - name: Upload agent reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-check-reports
+          path: docs/reports/
+          if-no-files-found: ignore
+
+  dashboard-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Run release health dashboard smoke test
+        working-directory: dashboard/app
+        run: npm run smoke:release-health

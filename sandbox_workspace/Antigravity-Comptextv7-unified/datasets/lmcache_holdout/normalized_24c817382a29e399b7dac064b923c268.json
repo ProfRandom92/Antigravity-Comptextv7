@@ -1,0 +1,11 @@
+{
+  "session_id": "24c817382a29e399b7dac064b923c268",
+  "source": "lmcache-agent-trace",
+  "log_lines": [
+    "2025-10-16T04:07:46Z INFO ECU=USER message=Hi How can I help you today",
+    "2025-10-16T04:07:48Z INFO ECU=USER message=I just received an order and I d like to",
+    "2025-10-16T04:07:48Z INFO ECU=USER message=I just received an order and I d like to"
+  ],
+  "expected_tool_sequence": [],
+  "expected_commitments": []
+}

@@ -1,0 +1,152 @@
+{
+  "manifest_version": "1.0",
+  "fixtures": [
+    {
+      "fixture_id": "coding_workflow_pr_review_v1",
+      "fixture_version": "1.0.0",
+      "category": "coding_workflow",
+      "family": "coding_workflow_pr_review",
+      "degradation_level": "baseline",
+      "path": "fixtures/coding_workflow_pr_review_v1",
+      "expected_admissible": true,
+      "contracts": [
+        "no_orphan_tool_calls",
+        "pre_merge_review",
+        "recovery_path_available",
+        "security_causal_block"
+      ],
+      "expected_failure_labels": []
+    },
+    {
+      "fixture_id": "coding_workflow_pr_review_mild_v1",
+      "fixture_version": "1.0.0",
+      "category": "coding_workflow",
+      "family": "coding_workflow_pr_review",
+      "degradation_level": "mild",
+      "path": "fixtures/coding_workflow_pr_review_mild_v1",
+      "expected_admissible": false,
+      "contracts": [
+        "no_orphan_tool_calls",
+        "pre_merge_review",
+        "recovery_path_available",
+        "security_causal_block"
+      ],
+      "expected_failure_labels": [
+        "RECOVERY_PATH_INVALID"
+      ]
+    },
+    {
+      "fixture_id": "coding_workflow_pr_review_moderate_v1",
+      "fixture_version": "1.0.0",
+      "category": "coding_workflow",
+      "family": "coding_workflow_pr_review",
+      "degradation_level": "moderate",
+      "path": "fixtures/coding_workflow_pr_review_moderate_v1",
+      "expected_admissible": false,
+      "contracts": [
+        "no_orphan_tool_calls",
+        "pre_merge_review",
+        "recovery_path_available",
+        "security_causal_block"
+      ],
+      "expected_failure_labels": [
+        "CAUSAL_DEPENDENCY_LOSS",
+        "RECOVERY_PATH_INVALID"
+      ]
+    },
+    {
+      "fixture_id": "coding_workflow_pr_review_degraded_v1",
+      "fixture_version": "1.0.0",
+      "category": "coding_workflow",
+      "family": "coding_workflow_pr_review",
+      "degradation_level": "severe",
+      "path": "fixtures/coding_workflow_pr_review_degraded_v1",
+      "expected_admissible": false,
+      "contracts": [
+        "no_orphan_tool_calls",
+        "pre_merge_review",
+        "recovery_path_available",
+        "security_causal_block"
+      ],
+      "expected_failure_labels": [
+        "CAUSAL_DEPENDENCY_LOSS",
+        "INVARIANT_VIOLATION",
+        "POLICY_ORDER_BROKEN",
+        "RECOVERY_PATH_INVALID"
+      ]
+    },
+    {
+      "fixture_id": "incident_response_page_triage_v1",
+      "fixture_version": "1.0.0",
+      "category": "incident_response",
+      "family": "incident_response_page_triage",
+      "degradation_level": "baseline",
+      "path": "fixtures/incident_response_page_triage_v1",
+      "expected_admissible": true,
+      "contracts": [
+        "alert_ack_before_mitigation",
+        "no_orphan_mitigation_steps",
+        "rollback_reachable",
+        "root_cause_links_incident"
+      ],
+      "expected_failure_labels": []
+    },
+    {
+      "fixture_id": "incident_response_page_triage_mild_v1",
+      "fixture_version": "1.0.0",
+      "category": "incident_response",
+      "family": "incident_response_page_triage",
+      "degradation_level": "mild",
+      "path": "fixtures/incident_response_page_triage_mild_v1",
+      "expected_admissible": false,
+      "contracts": [
+        "alert_ack_before_mitigation",
+        "no_orphan_mitigation_steps",
+        "rollback_reachable",
+        "root_cause_links_incident"
+      ],
+      "expected_failure_labels": [
+        "RECOVERY_PATH_INVALID"
+      ]
+    },
+    {
+      "fixture_id": "incident_response_page_triage_moderate_v1",
+      "fixture_version": "1.0.0",
+      "category": "incident_response",
+      "family": "incident_response_page_triage",
+      "degradation_level": "moderate",
+      "path": "fixtures/incident_response_page_triage_moderate_v1",
+      "expected_admissible": false,
+      "contracts": [
+        "alert_ack_before_mitigation",
+        "no_orphan_mitigation_steps",
+        "rollback_reachable",
+        "root_cause_links_incident"
+      ],
+      "expected_failure_labels": [
+        "RECOVERY_PATH_INVALID"
+      ]
+    },
+    {
+      "fixture_id": "incident_response_page_triage_degraded_v1",
+      "fixture_version": "1.0.0",
+      "category": "incident_response",
+      "family": "incident_response_page_triage",
+      "degradation_level": "severe",
+      "path": "fixtures/incident_response_page_triage_degraded_v1",
+      "expected_admissible": false,
+      "contracts": [
+        "alert_ack_before_mitigation",
+        "no_orphan_mitigation_steps",
+        "rollback_reachable",
+        "root_cause_links_incident"
+      ],
+      "expected_failure_labels": [
+        "CAUSAL_DEPENDENCY_LOSS",
+        "INVARIANT_VIOLATION",
+        "POLICY_ORDER_BROKEN",
+        "RECOVERY_PATH_INVALID"
+      ]
+    }
+  ]
+}

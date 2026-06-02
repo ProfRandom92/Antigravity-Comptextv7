@@ -1,0 +1,209 @@
+Audit log started at 2026-05-26T13:29:17Z
+Ingesting file 09867e5c74f53656f91797020d262e3b.jsonl as real trace session 09867e5c74f53656f91797020d262e3b
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+  Line 5: Parsed message turn
+  Line 6: Parsed message turn
+  Line 7: Parsed message turn
+  Line 8: Parsed message turn
+  Line 9: Parsed message turn
+  Line 10: Parsed message turn
+  Line 11: Parsed message turn
+  Line 12: Parsed message turn
+  Line 13: Parsed message turn
+  Line 14: Parsed tool call to update_reservation_flights
+  Line 15: Parsed message turn
+  Line 16: Parsed message turn
+  Line 17: Parsed message turn
+  Line 18: Parsed message turn
+  Line 19: Parsed message turn
+  Line 20: Parsed message turn
+  Line 21: Parsed message turn
+  Line 22: Parsed message turn
+  Line 23: Parsed message turn
+  Line 24: Parsed message turn
+  Line 25: Parsed message turn
+  Line 26: Parsed message turn
+  Line 27: Parsed message turn
+  Line 28: Parsed message turn
+  Line 29: Parsed message turn
+  Line 30: Parsed message turn
+  Line 31: Parsed tool call to update_reservation_flights
+Successfully processed 09867e5c74f53656f91797020d262e3b.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_09867e5c74f53656f91797020d262e3b.json
+Ingesting file 0c6629b0a328cc379ad0e3a62b0353bb.jsonl as real trace session 0c6629b0a328cc379ad0e3a62b0353bb
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed tool call to book_reservation
+  Line 4: Parsed message turn
+  Line 5: Parsed message turn
+  Line 6: Parsed message turn
+  Line 7: Parsed message turn
+  Line 8: Parsed message turn
+  Line 9: Parsed message turn
+  Line 10: Parsed message turn
+  Line 11: Parsed message turn
+  Line 12: Parsed tool call to book_reservation
+  Line 13: Parsed message turn
+  Line 14: Parsed tool call to update_reservation_flights
+  Line 15: Parsed message turn
+  Line 16: Parsed message turn
+  Line 17: Parsed message turn
+  Line 18: Parsed message turn
+  Line 19: Parsed message turn
+  Line 20: Parsed message turn
+  Line 21: Parsed message turn
+  Line 22: Parsed message turn
+  Line 23: Parsed tool call to update_reservation_flights
+  Line 24: Parsed tool call to update_reservation_flights
+  Line 25: Parsed message turn
+  Line 26: Parsed message turn
+  Line 27: Parsed message turn
+  Line 28: Parsed message turn
+  Line 29: Parsed tool call to update_reservation_flights
+  Line 30: Parsed message turn
+  Line 31: Parsed message turn
+  Line 32: Parsed message turn
+  Line 33: Parsed tool call to update_reservation_flights
+  Line 34: Parsed message turn
+  Line 35: Parsed tool call to update_reservation_flights
+  Line 36: Parsed message turn
+  Line 37: Parsed message turn
+  Line 38: Parsed message turn
+Successfully processed 0c6629b0a328cc379ad0e3a62b0353bb.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_0c6629b0a328cc379ad0e3a62b0353bb.json
+Ingesting file 22ffaaf33001ec7197ccd612e03d428e.jsonl as real trace session 22ffaaf33001ec7197ccd612e03d428e
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+  Line 5: Parsed message turn
+  Line 6: Parsed message turn
+Successfully processed 22ffaaf33001ec7197ccd612e03d428e.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_22ffaaf33001ec7197ccd612e03d428e.json
+Ingesting file 24c817382a29e399b7dac064b923c268.jsonl as real trace session 24c817382a29e399b7dac064b923c268
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+Successfully processed 24c817382a29e399b7dac064b923c268.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_24c817382a29e399b7dac064b923c268.json
+Ingesting file 253f1bdf4cfa489d2b5801d3b46fc498.jsonl as real trace session 253f1bdf4cfa489d2b5801d3b46fc498
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+  Line 5: Parsed message turn
+  Line 6: Parsed message turn
+  Line 7: Parsed message turn
+  Line 8: Parsed message turn
+  Line 9: Parsed message turn
+  Line 10: Parsed message turn
+  Line 11: Parsed message turn
+  Line 12: Parsed message turn
+  Line 13: Parsed message turn
+  Line 14: Parsed message turn
+  Line 15: Parsed message turn
+  Line 16: Parsed message turn
+  Line 17: Parsed message turn
+  Line 18: Parsed message turn
+  Line 19: Parsed message turn
+  Line 20: Parsed message turn
+  Line 21: Parsed message turn
+  Line 22: Parsed message turn
+  Line 23: Parsed message turn
+  Line 24: Parsed message turn
+  Line 25: Parsed message turn
+  Line 26: Parsed message turn
+  Line 27: Parsed message turn
+  Line 28: Parsed message turn
+  Line 29: Parsed message turn
+  Line 30: Parsed message turn
+  Line 31: Parsed message turn
+  Line 32: Parsed message turn
+  Line 33: Parsed message turn
+  Line 34: Parsed message turn
+  Line 35: Parsed message turn
+  Line 36: Parsed message turn
+  Line 37: Parsed message turn
+  Line 38: Parsed message turn
+  Line 39: Parsed message turn
+Successfully processed 253f1bdf4cfa489d2b5801d3b46fc498.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_253f1bdf4cfa489d2b5801d3b46fc498.json
+Ingesting file 299d321358d0b2fb2f6b7ca1ae4856b8.jsonl as real trace session 299d321358d0b2fb2f6b7ca1ae4856b8
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+Successfully processed 299d321358d0b2fb2f6b7ca1ae4856b8.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_299d321358d0b2fb2f6b7ca1ae4856b8.json
+Ingesting file 463fc7125362adfaa55a47dbc4ee3faf.jsonl as real trace session 463fc7125362adfaa55a47dbc4ee3faf
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+  Line 5: Parsed message turn
+  Line 6: Parsed message turn
+  Line 7: Parsed message turn
+  Line 8: Parsed message turn
+  Line 9: Parsed message turn
+  Line 10: Parsed message turn
+  Line 11: Parsed message turn
+  Line 12: Parsed message turn
+  Line 13: Parsed message turn
+  Line 14: Parsed message turn
+  Line 15: Parsed message turn
+  Line 16: Parsed message turn
+  Line 17: Parsed message turn
+  Line 18: Parsed message turn
+  Line 19: Parsed message turn
+  Line 20: Parsed message turn
+  Line 21: Parsed message turn
+  Line 22: Parsed message turn
+  Line 23: Parsed message turn
+Successfully processed 463fc7125362adfaa55a47dbc4ee3faf.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_463fc7125362adfaa55a47dbc4ee3faf.json
+Ingesting file 4e8f1c2ec7c1fedefd38e7945416f65c.jsonl as real trace session 4e8f1c2ec7c1fedefd38e7945416f65c
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+  Line 5: Parsed message turn
+  Line 6: Parsed message turn
+  Line 7: Parsed message turn
+  Line 8: Parsed message turn
+  Line 9: Parsed message turn
+  Line 10: Parsed message turn
+  Line 11: Parsed message turn
+  Line 12: Parsed message turn
+  Line 13: Parsed tool call to book_reservation
+  Line 14: Parsed message turn
+  Line 15: Parsed message turn
+  Line 16: Parsed message turn
+  Line 17: Parsed message turn
+  Line 18: Parsed tool call to book_reservation
+  Line 19: Parsed message turn
+Successfully processed 4e8f1c2ec7c1fedefd38e7945416f65c.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_4e8f1c2ec7c1fedefd38e7945416f65c.json
+Ingesting file 4f619f153313f676f839cd4afd8228d5.jsonl as real trace session 4f619f153313f676f839cd4afd8228d5
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+Successfully processed 4f619f153313f676f839cd4afd8228d5.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_4f619f153313f676f839cd4afd8228d5.json
+Ingesting file 5cacdab43997ef46db773ba7a7d4aa13.jsonl as real trace session 5cacdab43997ef46db773ba7a7d4aa13
+  Line 1: Parsed message turn
+  Line 2: Parsed message turn
+  Line 3: Parsed message turn
+  Line 4: Parsed message turn
+  Line 5: Parsed message turn
+  Line 6: Parsed message turn
+  Line 7: Parsed message turn
+  Line 8: Parsed message turn
+  Line 9: Parsed message turn
+  Line 10: Parsed message turn
+  Line 11: Parsed message turn
+  Line 12: Parsed message turn
+  Line 13: Parsed message turn
+  Line 14: Parsed message turn
+  Line 15: Parsed message turn
+  Line 16: Parsed message turn
+  Line 17: Parsed message turn
+Successfully processed 5cacdab43997ef46db773ba7a7d4aa13.jsonl to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/normalized_5cacdab43997ef46db773ba7a7d4aa13.json
+Generating synthetic supplementary traces...
+Generated synthetic trace to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/synthetic_supplement/normalized_syn_01_checkout.json
+Generated synthetic trace to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/synthetic_supplement/normalized_syn_02_database.json
+Generated synthetic trace to /data/data/com.termux/files/home/antigravity_v7_sandbox/datasets/lmcache_holdout/synthetic_supplement/normalized_syn_03_kubernetes.json

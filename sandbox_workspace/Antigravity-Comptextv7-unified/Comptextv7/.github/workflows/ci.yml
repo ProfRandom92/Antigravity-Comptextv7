@@ -1,0 +1,43 @@
+name: CompText V7 Industrial Validation
+
+on:
+  pull_request:
+  push:
+    branches: [main, work]
+
+jobs:
+  industrial-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Python dependencies
+        run: python -m pip install -e ".[test]"
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Canonical Check
+        run: npm run check
+
+      - name: Validate deterministic replay artifact drift
+        run: python scripts/validate_replay_artifact_drift.py
+
+      - name: Upload paper replay artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-replay-results
+          path: artifacts/paper_replay_results.json
+          if-no-files-found: ignore
+          retention-days: 14

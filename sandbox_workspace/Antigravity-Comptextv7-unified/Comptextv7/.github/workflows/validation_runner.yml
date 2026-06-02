@@ -1,0 +1,201 @@
+name: hash-companion-validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: Optional Hash/chilli request identifier to echo in the CFI-01 result payload.
+        required: false
+        type: string
+  pull_request:
+  push:
+    branches: [main, work]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validation-runner:
+    name: validation_runner cloud validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CFI_RESULT_PATH: reports/hash-chilli-cloud-ci-result.json
+      CFI_COMPACT_SUMMARY_PATH: reports/hash-chilli-cloud-ci-summary.json
+      CFI_SCHEMA_PATH: contracts/hash-chilli-cloud-ci-result.schema.json
+      CFI_WORKFLOW_NAME: hash-companion-validation
+      CFI_REQUEST_ID: ${{ github.event.inputs.request_id || '' }}
+      CFI_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      CFI_BRANCH: ${{ github.head_ref || github.ref_name }}
+      CFI_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      CFI_RESULT_ID: gha:${{ github.run_id }}:${{ github.run_attempt }}
+      CFI_ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts
+
+    steps:
+      - name: Capture requested timestamp
+        id: request_time
+        run: echo "requested_at=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout repository
+        id: checkout
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Python 3.11
+        id: setup_python
+        uses: actions/setup-python@v5
+        continue-on-error: true
+        with:
+          python-version: '3.11'
+
+      - name: Syntax-check CFI-03 publisher
+        id: publisher_syntax
+        if: steps.checkout.outcome == 'success' && steps.setup_python.outcome == 'success'
+        run: python -m py_compile scripts/publish_hash_chilli_ci_artifacts.py
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        id: install
+        run: |
+          python -m pip install -e ".[test]"
+          npm install
+      - name: Run Canonical Check
+        id: canonical_check
+        run: npm run check
+      - name: Publish CFI-03 Hash/chilli CI artifacts
+        id: write_summary
+        if: always()
+        env:
+          REQUESTED_AT: ${{ steps.request_time.outputs.requested_at }}
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          SETUP_PYTHON_OUTCOME: ${{ steps.setup_python.outcome }}
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          PYTEST_OUTCOME: ${{ steps.canonical_check.outcome }}
+          DASHBOARD_OUTCOME: ${{ steps.canonical_check.outcome }}
+        run: python scripts/publish_hash_chilli_ci_artifacts.py
+
+      - name: Validate CFI-03 result artifact against schema
+        if: always() && steps.write_summary.outcome == 'success'
+        env:
+          RESULT_PATH: ${{ env.CFI_RESULT_PATH }}
+          SCHEMA_PATH: ${{ env.CFI_SCHEMA_PATH }}
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          import sys
+          from datetime import datetime
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          result_path = Path(__import__("os").environ["RESULT_PATH"])
+          schema_path = Path(__import__("os").environ["SCHEMA_PATH"])
+          payload = json.loads(result_path.read_text(encoding="utf-8"))
+          schema = json.loads(schema_path.read_text(encoding="utf-8"))
+          errors = []
+
+          def json_type(value):
+              if value is None:
+                  return "null"
+              if isinstance(value, bool):
+                  return "boolean"
+              if isinstance(value, int) and not isinstance(value, bool):
+                  return "integer"
+              if isinstance(value, (int, float)) and not isinstance(value, bool):
+                  return "number"
+              if isinstance(value, str):
+                  return "string"
+              if isinstance(value, list):
+                  return "array"
+              if isinstance(value, dict):
+                  return "object"
+              return type(value).__name__
+
+          def accepts_type(value, expected):
+              expected_types = expected if isinstance(expected, list) else [expected]
+              return json_type(value) in expected_types or (json_type(value) == "integer" and "number" in expected_types)
+
+          for field in schema.get("required", []):
+              if field not in payload:
+                  errors.append(f"missing required field: {field}")
+
+          if schema.get("additionalProperties") is False:
+              allowed = set(schema.get("properties", {}))
+              for field in payload:
+                  if field not in allowed:
+                      errors.append(f"unexpected field: {field}")
+
+          for field, definition in schema.get("properties", {}).items():
+              if field not in payload:
+                  continue
+              value = payload[field]
+              if "type" in definition and not accepts_type(value, definition["type"]):
+                  errors.append(f"{field} has type {json_type(value)}, expected {definition['type']}")
+                  continue
+              if "const" in definition and value != definition["const"]:
+                  errors.append(f"{field} does not match const {definition['const']!r}")
+              if "enum" in definition and value not in definition["enum"]:
+                  errors.append(f"{field} is not one of {definition['enum']!r}")
+              if isinstance(value, str):
+                  if "minLength" in definition and len(value) < definition["minLength"]:
+                      errors.append(f"{field} is shorter than {definition['minLength']}")
+                  if "maxLength" in definition and len(value) > definition["maxLength"]:
+                      errors.append(f"{field} is longer than {definition['maxLength']}")
+                  if "pattern" in definition and not re.fullmatch(definition["pattern"], value):
+                      errors.append(f"{field} does not match required pattern")
+                  if definition.get("format") == "uri" and not urlparse(value).scheme:
+                      errors.append(f"{field} is not a URI")
+                  if definition.get("format") == "date-time":
+                      try:
+                          datetime.fromisoformat(value.replace("Z", "+00:00"))
+                      except ValueError:
+                          errors.append(f"{field} is not a date-time")
+
+          if errors:
+              print("CFI-03 result artifact failed schema validation:")
+              for error in errors:
+                  print(f"- {error}")
+              sys.exit(1)
+          print(f"CFI-03 result artifact validated against {schema_path}.")
+          PY
+
+      - name: Publish CFI-03 compact summary to job summary
+        if: always() && hashFiles(env.CFI_COMPACT_SUMMARY_PATH) != ''
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          payload = json.loads(Path("reports/hash-chilli-cloud-ci-summary.json").read_text(encoding="utf-8"))
+          print("## validation_runner CFI-03 summary")
+          print("")
+          for field in ("status", "summary", "commit_sha", "branch", "run_url", "artifact_url", "local_execution"):
+              print(f"- `{field}`: `{payload[field]}`")
+          PY
+
+      - name: Upload CFI-03 Hash/chilli CI artifacts
+        if: always() && hashFiles(env.CFI_RESULT_PATH) != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-runner-cfi-artifacts
+          path: |
+            ${{ env.CFI_RESULT_PATH }}
+            ${{ env.CFI_COMPACT_SUMMARY_PATH }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce validation_runner outcome
+        if: always()
+        run: |
+          if [ "${CFI_VALIDATION_STATUS:-failed}" != "passed" ]; then
+            echo "validation_runner completed with status: ${CFI_VALIDATION_STATUS:-failed}"
+            exit 1
+          fi
+          echo "validation_runner completed with status: passed"

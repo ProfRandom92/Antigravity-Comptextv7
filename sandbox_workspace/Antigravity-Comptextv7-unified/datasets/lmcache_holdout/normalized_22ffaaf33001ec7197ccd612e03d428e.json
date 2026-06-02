@@ -1,0 +1,14 @@
+{
+  "session_id": "22ffaaf33001ec7197ccd612e03d428e",
+  "source": "lmcache-agent-trace",
+  "log_lines": [
+    "2025-10-16T04:10:01Z INFO ECU=USER message=Hi How can I help you today",
+    "2025-10-16T04:10:02Z INFO ECU=USER message=Hi I m Yusuf Hernandez and I m having so",
+    "2025-10-16T04:10:02Z INFO ECU=USER message=Hi I m Yusuf Hernandez and I m having so",
+    "2025-10-16T04:10:03Z INFO ECU=USER message=Hi I m Yusuf Hernandez and I m having so",
+    "2025-10-16T04:10:03Z INFO ECU=USER message=Hi I m Yusuf Hernandez and I m having so",
+    "2025-10-16T04:10:02Z INFO ECU=USER message=Hi I m Yusuf Hernandez and I m having so"
+  ],
+  "expected_tool_sequence": [],
+  "expected_commitments": []
+}

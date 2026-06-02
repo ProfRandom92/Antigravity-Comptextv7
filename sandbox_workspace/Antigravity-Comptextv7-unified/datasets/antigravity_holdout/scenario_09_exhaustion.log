@@ -1,0 +1,3 @@
+2026-05-26T12:00:00Z WARN ECU=CPC Memory alert threshold=95%
+2026-05-26T12:00:05Z ERROR ECU=CPC Buffer overflow page=0x3F
+2026-05-26T12:00:10Z FATAL ECU=CPC Resource exhaustion shutdown initiated
