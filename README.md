@@ -1,100 +1,276 @@
-# 🚀 Antigravity x CompText v7 (KVTC) Core-Engine
+# 🚀 Antigravity × CompText v7
 
 <div align="center">
 
 [![GitHub Stars](https://img.shields.io/github/stars/ProfRandom92/Antigravity-Comptextv7?style=for-the-badge&color=yellow)](https://github.com/ProfRandom92/Antigravity-Comptextv7/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Python: 3.10+](https://img.shields.io/badge/Python-3.10+-brightgreen.svg?style=for-the-badge)](https://www.python.org/)
-[![Security: SHA-256 Chained](https://img.shields.io/badge/Security-SHA--256%20Chained-red.svg?style=for-the-badge)]()
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg?style=for-the-badge)](http://makeapullrequest.com)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Rust](https://img.shields.io/badge/Rust-integrated-000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Security](https://img.shields.io/badge/Security-SHA--256%20Sidecar-red.svg?style=for-the-badge)](#-security-model)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](#-contributing)
 
-**Ein krypto-forensisch abgesichertes Protokoll zur deterministischen Trace-Kompression und verlustfreien Rekonstruktion autonomer Multi-Agenten-Systeme unter nicht-adaptiven Holdout-Validierungsmetriken.**
+**Deterministic trace compression for autonomous agent systems.**
 
-[📖 Dokumentation](#-1-architektonischer-kern--paradigmenwechsel) • [📊 Benchmarks](#-3-benchmark-ergebnisse--validierung) • [🤝 Mitwirken](#-5-community--contributing) • [🗺️ Roadmap](#-6-entwicklungs-road-to-v8)
+CompText v7 separates compressible linguistic payloads from replay-critical state, then reconstructs canonical traces with cryptographic sidecar integrity. The result is aggressive token reduction without sacrificing strict holdout validation.
+
+[Overview](#-overview) • [Architecture](#-architecture) • [Rust Integration](#-rust-integration) • [Benchmarks](#-benchmarks) • [Contributing](#-contributing)
 
 </div>
 
 ---
 
-## 🗺️ Systemarchitektur & Datenfluss
+## ✨ Overview
 
-Anstatt auf unzuverlässige, stochastische Rekonstruktion zu setzen, separiert dieses Framework die Datenströme innerhalb der `Antigravity`-Hooks vollständig, um die Holdout-Metriken im Test-Runner zu 100 % stabil zu halten:
+**Antigravity × CompText v7** is a KVTC-style core engine for deterministic trace compression and lossless replay reconstruction in autonomous multi-agent systems.
+
+The central idea is simple:
+
+> Compress what is linguistically redundant. Preserve what is operationally decisive.
+
+Classic lossy trace compression fails when validators expect exact tool order, commitment tokens, state hashes, and canonical replay strings. CompText v7 avoids that failure mode by splitting each trace into two coordinated streams:
+
+| Layer | Purpose | Guarantee |
+|---|---|---|
+| **CompText payload** | Pruned, compact linguistic trace | Lower token and transport cost |
+| **Replay sidecar** | Tool sequence, commitments, hashes, state anchors | Deterministic reconstruction |
+| **SHA-256 audit chain** | Integrity proof over critical replay metadata | Tamper detection |
+| **Holdout validator** | Non-adaptive replay verification | Stable replay score |
+
+---
+
+## 🧠 Why this exists
+
+Agent traces are not normal text. They contain natural language, tool calls, hidden sequencing assumptions, external state references, and validation-sensitive tokens. If all of that is compressed as plain prose, replay integrity collapses.
+
+CompText v7 treats agent traces as structured forensic artifacts:
+
+- **Payload text** can be reduced aggressively.
+- **Replay-critical state** is isolated in a deterministic sidecar.
+- **Integrity anchors** make silent mutation detectable.
+- **Canonical reconstruction** keeps validation independent from stochastic LLM recovery.
+
+---
+
+## 🗺 Architecture
+
+```mermaid
+flowchart TD
+    A[Raw LMCache / Agent Trace] --> B{Trace Splitter}
+
+    B --> C[CompText v7 Payload<br/>linguistic pruning]
+    B --> D[Replay Sidecar<br/>tool order, commitments, state hashes]
+
+    C --> E[Compressed Transport Package]
+    D --> F[SHA-256 Integrity Anchor]
+    F --> E
+
+    E --> G{Runtime Path}
+    G --> H[Python Reference Engine]
+    G --> I[Rust Fast Path]
+
+    H --> J[Canonical Replay Reconstruction]
+    I --> J
+
+    J --> K[Strict Holdout Validator]
+    K --> L[Replay Score: 1.00]
+
+    style A stroke-width:2px
+    style D stroke-width:2px
+    style F stroke-width:2px
+    style I stroke-width:2px
+    style L stroke-width:2px
+```
+
+### Data flow
+
+```mermaid
+sequenceDiagram
+    participant Trace as Raw Trace
+    participant Split as KVTC Splitter
+    participant Text as CompText Payload
+    participant Sidecar as Replay Sidecar
+    participant Hash as SHA-256 Chain
+    participant Replay as Reconstructor
+    participant Test as Holdout Validator
+
+    Trace->>Split: ingest production trace
+    Split->>Text: prune redundant language
+    Split->>Sidecar: preserve replay-critical state
+    Sidecar->>Hash: derive integrity anchor
+    Text->>Replay: compact payload
+    Hash->>Replay: verified sidecar metadata
+    Replay->>Test: canonical replay output
+    Test-->>Replay: deterministic validation result
+```
+
+---
+
+## 🦀 Rust Integration
+
+Rust is integrated as the performance-oriented execution path for the parts that should be fast, deterministic, and easy to audit:
+
+- byte-level payload handling
+- deterministic hashing and verification
+- replay-sidecar validation
+- future zero-copy trace packaging
+- low-overhead execution inside CI or agent runtimes
+
+Python remains useful as the reference and experimentation layer. Rust is the direction for hardened, production-grade execution.
+
+```mermaid
+flowchart LR
+    P[Python Reference Layer] --> S[Shared KVTC Semantics]
+    R[Rust Core Layer] --> S
+    S --> V[Deterministic Replay Contract]
+    V --> C[CI / Benchmarks / Agent Runtime]
+```
+
+---
+
+## 🔒 Security Model
+
+CompText v7 does not treat compression as a purely cosmetic optimization. Every replay-sensitive field is part of the integrity surface.
+
+The sidecar protects:
+
+- tool execution order
+- commitment and control tokens
+- final state hash
+- replay metadata
+- validation-critical anchors
+
+If a compressed package is modified without updating the expected integrity chain, reconstruction should fail loudly instead of producing a misleading replay.
+
+---
+
+## 📊 Benchmarks
+
+Current validation targets are based on the existing CompText v7 benchmark profile:
+
+| Group | Strategy | Avg. Payload | Replay Validity | Notes |
+|---|---:|---:|---:|---|
+| A | Raw baseline | 2023.9 bytes | 1.00 | No compression |
+| B | CompText v7 | **744.4 bytes** | **1.00** | **63.2 % reduction** |
+| C | Regex pruning | ~68 % of raw | 1.00 | No forensic integrity |
+| D/E | Blind reduction | variable | 0.0 on complex traces | Loses temporal/state-critical tokens |
+
+The design goal is not maximum textual compression at any cost. The goal is **maximum safe reduction under strict deterministic replay constraints**.
+
+---
+
+## 📦 Repository Map
 
 ```text
-       ┌────────────────────────────────────────────────────────┐
-       │             LMCache Produktionstrace (Raw)            │
-       └───────────────────────────┬────────────────────────────┘
-                                   │
-                    ┌──────────────┴──────────────┐
-                    ▼                             ▼
-        ┌───────────────────────┐     ┌───────────────────────┐
-        │  Linguistische Nutz-  │     │ Deterministisches     │
-        │  daten (CompText v7)  │     │ Replay-Sidecar        │
-        └───────────┬───────────┘     └───────────┬───────────┘
-                    │ (63.2% Reduktion)           │ (Isolierte Variablen)
-                    ▼                             ▼
-        ┌───────────────────────────────────────────────────────┐
-        │       Sichere Übertragung / Krypto-Signierung         │
-        │            [SHA-256 Forensic Hash Chain]              │
-        └───────────────────────────┬────────────────────────────
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │          reconstruct_canonical_replay()               │
-        │         (Deterministische Rekonstruktion)             │
-        └───────────────────────────┬───────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │       Strikte Holdout-Validierung (Score: 1.00)       │
-        └───────────────────────────────────────────────────────┘
-
+.
+├── .antigravitycli/       # Antigravity CLI/runtime configuration
+├── Comptextv7/            # CompText v7 integration surface
+├── artifacts/             # Generated outputs and validation artifacts
+├── benchmarks/            # Benchmark profiles and comparison material
+├── core/                  # KVTC / replay core components
+├── datasets/              # Fixtures and trace datasets
+├── reports/               # Evaluation notes and generated reports
+├── tests/                 # Holdout, replay, and integrity tests
+└── README.md              # Project landing page
 ```
-## 💡 1. Architektonischer Kern & Paradigmenwechsel
-Herkömmliche Ansätze zur Optimierung von Agenten-Traces basieren oft auf der Hypothese, dass stark verlustbehaftete (*lossy*) Textkompression durch nachgelagerte Sprachmodelle (LLMs) stochastisch rekonstruiert werden kann. Empirische Tests zeigen jedoch, dass dieser Ansatz bei strikten, nicht-adaptiven String- und Token-Abgleichen vollständig kollabiert. Sobald kritische Steuerungs-Tokens verworfen werden, sinkt die Validierungsgenauigkeit komplexer Log-Strukturen auf **0.0**.
-**Der Antigravity x CompText Pivot:** * **Nutzdaten-Kompression:** Aggressiv prunende Kompression zur Minimierung von Übertragungskosten und Token-Usage.
- * **Sidecar-Integrität:** Verlustfreie, isolierte Kapselung aller sequenz- und zustandskritischen Systemvariablen (tool_sequence, commitment_tokens, final_state_hash).
-## 🔒 2. Krypto-Forensische Auditierung (CISO-Perspektive)
-Im Gegensatz zu einfachem Regex-Pruning verknüpft die CompText v7 Core-Engine die Datenreduktion untrennbar mit einem **SHA-256-basierten Integritätsschutz**. Jedes Replay-Sidecar enthält einen kryptografischen Signaturanker (integrity_hash). Jede unbefugte Modifikation bricht die mathematische Kette und wird sofort im Audit-Trail detektiert.
-### Evaluierungsmatrix im Vergleich
-| Evaluierungskriterium | Raw Data (Gruppe A) | Regex Pruning (Gruppe C) | CompText v7 (Gruppe B) |
-|---|---|---|---|
-| **Payload-Volumen** | 100 % (Ineffizient) | ca. 68 % | **ca. 36.8 % (Optimal)** |
-| **Replay-Validität** | 100 % | 100 % | **100 %** |
-| **Manipulationserkennung** | Nicht gegeben | Nicht gegeben | **Gegeben (SHA-256)** |
-| **Forensische Auditierung** | Nicht deterministisch | Nicht deterministisch | **Deterministisch** |
-## 📊 3. Benchmark-Ergebnisse & Validierung
-Das System wurde zweistufig evaluiert: gegen kontrollierte synthetische Grenzfälle sowie gegen 10 großvolumige Produktionstraces aus realen Agenten-Interaktionen. Die zugrundeliegenden Holdout-Metriken wurden im gesamten Verlauf nicht modifiziert.
-### 3.1 Reale LMCache-Produktionstraces (Ø-Werte)
- * **Gruppe A (Raw Baseline):** 2023.9 Bytes | Validierung: 1.00
- * **Gruppe B (CompText v7):** **744.4 Bytes** | Validierung: **1.00** *(Konstante Perfektion bei 63,2 % Ersparnis)*
- * **Gruppe D/E (Stumpfe Reduktion):** Verliert bei komplexen Mammut-Logs (> 4000 Bytes) jegliche temporale Sequenz-Validität und stürzt systemisch auf einen Score von **0.0** ab.
-### 3.2 Synthetische Edge-Cases (syn_03_kubernetes)
- * Bei hochgradig spezifischen Token-Isolierungen (z. B. "replicas=5") erreicht CompText v7 das informationstheoretische Maximum (Score: 0.67) und agiert absolut paritätisch zur unkomprimierten Rohdaten-Baseline.
-## 📂 4. Repository-Struktur
-```text
-├── core/
-│   ├── kvtc_v7.py              # Kernmodul der KVTC-Rekonstruktions-Engine
-│   └── pipelines/              # Integrations-Hooks für die Antigravity-Pipeline
-├── tests/
-│   ├── fixtures/
-│   │   └── agent_traces/       # Kuratierte, deterministische Realdaten-Fixtures
-│   ├── test_lmcache_replay_integrity.py
-│   └── test_blind_antigravity_trace_survival.py
-└── README.md                   # System-Spezifikation
 
+---
+
+## ⚡ Quickstart
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ProfRandom92/Antigravity-Comptextv7.git
+cd Antigravity-Comptextv7
 ```
-## 🤝 5. Community & Contributing
-Du möchtest das Protokoll noch effizienter machen? Contributors sind herzlich willkommen! Egal ob Bugfixes, neue Test-Fixtures oder Optimierungen am Token-Pruning.
- 1. Forke das Projekt
- 2. Erstelle einen Feature-Branch (git checkout -b feature/AmazingFeature)
- 3. Commit deine Änderungen (git commit -m 'Add some AmazingFeature')
- 4. Push den Branch (git push origin feature/AmazingFeature)
- 5. Öffne einen Pull Request
-### 🌟 Unterstütze uns!
-Wenn dir das Projekt hilft oder du den Ansatz spannend findest, **lass uns gerne einen Stern (Star) da!** Das motiviert uns, die Core-Engine weiter auszubauen.
-## 🗺️ 6. Entwicklungs-Road to v8
- * [x] Fusion der kontextuellen Datenreduktion mit den Ausführungshooks der Antigravity-Pipeline.
- * [x] Validierung der deterministischen 100%-Rekonstruktion unter strikten Holdout-Metriken.
- * [ ] **Next Step:** Substitution der statischen known_words-Extraktion durch ein laufzeitbasiertes, schema-gesteuertes Extraktions-Framework (Enterprise-Generalisierung).
-*Entwickelt im Rahmen des CompText SafePush Frameworks zur Maximierung der Token-Effizienz autonomer Infrastrukturen.*
+
+Run the Python validation suite:
+
+```bash
+python -m pytest
+```
+
+When working on the Rust path, use the normal Rust toolchain from the Rust module location:
+
+```bash
+cargo test
+cargo build --release
+```
+
+---
+
+## 🧪 What to test before opening a PR
+
+Before submitting changes, verify that your patch does not weaken replay determinism:
+
+```bash
+python -m pytest
+cargo test
+```
+
+Recommended checks:
+
+- compressed payload stays smaller than raw baseline
+- replay reconstruction remains canonical
+- sidecar hash validation catches mutation
+- holdout validation remains stable
+- benchmark outputs are reproducible
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome. The project is especially interested in work that improves determinism, compression quality, auditability, or Rust hardening.
+
+Good first contribution areas:
+
+- add new trace fixtures
+- improve benchmark coverage
+- document edge cases
+- add Rust-side validation tests
+- tighten sidecar schema checks
+- improve CI reproducibility
+
+Contribution flow:
+
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature/your-improvement`.
+3. Make a focused change.
+4. Run tests locally.
+5. Open a pull request with a clear before/after explanation.
+
+Please keep PRs small, reproducible, and validation-oriented.
+
+---
+
+## 🛣 Roadmap
+
+- [x] Deterministic replay-sidecar architecture
+- [x] SHA-256 integrity anchoring
+- [x] Holdout-oriented validation profile
+- [x] Rust execution path introduced
+- [ ] Schema-driven sidecar extraction
+- [ ] Rust-first replay validator
+- [ ] CI benchmark snapshots
+- [ ] Public examples for custom trace datasets
+- [ ] v8 generalization layer for enterprise agent pipelines
+
+---
+
+## 🌟 Support the project
+
+If this project helps you reason about safer agent traces, compression, or deterministic replay, consider leaving a star. It makes the project easier to discover and helps attract contributors who care about reliable agent infrastructure.
+
+---
+
+## 📄 License
+
+This project is released under the MIT License.
+
+---
+
+<div align="center">
+
+**CompText v7: compress the noise, preserve the proof.**
+
+</div>
