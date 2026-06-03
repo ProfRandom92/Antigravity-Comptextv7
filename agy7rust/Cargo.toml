@@ -16,3 +16,7 @@ hex = "0.4"
 name = "sparkctl"
 path = "src/bin/sparkctl.rs"
 
+[[bin]]
+name = "agy-ct"
+path = "src/bin/agy_ct.rs"
+
