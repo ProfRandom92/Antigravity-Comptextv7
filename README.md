@@ -1,8 +1,10 @@
 # sparkctl
 
-## Antigravity-CompText v7 / SPARK Context Layer
+<p align="center">
+  <img src="assets/branding/sparkctl-logo.png" alt="sparkctl logo" width="520">
+</p>
 
-<!-- Branding assets pending: assets/branding/sparkctl-logo.png -->
+## Antigravity-CompText v7 / SPARK Context Layer
 
 <div align="center">
 
