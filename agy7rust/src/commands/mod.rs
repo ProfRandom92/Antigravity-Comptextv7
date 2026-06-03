@@ -68,5 +68,7 @@ pub enum Commands {
     ContextValidate {
         #[arg(short = 'i', long = "input")]
         input: String,
+        #[arg(short = 's', long = "schema")]
+        schema: Option<String>,
     },
 }

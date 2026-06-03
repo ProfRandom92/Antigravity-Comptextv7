@@ -18,6 +18,8 @@ enum Commands {
     Doctor,
     #[command(about = "Run local Rust quality checks (fmt, check, test, clippy)")]
     RustValidate,
+    #[command(about = "Run complete context lifecycle (build, render, validate)")]
+    ContextAll,
 }
 
 fn main() -> Result<()> {
@@ -29,6 +31,9 @@ fn main() -> Result<()> {
         }
         Commands::RustValidate => {
             sparkctl::rust_validate::run_rust_validate()?;
+        }
+        Commands::ContextAll => {
+            sparkctl::context_all::run_context_all()?;
         }
     }
 
