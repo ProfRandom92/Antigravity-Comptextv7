@@ -1180,3 +1180,17 @@ fn test_sparkctl_spark_demo_execution() {
     assert!(stdout_str.contains("=== sparkctl spark-demo ==="));
     assert!(stdout_str.contains("spark-demo result: PASS"));
 }
+
+#[test]
+fn test_sparkctl_handoff_check_execution() {
+    use std::process::Command;
+    let output = Command::new("cargo")
+        .args(&["run", "--bin", "sparkctl", "--", "handoff-check"])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("=== sparkctl handoff-check ==="));
+    assert!(stdout_str.contains("handoff-check result: PASS"));
+}

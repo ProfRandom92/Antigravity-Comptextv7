@@ -22,6 +22,8 @@ enum Commands {
     ContextAll,
     #[command(about = "Run complete end-to-end demo pipeline (compress, build, render, validate)")]
     SparkDemo,
+    #[command(about = "Verify local repository handoff readiness")]
+    HandoffCheck,
 }
 
 fn main() -> Result<()> {
@@ -39,6 +41,9 @@ fn main() -> Result<()> {
         }
         Commands::SparkDemo => {
             sparkctl::spark_demo::run_spark_demo()?;
+        }
+        Commands::HandoffCheck => {
+            sparkctl::handoff_check::run_handoff_check()?;
         }
     }
 
