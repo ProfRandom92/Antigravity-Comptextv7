@@ -7,13 +7,14 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Rust](https://img.shields.io/badge/Rust-integrated-000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Security](https://img.shields.io/badge/Security-SHA--256%20Sidecar-red.svg?style=for-the-badge)](#-security-model)
+[![SPARK](https://img.shields.io/badge/SPARK-Hackathon%20Track-2b6cb0.svg?style=for-the-badge)](#-spark-hackathon-track)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](#-contributing)
 
 **Deterministic trace compression for autonomous agent systems.**
 
 CompText v7 separates compressible linguistic payloads from replay-critical state, then reconstructs canonical traces with cryptographic sidecar integrity. The result is aggressive token reduction without sacrificing strict holdout validation.
 
-[Overview](#-overview) • [Architecture](#-architecture) • [Rust Integration](#-rust-integration) • [Benchmarks](#-benchmarks) • [Contributing](#-contributing)
+[Overview](#-overview) • [SPARK Track](#-spark-hackathon-track) • [Architecture](#-architecture) • [Rust Integration](#-rust-integration) • [Benchmarks](#-benchmarks) • [Contributing](#-contributing)
 
 </div>
 
@@ -35,6 +36,34 @@ Classic lossy trace compression fails when validators expect exact tool order, c
 | **Replay sidecar** | Tool sequence, commitments, hashes, state anchors | Deterministic reconstruction |
 | **SHA-256 audit chain** | Integrity proof over critical replay metadata | Tamper detection |
 | **Holdout validator** | Non-adaptive replay verification | Stable replay score |
+
+---
+
+## 🏛 SPARK Hackathon Track
+
+**SPARK extracts. CompText v7 proves it.**
+
+This repository now contains the SPARK Hackathon integration track for applying CompText v7 to audit-safe administrative AI workflows. The target use case is deterministic packaging of SPARK extraction outputs so that structured results from planning and approval procedures can be verified, replayed, and checked for silent mutation.
+
+The SPARK track focuses on the **Safe and Stable** challenge:
+
+- wrap SPARK-style extractor JSON into a deterministic CompText v7 package
+- preserve replay-critical fields in a sidecar instead of compressing them away
+- anchor every package with SHA-256 integrity metadata
+- provide offline `verify` and `replay` flows suitable for authority-controlled deployments
+- demonstrate tamper detection against modified extraction fields, metadata, and state hashes
+
+The intended Rust deliverable lives under `agy7rust/` and acts as a hardened CLI path for SPARK-oriented packaging:
+
+```bash
+agy7rust compress --input examples/spark/extraction.json --output artifacts/spark/extraction.spkg
+agy7rust inspect  --input artifacts/spark/extraction.spkg
+agy7rust verify   --input artifacts/spark/extraction.spkg
+agy7rust replay   --input artifacts/spark/extraction.spkg
+agy7rust adversarial --input examples/spark/extraction.json
+```
+
+For the hackathon demo, the minimum proof is simple: same SPARK extraction input produces the same package bytes, valid packages replay deterministically, and any unauthorized mutation fails verification before it can become a misleading administrative artifact.
 
 ---
 
@@ -301,10 +330,12 @@ The design goal is not maximum textual compression at any cost. The goal is **ma
 .
 ├── .antigravitycli/       # Antigravity CLI/runtime configuration
 ├── Comptextv7/            # CompText v7 integration surface
+├── agy7rust/              # Rust CLI path for SPARK-ready packaging, verify, replay
 ├── artifacts/             # Generated outputs and validation artifacts
 ├── benchmarks/            # Benchmark profiles and comparison material
 ├── core/                  # KVTC / replay core components
 ├── datasets/              # Fixtures and trace datasets
+├── examples/spark/        # SPARK-style extraction fixtures and demo input
 ├── reports/               # Evaluation notes and generated reports
 ├── tests/                 # Holdout, replay, and integrity tests
 └── README.md              # Project landing page
@@ -330,8 +361,17 @@ python -m pytest
 When working on the Rust path, use the normal Rust toolchain from the Rust module location:
 
 ```bash
+cd agy7rust
 cargo test
 cargo build --release
+```
+
+SPARK demo target:
+
+```bash
+cargo run -- compress -i ../examples/spark/extraction.json -o ../artifacts/spark/extraction.spkg
+cargo run -- verify   -i ../artifacts/spark/extraction.spkg
+cargo run -- replay   -i ../artifacts/spark/extraction.spkg
 ```
 
 ---
@@ -342,7 +382,7 @@ Before submitting changes, verify that your patch does not weaken replay determi
 
 ```bash
 python -m pytest
-cargo test
+cd agy7rust && cargo test
 ```
 
 Recommended checks:
@@ -352,16 +392,18 @@ Recommended checks:
 - sidecar hash validation catches mutation
 - holdout validation remains stable
 - benchmark outputs are reproducible
+- SPARK-style extraction fixtures verify and replay deterministically
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome. The project is especially interested in work that improves determinism, compression quality, auditability, or Rust hardening.
+Contributions are welcome. The project is especially interested in work that improves determinism, compression quality, auditability, Rust hardening, or SPARK-style administrative AI verification.
 
 Good first contribution areas:
 
 - add new trace fixtures
+- add SPARK-style extraction fixtures
 - improve benchmark coverage
 - document edge cases
 - add Rust-side validation tests
@@ -386,8 +428,10 @@ Please keep PRs small, reproducible, and validation-oriented.
 - [x] SHA-256 integrity anchoring
 - [x] Holdout-oriented validation profile
 - [x] Rust execution path introduced
+- [ ] SPARK-style extraction package format
 - [ ] Schema-driven sidecar extraction
 - [ ] Rust-first replay validator
+- [ ] Offline SPARK demo fixtures
 - [ ] CI benchmark snapshots
 - [ ] Public examples for custom trace datasets
 - [ ] v8 generalization layer for enterprise agent pipelines
