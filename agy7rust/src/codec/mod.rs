@@ -1,3 +1,2 @@
-pub mod decode;
-pub mod encode;
-pub mod schema;
+pub mod hash;
+pub mod package;
