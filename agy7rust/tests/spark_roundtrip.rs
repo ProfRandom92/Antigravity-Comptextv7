@@ -1123,3 +1123,17 @@ fn test_context_validate_invalid_shape_fails() {
     assert!(res.is_err());
     assert!(res.unwrap_err().contains("validate_model_shape failed"));
 }
+
+#[test]
+fn test_sparkctl_doctor_execution() {
+    use std::process::Command;
+    let output = Command::new("cargo")
+        .args(&["run", "--bin", "sparkctl", "--", "doctor"])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("=== sparkctl doctor report ==="));
+    assert!(stdout_str.contains("doctor result: PASS"));
+}
