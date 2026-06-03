@@ -1,4 +1,8 @@
-# 🚀 Antigravity × CompText v7
+# sparkctl
+
+## Antigravity-CompText v7 / SPARK Context Layer
+
+<!-- Branding assets pending: assets/branding/sparkctl-logo.png -->
 
 <div align="center">
 
@@ -8,25 +12,18 @@
 [![Rust](https://img.shields.io/badge/Rust-integrated-000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Security](https://img.shields.io/badge/Security-SHA--256%20Sidecar-red.svg?style=for-the-badge)](#-security-model)
 [![SPARK](https://img.shields.io/badge/SPARK-Hackathon%20Track-2b6cb0.svg?style=for-the-badge)](#-spark-hackathon-track)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](#-contributing)
 
-**Deterministic trace compression for autonomous agent systems.**
-
-CompText v7 separates compressible linguistic payloads from replay-critical state, then reconstructs canonical traces with cryptographic sidecar integrity. The SPARK track adds an offline Rust path for packaging, schema checks, operational context generation, token-light rendering, and context validation.
-
-[Overview](#-overview) • [SPARK Track](#-spark-hackathon-track) • [Operational Context Layer](#-operational-context-layer) • [Architecture](#-architecture) • [Rust Integration](#-rust-integration) • [Quickstart](#-quickstart)
+**Deterministic trace compression and operational context validation for autonomous agent systems.**
 
 </div>
 
 ---
 
-## ✨ Overview
+## 🚀 Overview
 
-**Antigravity × CompText v7** is a KVTC-style core engine for deterministic trace compression and replay-oriented reconstruction in autonomous multi-agent systems.
+`sparkctl` is the unified operations controller and command-line interface for the **Antigravity-CompText v7 / SPARK Context Layer**. It streamlines local diagnostics, codebase validation, pipeline lifecycle orchestration, and integration demonstrations under a clean, secure, and offline execution environment.
 
-The central idea is simple:
-
-> Compress what is linguistically redundant. Preserve what is operationally decisive.
+CompText v7 separates compressible linguistic payloads from replay-critical state, then reconstructs canonical traces with cryptographic sidecar integrity. The SPARK Context Layer provides offline Rust pipelines for packaging, schema validation, token-light rendering, and structured context checking.
 
 Classic lossy trace compression fails when validators expect exact tool order, commitment tokens, state hashes, and canonical replay strings. CompText v7 avoids that failure mode by splitting each trace into two coordinated streams:
 
@@ -39,103 +36,59 @@ Classic lossy trace compression fails when validators expect exact tool order, c
 
 ---
 
-## 🏛 SPARK Hackathon Track
+## 🛠 Command Surface
 
-**SPARK-style extraction packaging for offline audit workflows.**
+`sparkctl` consolidates all operations under a single command-line interface:
 
-This repository contains the SPARK Hackathon integration track for applying CompText v7 design patterns to audit-safe administrative AI workflows. The target use case is deterministic packaging of SPARK-style extraction outputs so that structured results from planning and approval procedures can be verified, replayed, schema-checked, and summarized without reconstructing raw payload content.
+*   **`sparkctl doctor`**: Diagnoses local project readiness by verifying the presence of key configuration files, JSON schemas, and output artifacts.
+*   **`sparkctl rust-validate`**: Automates execution of local crate quality checks (`cargo fmt`, `cargo check`, `cargo test`, `cargo clippy`).
+*   **`sparkctl context-all`**: Coordinates the local context pipeline sequence (`context-build`, `context-render`, `context-validate`).
+*   **`sparkctl spark-demo`**: Orchestrates the full end-to-end integration lifecycle (`compress`, `context-build`, `context-render`, `context-validate`).
+*   **`sparkctl handoff-check`**: Validates file completeness and command availability to ensure clean repository handoff status.
 
-The SPARK track focuses on the **Safe and Stable** challenge:
+---
 
-- wrap SPARK-style extractor JSON into a deterministic CompText v7 package
-- preserve replay-critical fields in a sidecar instead of compressing them away
-- anchor packages with SHA-256 integrity metadata
-- provide offline `verify`, `replay`, and `schema-check` flows for authority-controlled deployments
-- provide an offline operational context layer for build/render/validate workflows
-- demonstrate tamper-sensitive checks against modified extraction fields, metadata, and state hashes
+## ⚡ Quickstart
 
-The Rust deliverable lives under `agy7rust/` and exposes the CLI path for SPARK-style packaging:
+To run `sparkctl`, navigate to the `agy7rust` directory and use `cargo run`:
 
 ```bash
 cd agy7rust
-cargo run -- compress -i ../examples/spark/extraction.json -o ../artifacts/spark/extraction.spkg
-cargo run -- inspect  -i ../artifacts/spark/extraction.spkg
-cargo run -- verify   -i ../artifacts/spark/extraction.spkg
-cargo run -- replay   -i ../artifacts/spark/extraction.spkg
-cargo run -- adversarial -i ../examples/spark/extraction.json
-cargo run -- schema-check -i ../examples/spark/extraction.json -s ../schemas/genehmigung_v1.json
+cargo run --bin sparkctl -- doctor
+cargo run --bin sparkctl -- rust-validate
+cargo run --bin sparkctl -- context-all
+cargo run --bin sparkctl -- spark-demo
+cargo run --bin sparkctl -- handoff-check
 ```
 
-For the hackathon demo, the minimum proof is simple: the same SPARK-style extraction input produces the same package bytes in the validated scope, valid packages replay deterministically in that scope, and unauthorized mutation fails verification before it can become a misleading administrative artifact.
+### Artifact Outputs
+The SPARK pipeline generates and validates the following key artifacts under `artifacts/spark/`:
+- `artifacts/spark/extraction.spkg`: The deterministically compressed trace package containing payload and sidecar metadata.
+- `artifacts/spark/context.json`: The compiled structured operational context mapping dependencies and security parameters.
+- `artifacts/spark/context_render.txt`: The token-light rendered text view for verification and summarization.
 
 ---
 
-## 🧩 Operational Context Layer
+## 🔒 Safety, Boundaries & Claim Hygiene
 
-Phase 3 adds the SPARK operational context layer. It is intentionally offline and narrow: it does not add MCP server behavior, RAG, embeddings, a vector database, external tool orchestration, or official SPARK compatibility claims.
-
-The layer is split into four completed slices:
-
-| Phase | Capability | Main outputs |
-|---|---|---|
-| **3A** | Context model | `OperationalContext`, dependency edges, validation metadata |
-| **3B** | Context build | `artifacts/spark/context.json` |
-| **3C** | Context render | `artifacts/spark/context_render.txt` |
-| **3D** | Context validate | structural and configured leak-boundary checks |
-
-Run from `agy7rust/`:
-
-```bash
-cargo run -- context-build -i ../artifacts/spark/extraction.spkg -s ../schemas/genehmigung_v1.json -o ../artifacts/spark/context.json
-cargo run -- context-render -i ../artifacts/spark/context.json -o ../artifacts/spark/context_render.txt
-cargo run -- context-validate -i ../artifacts/spark/context.json
-```
-
-Phase 3 handoff artifacts:
-
-- `PHASE3_CONTEXT_LAYER_PLAN.md`
-- `PHASE3A_CONTEXT_MODEL_SNAPSHOT.md`
-- `PHASE3B_CONTEXT_BUILD_HANDBOOK.md`
-- `PHASE3B_CONTEXT_BUILD_SNAPSHOT.md`
-- `PHASE3C_CONTEXT_RENDER_HANDBOOK.md`
-- `PHASE3C_CONTEXT_RENDER_SNAPSHOT.md`
-- `PHASE3D_CONTEXT_VALIDATE_HANDBOOK.md`
-- `PHASE3D_CONTEXT_VALIDATE_SNAPSHOT.md`
-- `PHASE3_CONTEXT_LAYER_FINAL_SNAPSHOT.md`
-- `PHASE3_GITHUB_HANDOFF.md`
-
-Validation recorded before handoff:
-
-```bash
-cargo fmt --all --check
-cargo check
-cargo test
-cargo clippy -- -D warnings
-cargo run -- context-build -i ../artifacts/spark/extraction.spkg -s ../schemas/genehmigung_v1.json -o ../artifacts/spark/context.json
-cargo run -- context-render -i ../artifacts/spark/context.json -o ../artifacts/spark/context_render.txt
-cargo run -- context-validate -i ../artifacts/spark/context.json
-cargo run -- schema-check -i ../examples/spark/extraction.json -s ../schemas/genehmigung_v1.json
-powershell -File ./demo_spark.ps1
-```
-
-Observed in the validated local scope: `cargo test` passed 27/27 tests, offline behavior was deterministic in the validated test scope, and configured leak checks passed in the validated scope.
+*   **Offline Execution:** All subcommands operate completely locally. Offline behavior was deterministic in the validated test scope.
+*   **Leak Boundaries:** Configured leak checks passed in the validated scope.
+*   **Local Handoff Checks:** `sparkctl handoff-check` validates local repository readiness and file availability only; it does not verify remote CI or GitHub Actions status.
+*   **Compatibility:** No official SPARK compatibility claim is made.
+*   **Compliance:** No compliance claim (such as EU AI Act compliance) is made.
+*   **Risks:** No blocking risks found in the validated scope.
 
 ---
 
-## 🧠 Why this exists
+## 📈 Project Phase Status
 
-Agent traces are not normal text. They contain natural language, tool calls, hidden sequencing assumptions, external state references, and validation-sensitive tokens. If all of that is compressed as plain prose, replay integrity collapses.
-
-CompText v7 treats agent traces as structured artifacts:
-
-- **Payload text** can be reduced aggressively.
-- **Replay-critical state** is isolated in deterministic metadata.
-- **Integrity anchors** make silent mutation detectable.
-- **Canonical reconstruction** keeps validation independent from stochastic LLM recovery.
+*   **Phase 3 (Context Layer):** Build, Render, and Validate slices — **Complete**
+*   **Phase 4 (sparkctl Command Surface):** `doctor`, `rust-validate`, `context-all`, `spark-demo`, and `handoff-check` subcommands — **Complete**
+*   **Phase 5 (Release & Branding):** Release documentation & branding integration — **In Progress**
 
 ---
 
-## 🗺 Architecture
+## 🏛 Architecture
 
 CompText v7 is built around one hard rule: **payload compression must never destroy replay-critical state**.
 
@@ -259,7 +212,7 @@ The sidecar protects:
 - validation-critical anchors
 - context validation anchors
 
-If a compressed package is modified without updating the expected integrity chain, reconstruction should fail loudly instead of producing a misleading replay.
+If a compressed package is modified without updating the expected integrity chain, reconstruction fails loudly instead of producing a misleading replay.
 
 Non-claims:
 
@@ -308,84 +261,6 @@ The design goal is not maximum textual compression at any cost. The goal is maxi
 
 ---
 
-## ⚡ Quickstart
-
-Clone the repository:
-
-```bash
-git clone https://github.com/ProfRandom92/Antigravity-Comptextv7.git
-cd Antigravity-Comptextv7
-```
-
-Run the Python validation suite:
-
-```bash
-python -m pytest
-```
-
-Run the Rust path:
-
-```bash
-cd agy7rust
-cargo test
-cargo build --release
-```
-
-SPARK package demo:
-
-```bash
-cargo run -- compress -i ../examples/spark/extraction.json -o ../artifacts/spark/extraction.spkg
-cargo run -- verify   -i ../artifacts/spark/extraction.spkg
-cargo run -- replay   -i ../artifacts/spark/extraction.spkg
-cargo run -- schema-check -i ../examples/spark/extraction.json -s ../schemas/genehmigung_v1.json
-```
-
-SPARK context demo:
-
-```bash
-cargo run -- context-build -i ../artifacts/spark/extraction.spkg -s ../schemas/genehmigung_v1.json -o ../artifacts/spark/context.json
-cargo run -- context-render -i ../artifacts/spark/context.json -o ../artifacts/spark/context_render.txt
-cargo run -- context-validate -i ../artifacts/spark/context.json
-```
-
-Full Rust validation checklist:
-
-```bash
-cargo fmt --all --check
-cargo check
-cargo test
-cargo clippy -- -D warnings
-powershell -File ./demo_spark.ps1
-```
-
----
-
-## 🧪 What to test before opening a PR
-
-Before submitting changes, verify that your patch does not weaken replay determinism or context-layer boundaries:
-
-```bash
-python -m pytest
-cd agy7rust
-cargo fmt --all --check
-cargo check
-cargo test
-cargo clippy -- -D warnings
-```
-
-Recommended checks:
-
-- compressed payload stays smaller than raw baseline
-- replay reconstruction remains canonical in the validated scope
-- sidecar hash validation catches mutation
-- schema-sidecar validation still rejects missing required fields
-- context rendering remains token-light
-- configured leak checks continue to pass
-- benchmark outputs are reproducible
-- SPARK-style extraction fixtures verify, replay, and context-validate deterministically in the validated test scope
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome. The project is especially interested in work that improves determinism, compression quality, auditability, Rust hardening, or SPARK-style administrative AI verification.
@@ -424,6 +299,7 @@ Please keep PRs small, reproducible, and validation-oriented.
 - [x] Offline SPARK demo fixtures
 - [x] SPARK operational context model
 - [x] SPARK context build/render/validate CLI flow
+- [x] Unified CLI `sparkctl` (`doctor`, `rust-validate`, `context-all`, `spark-demo`, `handoff-check`)
 - [ ] CI benchmark snapshots
 - [ ] Fresh-clone GitHub verification workflow
 - [ ] Public examples for custom trace datasets
