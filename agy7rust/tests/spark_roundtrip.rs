@@ -1137,3 +1137,18 @@ fn test_sparkctl_doctor_execution() {
     assert!(stdout_str.contains("=== sparkctl doctor report ==="));
     assert!(stdout_str.contains("doctor result: PASS"));
 }
+
+#[test]
+fn test_sparkctl_rust_validate_execution() {
+    use std::process::Command;
+    let output = Command::new("cargo")
+        .env("SPARKCTL_IN_TEST", "1")
+        .args(&["run", "--bin", "sparkctl", "--", "rust-validate"])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("=== sparkctl rust-validate ==="));
+    assert!(stdout_str.contains("rust-validate result: PASS"));
+}

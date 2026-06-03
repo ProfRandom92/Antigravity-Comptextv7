@@ -16,6 +16,8 @@ struct Cli {
 enum Commands {
     #[command(about = "Diagnose local project readiness")]
     Doctor,
+    #[command(about = "Run local Rust quality checks (fmt, check, test, clippy)")]
+    RustValidate,
 }
 
 fn main() -> Result<()> {
@@ -24,6 +26,9 @@ fn main() -> Result<()> {
     match &cli.command {
         Commands::Doctor => {
             sparkctl::doctor::run_doctor()?;
+        }
+        Commands::RustValidate => {
+            sparkctl::rust_validate::run_rust_validate()?;
         }
     }
 
