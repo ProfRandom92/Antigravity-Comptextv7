@@ -1,6 +1,9 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
+#[path = "../sparkctl/mod.rs"]
+mod sparkctl;
+
 #[derive(Parser)]
 #[command(name = "agy-ct")]
 #[command(about = "Antigravity-CompText SPARK CLI", long_about = None)]
@@ -183,16 +186,16 @@ fn main() -> Result<()> {
             println!("Placeholder: run automatic workflow execution");
         }
         Commands::Demo => {
-            println!("Placeholder: demo workflow execution");
+            sparkctl::spark_demo::run_spark_demo()?;
         }
         Commands::Doctor => {
-            println!("Placeholder: doctor diagnostics check");
+            sparkctl::doctor::run_doctor()?;
         }
         Commands::Validate => {
-            println!("Placeholder: validation code checks");
+            sparkctl::rust_validate::run_rust_validate()?;
         }
         Commands::Handoff => {
-            println!("Placeholder: handoff verification check");
+            sparkctl::handoff_check::run_handoff_check()?;
         }
         Commands::Package { subcommand } => match subcommand {
             PackageCommands::Compress { .. } => {
@@ -222,7 +225,7 @@ fn main() -> Result<()> {
                 println!("Placeholder: context validate");
             }
             ContextCommands::All => {
-                println!("Placeholder: context all");
+                sparkctl::context_all::run_context_all()?;
             }
         },
         Commands::Schema { subcommand } => match subcommand {
