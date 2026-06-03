@@ -20,6 +20,8 @@ enum Commands {
     RustValidate,
     #[command(about = "Run complete context lifecycle (build, render, validate)")]
     ContextAll,
+    #[command(about = "Run complete end-to-end demo pipeline (compress, build, render, validate)")]
+    SparkDemo,
 }
 
 fn main() -> Result<()> {
@@ -34,6 +36,9 @@ fn main() -> Result<()> {
         }
         Commands::ContextAll => {
             sparkctl::context_all::run_context_all()?;
+        }
+        Commands::SparkDemo => {
+            sparkctl::spark_demo::run_spark_demo()?;
         }
     }
 

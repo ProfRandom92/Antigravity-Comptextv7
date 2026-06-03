@@ -1166,3 +1166,17 @@ fn test_sparkctl_context_all_execution() {
     assert!(stdout_str.contains("=== sparkctl context-all ==="));
     assert!(stdout_str.contains("context-all result: PASS"));
 }
+
+#[test]
+fn test_sparkctl_spark_demo_execution() {
+    use std::process::Command;
+    let output = Command::new("cargo")
+        .args(&["run", "--bin", "sparkctl", "--", "spark-demo"])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("=== sparkctl spark-demo ==="));
+    assert!(stdout_str.contains("spark-demo result: PASS"));
+}
