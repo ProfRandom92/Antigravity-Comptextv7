@@ -1,33 +1,41 @@
-# sparkctl
+# CompText-Sparkctl
 
 <p align="center">
-  <img src="assets/branding/sparkctl-logo.png" alt="sparkctl logo" width="520">
+  <img src="assets/branding/sparkctl-logo.png" alt="CompText-Sparkctl logo" width="520">
 </p>
-
-## Antigravity-CompText v7 / SPARK Context Layer
 
 <div align="center">
 
-[![GitHub Stars](https://img.shields.io/github/stars/ProfRandom92/Antigravity-Comptextv7?style=for-the-badge&color=yellow)](https://github.com/ProfRandom92/Antigravity-Comptextv7/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/ProfRandom92/comptext-sparkctl?style=for-the-badge&color=yellow)](https://github.com/ProfRandom92/comptext-sparkctl/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Rust](https://img.shields.io/badge/Rust-integrated-000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![Security](https://img.shields.io/badge/Security-SHA--256%20Sidecar-red.svg?style=for-the-badge)](#-security-model)
-[![SPARK](https://img.shields.io/badge/SPARK-Hackathon%20Track-2b6cb0.svg?style=for-the-badge)](#-spark-hackathon-track)
+[![Rust](https://img.shields.io/badge/Rust-CLI-000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Security](https://img.shields.io/badge/Security-SHA--256%20Sidecar-red.svg?style=for-the-badge)](#-safety-boundaries--claim-hygiene)
+[![SPARK](https://img.shields.io/badge/SPARK-Context%20Artifacts-2b6cb0.svg?style=for-the-badge)](#-spark-context-artifacts)
 
-**Deterministic trace compression and operational context validation for autonomous agent systems.**
+**Deterministic Rust CLI for CompText trace packaging, replay-sidecar validation, and SPARK-ready context artifacts.**
 
 </div>
 
 ---
 
-## 🚀 Overview
+## Overview
 
-`sparkctl` is the unified operations controller and command-line interface for the **Antigravity-CompText v7 / SPARK Context Layer**. It streamlines local diagnostics, codebase validation, pipeline lifecycle orchestration, and integration demonstrations under a clean, secure, and offline execution environment.
+**CompText-Sparkctl** is a local Rust command-line toolkit for turning agent or operational traces into compact, verifiable packages and SPARK-style context artifacts.
 
-CompText v7 separates compressible linguistic payloads from replay-critical state, then reconstructs canonical traces with cryptographic sidecar integrity. The SPARK Context Layer provides offline Rust pipelines for packaging, schema validation, token-light rendering, and structured context checking.
+The project is built around one hard rule: **compression must not destroy replay-critical state**. CompText separates compact linguistic payloads from replay-sensitive metadata, then validates the result with a replay sidecar, SHA-256 integrity anchors, schema checks, and offline context validation flows.
 
-Classic lossy trace compression fails when validators expect exact tool order, commitment tokens, state hashes, and canonical replay strings. CompText v7 avoids that failure mode by splitting each trace into two coordinated streams:
+The repository currently exposes two CLI entry points:
+
+- `sparkctl` — the validated compatibility surface for local diagnostics, Rust validation, context pipeline checks, demo execution, and handoff checks.
+- `agy-ct` — the newer CompText command surface, currently wired to safe compatibility wrappers for selected existing `sparkctl` functionality.
+
+Previously, this project used the working name **Antigravity-CompText v7**. The current public project name is **CompText-Sparkctl**.
+
+---
+
+## What it does
+
+CompText-Sparkctl validates the split between compressible trace content and replay-critical state:
 
 | Layer | Purpose | Target property |
 |---|---|---|
@@ -35,24 +43,17 @@ Classic lossy trace compression fails when validators expect exact tool order, c
 | **Replay sidecar** | Tool sequence, commitments, hashes, state anchors | Deterministic reconstruction in the validated scope |
 | **SHA-256 audit chain** | Integrity metadata over critical replay data | Tamper-sensitive validation |
 | **Holdout validator** | Non-adaptive replay verification | Stable replay score in benchmark runs |
+| **SPARK context artifacts** | Structured operational context and rendered summaries | Local validation and handoff readiness |
+
+Classic lossy compression fails when validators expect exact tool order, commitment tokens, state hashes, and canonical replay strings. CompText-Sparkctl keeps those replay-sensitive fields outside the lossy zone.
 
 ---
 
-## 🛠 Command Surface
+## Command Surface
 
-`sparkctl` consolidates all operations under a single command-line interface:
+### `sparkctl`
 
-*   **`sparkctl doctor`**: Diagnoses local project readiness by verifying the presence of key configuration files, JSON schemas, and output artifacts.
-*   **`sparkctl rust-validate`**: Automates execution of local crate quality checks (`cargo fmt`, `cargo check`, `cargo test`, `cargo clippy`).
-*   **`sparkctl context-all`**: Coordinates the local context pipeline sequence (`context-build`, `context-render`, `context-validate`).
-*   **`sparkctl spark-demo`**: Orchestrates the full end-to-end integration lifecycle (`compress`, `context-build`, `context-render`, `context-validate`).
-*   **`sparkctl handoff-check`**: Validates file completeness and command availability to ensure clean repository handoff status.
-
----
-
-## ⚡ Quickstart
-
-To run `sparkctl`, navigate to the `agy7rust` directory and use `cargo run`:
+`sparkctl` is the validated operations controller:
 
 ```bash
 cd agy7rust
@@ -63,42 +64,61 @@ cargo run --bin sparkctl -- spark-demo
 cargo run --bin sparkctl -- handoff-check
 ```
 
-### Artifact Outputs
-The SPARK pipeline generates and validates the following key artifacts under `artifacts/spark/`:
-- `artifacts/spark/extraction.spkg`: The deterministically compressed trace package containing payload and sidecar metadata.
-- `artifacts/spark/context.json`: The compiled structured operational context mapping dependencies and security parameters.
-- `artifacts/spark/context_render.txt`: The token-light rendered text view for verification and summarization.
+Validated command responsibilities:
+
+- `sparkctl doctor` checks local project readiness.
+- `sparkctl rust-validate` runs local Rust quality checks.
+- `sparkctl context-all` runs the local context build/render/validate sequence.
+- `sparkctl spark-demo` runs the local end-to-end demonstration flow.
+- `sparkctl handoff-check` checks local repository handoff readiness.
+
+### `agy-ct`
+
+`agy-ct` is the newer command surface for CompText-Sparkctl. It currently provides the command tree and safe compatibility wrappers without introducing a new run orchestrator.
+
+```bash
+cd agy7rust
+cargo run --bin agy-ct -- --help
+cargo run --bin agy-ct -- doctor
+cargo run --bin agy-ct -- validate
+cargo run --bin agy-ct -- handoff
+cargo run --bin agy-ct -- demo
+cargo run --bin agy-ct -- context all
+```
+
+Current wrapper mapping:
+
+| `agy-ct` command | Existing validated backend |
+|---|---|
+| `agy-ct doctor` | `sparkctl::doctor::run_doctor()` |
+| `agy-ct validate` | `sparkctl::rust_validate::run_rust_validate()` |
+| `agy-ct handoff` | `sparkctl::handoff_check::run_handoff_check()` |
+| `agy-ct demo` | `sparkctl::spark_demo::run_spark_demo()` |
+| `agy-ct context all` | `sparkctl::context_all::run_context_all()` |
+
+Other `agy-ct` commands remain explicit placeholders until their implementation phase is approved.
 
 ---
 
-## 🔒 Safety, Boundaries & Claim Hygiene
+## SPARK Context Artifacts
 
-*   **Offline Execution:** All subcommands operate completely locally. Offline behavior was deterministic in the validated test scope.
-*   **Leak Boundaries:** Configured leak checks passed in the validated scope.
-*   **Local Handoff Checks:** `sparkctl handoff-check` validates local repository readiness and file availability only; it does not verify remote CI or GitHub Actions status.
-*   **Compatibility:** No official SPARK compatibility claim is made.
-*   **Compliance:** No compliance claim (such as EU AI Act compliance) is made.
-*   **Risks:** No blocking risks found in the validated scope.
+The local SPARK-style demo and context pipeline generates and validates artifacts under `artifacts/spark/`:
 
----
+- `artifacts/spark/extraction.spkg` — compact trace package containing payload and replay-sidecar metadata.
+- `artifacts/spark/context.json` — structured operational context for validation and handoff.
+- `artifacts/spark/context_render.txt` — token-light rendered context view for review and summarization.
 
-## 📈 Project Phase Status
-
-*   **Phase 3 (Context Layer):** Build, Render, and Validate slices — **Complete**
-*   **Phase 4 (sparkctl Command Surface):** `doctor`, `rust-validate`, `context-all`, `spark-demo`, and `handoff-check` subcommands — **Complete**
-*   **Phase 5 (Release & Branding):** Release documentation & branding integration — **In Progress**
+These artifacts are intended for local, reproducible validation and review workflows.
 
 ---
 
-## 🏛 Architecture
-
-CompText v7 is built around one hard rule: **payload compression must never destroy replay-critical state**.
+## Architecture
 
 ```mermaid
 flowchart TD
-    raw["Raw Agent / LMCache Trace"]
+    raw["Raw Agent / Operational Trace"]
 
-    subgraph split["KVTC Split Layer"]
+    subgraph split["CompText Split Layer"]
         splitter["Trace Splitter"]
         classifier["Replay-Critical Field Classifier"]
     end
@@ -106,17 +126,17 @@ flowchart TD
     subgraph payload["Compressible Payload Stream"]
         text["Linguistic Payload"]
         prune["Redundancy Pruning"]
-        compact["CompText v7 Compact Payload"]
+        compact["Compact Payload"]
     end
 
-    subgraph sidecar["Deterministic Replay Sidecar"]
+    subgraph sidecar["Replay Sidecar"]
         order["Tool Order"]
         commits["Commitment Tokens"]
         state["State Hashes"]
         anchors["Validation Anchors"]
     end
 
-    subgraph context["Operational Context Layer"]
+    subgraph context["SPARK Context Layer"]
         ctxbuild["context-build"]
         ctxrender["context-render"]
         ctxvalidate["context-validate"]
@@ -166,7 +186,7 @@ flowchart LR
         H["Context validation anchors"]
     end
 
-    subgraph output["CompText v7 Package"]
+    subgraph output["CompText Package"]
         I["Compact payload"]
         J["Replay sidecar"]
         K["SHA-256 audit chain"]
@@ -186,48 +206,41 @@ flowchart LR
 
 ---
 
-## 🦀 Rust Integration
+## Rust Integration
 
-Rust is integrated as the execution path for the parts that should be fast, deterministic in the validated scope, and easy to audit:
+Rust is the hardened local execution path for components that need to be fast, auditable, and deterministic in the validated scope:
 
 - byte-level payload handling
 - deterministic hashing and verification
 - replay-sidecar validation
 - schema-sidecar validation
 - operational context build/render/validate flows
-- low-overhead execution inside local validation workflows
+- local CLI validation and handoff checks
 
-Python remains useful as the reference and experimentation layer. Rust is the direction for hardened execution.
+Python remains useful as a reference and experimentation layer. Rust is the direction for hardened execution.
 
 ---
 
-## 🔒 Security Model
+## Safety, Boundaries & Claim Hygiene
 
-CompText v7 does not treat compression as a purely cosmetic optimization. Every replay-sensitive field is part of the integrity surface.
-
-The sidecar protects:
-
-- tool execution order
-- commitment and control tokens
-- final state hash
-- replay metadata
-- validation-critical anchors
-- context validation anchors
-
-If a compressed package is modified without updating the expected integrity chain, reconstruction fails loudly instead of producing a misleading replay.
+- **Offline execution:** Validated commands operate locally. Offline behavior was deterministic in the validated test scope.
+- **Leak boundaries:** Configured leak checks passed in the validated scope.
+- **Local handoff checks:** `sparkctl handoff-check` checks local repository readiness and file availability only; it does not verify remote CI or GitHub Actions status.
+- **SPARK:** No official SPARK compatibility claim is made.
+- **Compliance:** No compliance claim, including EU AI Act compliance, is made.
+- **Risk statement:** No blocking risks found in the validated scope.
 
 Non-claims:
 
-- no official SPARK compatibility claim
-- no EU AI Act compliance claim
 - no legal evidentiary-status claim
 - no forensic certainty claim
-- no MCP server capability
+- no MCP server capability claim
 - no RAG, embeddings, vector database, or external tool-orchestration layer
+- no production-readiness, certification, or compliance claim
 
 ---
 
-## 📊 Benchmarks
+## Benchmarks
 
 Current validation targets are based on the existing CompText v7 benchmark profile:
 
@@ -238,19 +251,20 @@ Current validation targets are based on the existing CompText v7 benchmark profi
 | C | Regex pruning | ~68 % of raw | 1.00 | No forensic integrity |
 | D/E | Blind reduction | variable | 0.0 on complex traces | Loses temporal/state-critical tokens |
 
-The design goal is not maximum textual compression at any cost. The goal is maximum safe reduction under strict deterministic replay constraints.
+The design goal is not maximum textual compression at any cost. The goal is maximum safe reduction under strict replay constraints.
 
 ---
 
-## 📦 Repository Map
+## Repository Map
 
 ```text
 .
 ├── .agent/                 # Local agent skills used for gated implementation
-├── .antigravitycli/        # Antigravity CLI/runtime configuration
+├── .antigravitycli/        # Local agent runtime configuration
 ├── Comptextv7/             # CompText v7 integration surface
-├── agy7rust/               # Rust CLI path for SPARK-style packaging and context flows
-├── artifacts/spark/        # Generated SPARK demo/package/context artifacts
+├── agy7rust/               # Rust CLI path for packaging, validation, and context flows
+├── artifacts/spark/        # Generated SPARK-style demo/package/context artifacts
+├── assets/branding/        # Project branding assets
 ├── benchmarks/             # Benchmark profiles and comparison material
 ├── core/                   # KVTC / replay core components
 ├── datasets/               # Fixtures and trace datasets
@@ -263,9 +277,43 @@ The design goal is not maximum textual compression at any cost. The goal is maxi
 
 ---
 
-## 🤝 Contributing
+## Project Phase Status
 
-Contributions are welcome. The project is especially interested in work that improves determinism, compression quality, auditability, Rust hardening, or SPARK-style administrative AI verification.
+- **Phase 3:** Operational context layer — complete.
+- **Phase 4:** `sparkctl` command surface — complete.
+- **Phase 5:** Release README and branding integration — complete.
+- **Phase 6A:** `agy-ct` CLI architecture handbook — complete.
+- **Phase 6B:** `agy-ct` binary and command tree — complete.
+- **Phase 6C:** `agy-ct` compatibility wrappers — complete in the validated command scope.
+
+---
+
+## Roadmap
+
+- [x] Deterministic replay-sidecar architecture
+- [x] SHA-256 integrity anchoring
+- [x] Holdout-oriented validation profile
+- [x] Rust execution path introduced
+- [x] SPARK-style extraction package format
+- [x] Schema-driven sidecar extraction
+- [x] Offline SPARK demo fixtures
+- [x] SPARK operational context model
+- [x] SPARK context build/render/validate CLI flow
+- [x] Unified `sparkctl` CLI
+- [x] `agy-ct` command surface
+- [x] `agy-ct` compatibility wrappers
+- [ ] `agy-ct run` orchestrator
+- [ ] JSON report export
+- [ ] Notebook bundle/export
+- [ ] Context compiler roadmap
+- [ ] Agent-control event model
+- [ ] Fresh-clone GitHub verification workflow
+
+---
+
+## Contributing
+
+Contributions are welcome, especially work that improves determinism, compression quality, auditability, Rust hardening, SPARK-style administrative AI verification, or reproducible validation.
 
 Good first contribution areas:
 
@@ -278,44 +326,11 @@ Good first contribution areas:
 - improve CI reproducibility
 - extend operational context validation while preserving leak boundaries
 
-Contribution flow:
-
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature/your-improvement`.
-3. Make a focused change.
-4. Run tests locally.
-5. Open a pull request with a clear before/after explanation.
-
-Please keep PRs small, reproducible, and validation-oriented.
+Please keep pull requests small, reproducible, and validation-oriented.
 
 ---
 
-## 🛣 Roadmap
-
-- [x] Deterministic replay-sidecar architecture
-- [x] SHA-256 integrity anchoring
-- [x] Holdout-oriented validation profile
-- [x] Rust execution path introduced
-- [x] SPARK-style extraction package format
-- [x] Schema-driven sidecar extraction
-- [x] Offline SPARK demo fixtures
-- [x] SPARK operational context model
-- [x] SPARK context build/render/validate CLI flow
-- [x] Unified CLI `sparkctl` (`doctor`, `rust-validate`, `context-all`, `spark-demo`, `handoff-check`)
-- [ ] CI benchmark snapshots
-- [ ] Fresh-clone GitHub verification workflow
-- [ ] Public examples for custom trace datasets
-- [ ] v8 generalization layer for enterprise agent pipelines
-
----
-
-## 🌟 Support the project
-
-If this project helps you reason about safer agent traces, compression, or deterministic replay, consider leaving a star. It makes the project easier to discover and helps attract contributors who care about reliable agent infrastructure.
-
----
-
-## 📄 License
+## License
 
 This project is released under the MIT License.
 
@@ -323,6 +338,6 @@ This project is released under the MIT License.
 
 <div align="center">
 
-**CompText v7: compress the noise, preserve the proof.**
+**CompText-Sparkctl: compress the noise, preserve the proof.**
 
 </div>
