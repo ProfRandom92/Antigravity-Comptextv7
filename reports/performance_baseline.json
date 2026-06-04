@@ -1,0 +1,62 @@
+{
+  "tool": "agy-ct",
+  "project": "CompText-Sparkctl",
+  "phase": "6G",
+  "wording_statement": "Performance baseline measured on local validation environment. No performance optimization was performed in this phase. Measurements are local and environment-specific.",
+  "timings": [
+    {
+      "command": "cargo run --bin agy-ct -- run",
+      "duration_seconds": 8.36
+    },
+    {
+      "command": "cargo run --bin agy-ct -- doctor",
+      "duration_seconds": 0.39
+    },
+    {
+      "command": "cargo run --bin agy-ct -- validate",
+      "duration_seconds": 18.48
+    },
+    {
+      "command": "cargo run --bin agy-ct -- context all",
+      "duration_seconds": 1.73
+    },
+    {
+      "command": "cargo run --bin sparkctl -- doctor",
+      "duration_seconds": 0.36
+    },
+    {
+      "command": "cargo run --bin sparkctl -- rust-validate",
+      "duration_seconds": 14.49
+    },
+    {
+      "command": "cargo run --bin sparkctl -- context-all",
+      "duration_seconds": 2.72
+    },
+    {
+      "command": "cargo run --bin sparkctl -- spark-demo",
+      "duration_seconds": 2.65
+    },
+    {
+      "command": "cargo run --bin sparkctl -- handoff-check",
+      "duration_seconds": 7.48
+    }
+  ],
+  "artifact_sizes": [
+    {
+      "path": "artifacts/spark/extraction.spkg",
+      "size_bytes": 1674
+    },
+    {
+      "path": "artifacts/spark/context.json",
+      "size_bytes": 1916
+    },
+    {
+      "path": "artifacts/spark/context_render.txt",
+      "size_bytes": 1757
+    },
+    {
+      "path": "reports/latest.json",
+      "size_bytes": 627
+    }
+  ]
+}
