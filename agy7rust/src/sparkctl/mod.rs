@@ -1,3 +1,4 @@
+pub mod benchmark_action;
 pub mod context_all;
 pub mod doctor;
 pub mod handoff_check;

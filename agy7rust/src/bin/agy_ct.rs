@@ -92,6 +92,8 @@ enum Commands {
         #[command(subcommand)]
         subcommand: NotebookCommands,
     },
+    #[command(about = "Run local performance benchmark and validation checks")]
+    Benchmark,
 }
 
 #[derive(Subcommand)]
@@ -244,6 +246,9 @@ fn main() -> Result<()> {
                 println!("Placeholder: notebook bundle");
             }
         },
+        Commands::Benchmark => {
+            sparkctl::benchmark_action::run_benchmark_action()?;
+        }
     }
 
     Ok(())
