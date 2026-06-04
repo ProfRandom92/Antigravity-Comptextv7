@@ -183,7 +183,7 @@ fn main() -> Result<()> {
 
     match &cli.command {
         Commands::Run => {
-            println!("Placeholder: run automatic workflow execution");
+            run_orchestrator()?;
         }
         Commands::Demo => {
             sparkctl::spark_demo::run_spark_demo()?;
@@ -245,5 +245,57 @@ fn main() -> Result<()> {
         },
     }
 
+    Ok(())
+}
+
+fn run_orchestrator() -> Result<()> {
+    println!("CompText-Sparkctl run");
+    println!();
+    println!("plan");
+    println!("  1 workspace doctor");
+    println!("  2 context pipeline");
+    println!("  3 spark demo");
+    println!("  4 handoff check");
+    println!();
+    println!("run");
+
+    // Stage 1: workspace doctor
+    if let Err(e) = sparkctl::doctor::run_doctor() {
+        println!("  [1/4] workspace doctor   FAIL");
+        println!();
+        println!("result FAIL");
+        return Err(e);
+    }
+    println!("  [1/4] workspace doctor   PASS");
+
+    // Stage 2: context pipeline
+    if let Err(e) = sparkctl::context_all::run_context_all() {
+        println!("  [2/4] context pipeline   FAIL");
+        println!();
+        println!("result FAIL");
+        return Err(e);
+    }
+    println!("  [2/4] context pipeline   PASS");
+
+    // Stage 3: spark demo
+    if let Err(e) = sparkctl::spark_demo::run_spark_demo() {
+        println!("  [3/4] spark demo         FAIL");
+        println!();
+        println!("result FAIL");
+        return Err(e);
+    }
+    println!("  [3/4] spark demo         PASS");
+
+    // Stage 4: handoff check
+    if let Err(e) = sparkctl::handoff_check::run_handoff_check() {
+        println!("  [4/4] handoff check      FAIL");
+        println!();
+        println!("result FAIL");
+        return Err(e);
+    }
+    println!("  [4/4] handoff check      PASS");
+
+    println!();
+    println!("result PASS");
     Ok(())
 }
