@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use serde::Serialize;
 
 #[path = "../sparkctl/mod.rs"]
 mod sparkctl;
@@ -248,6 +249,54 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+#[derive(Serialize)]
+struct Report {
+    tool: String,
+    project: String,
+    phase: String,
+    result: String,
+    stages: Vec<StageReport>,
+    artifacts: Vec<String>,
+    report: String,
+}
+
+#[derive(Serialize)]
+struct StageReport {
+    index: usize,
+    name: String,
+    status: String,
+}
+
+fn write_report(stages: Vec<StageReport>, result: &str) -> Result<()> {
+    let report_data = Report {
+        tool: "agy-ct".to_string(),
+        project: "CompText-Sparkctl".to_string(),
+        phase: "6E".to_string(),
+        result: result.to_string(),
+        stages,
+        artifacts: vec![
+            "artifacts/spark/extraction.spkg".to_string(),
+            "artifacts/spark/context.json".to_string(),
+            "artifacts/spark/context_render.txt".to_string(),
+        ],
+        report: "reports/latest.json".to_string(),
+    };
+
+    let path = std::path::Path::new("../reports");
+    if path.exists() || std::fs::create_dir_all(path).is_ok() {
+        let file_path = path.join("latest.json");
+        let serialized = serde_json::to_string_pretty(&report_data)?;
+        std::fs::write(file_path, serialized)?;
+    } else {
+        std::fs::create_dir_all("reports")?;
+        let file_path = std::path::Path::new("reports/latest.json");
+        let serialized = serde_json::to_string_pretty(&report_data)?;
+        std::fs::write(file_path, serialized)?;
+    }
+
+    Ok(())
+}
+
 fn run_orchestrator() -> Result<()> {
     println!("CompText-Sparkctl run");
     println!();
@@ -259,43 +308,85 @@ fn run_orchestrator() -> Result<()> {
     println!();
     println!("run");
 
+    let mut stages = vec![
+        StageReport {
+            index: 1,
+            name: "workspace doctor".to_string(),
+            status: "SKIPPED".to_string(),
+        },
+        StageReport {
+            index: 2,
+            name: "context pipeline".to_string(),
+            status: "SKIPPED".to_string(),
+        },
+        StageReport {
+            index: 3,
+            name: "spark demo".to_string(),
+            status: "SKIPPED".to_string(),
+        },
+        StageReport {
+            index: 4,
+            name: "handoff check".to_string(),
+            status: "SKIPPED".to_string(),
+        },
+    ];
+
     // Stage 1: workspace doctor
+    stages[0].status = "RUNNING".to_string();
     if let Err(e) = sparkctl::doctor::run_doctor() {
+        stages[0].status = "FAIL".to_string();
         println!("  [1/4] workspace doctor   FAIL");
         println!();
         println!("result FAIL");
+        let _ = write_report(stages, "FAIL");
         return Err(e);
     }
+    stages[0].status = "PASS".to_string();
     println!("  [1/4] workspace doctor   PASS");
 
     // Stage 2: context pipeline
+    stages[1].status = "RUNNING".to_string();
     if let Err(e) = sparkctl::context_all::run_context_all() {
+        stages[1].status = "FAIL".to_string();
         println!("  [2/4] context pipeline   FAIL");
         println!();
         println!("result FAIL");
+        let _ = write_report(stages, "FAIL");
         return Err(e);
     }
+    stages[1].status = "PASS".to_string();
     println!("  [2/4] context pipeline   PASS");
 
     // Stage 3: spark demo
+    stages[2].status = "RUNNING".to_string();
     if let Err(e) = sparkctl::spark_demo::run_spark_demo() {
+        stages[2].status = "FAIL".to_string();
         println!("  [3/4] spark demo         FAIL");
         println!();
         println!("result FAIL");
+        let _ = write_report(stages, "FAIL");
         return Err(e);
     }
+    stages[2].status = "PASS".to_string();
     println!("  [3/4] spark demo         PASS");
 
     // Stage 4: handoff check
+    stages[3].status = "RUNNING".to_string();
     if let Err(e) = sparkctl::handoff_check::run_handoff_check() {
+        stages[3].status = "FAIL".to_string();
         println!("  [4/4] handoff check      FAIL");
         println!();
         println!("result FAIL");
+        let _ = write_report(stages, "FAIL");
         return Err(e);
     }
+    stages[3].status = "PASS".to_string();
     println!("  [4/4] handoff check      PASS");
 
     println!();
     println!("result PASS");
+
+    write_report(stages, "PASS")?;
+
     Ok(())
 }
