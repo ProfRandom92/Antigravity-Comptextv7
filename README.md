@@ -105,6 +105,12 @@ The local SPARK-style demo and context pipeline generates and validates artifact
 
 These artifacts are intended for local, reproducible validation and review workflows.
 
+### Demo Evidence
+
+Demo evidence:
+- SPARK challenge demo evidence: [DEMO_SPARK_EVIDENCE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/DEMO_SPARK_EVIDENCE.md)
+- Local performance baseline: [PERFORMANCE_BASELINE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/PERFORMANCE_BASELINE.md)
+
 ---
 
 ## Architecture
