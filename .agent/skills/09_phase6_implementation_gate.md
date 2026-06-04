@@ -2,11 +2,12 @@
 
 ## 1. Phased Execution Roadmap
 No cross-phase implementations are allowed. Development must follow these strict gates:
-- **Phase 6B**: `agy-ct` binary configuration, dependencies registration, and `clap` tree definition only. No execution logic.
-- **Phase 6C**: Compatibility command wrappers implementation (mapping `doctor`, `validate`, and `handoff` commands).
-- **Phase 6D**: Automatic `run` and `demo` workflow orchestrator logic.
-- **Phase 6E**: Structured output modes (`--json`, `--plain`) and execution JSON report exporter.
-- **Phase 6F**: Context cache valve functionality and notebook bundle exporter.
+- **Phase 6B**: `agy-ct` binary configuration and `clap` tree definition (Complete).
+- **Phase 6C**: Compatibility wrappers mapping `doctor`, `validate`, `handoff`, `demo`, and `context all` (Complete).
+- **Phase 6D**: Automatic `agy-ct run` orchestrator sequencing doctor, context pipeline, demo, and handoff checks (Complete).
+- **Phase 6E**: Execution JSON report exporter writing to `reports/latest.json` (Complete).
+- **Phase 6F**: Context cache valve functionality and optional NotebookLM source bundle exporter (Future / Optional).
+- **Performance Baseline & Hardening**: Baseline validation benchmarks and downstream event loop execution (Future work).
 
 ## 2. Dependency Restriction
 - The installation of heavy or complex libraries (`dag_exec`, `asupersync`, `wasm_sandbox`, `wasmtime`, `tokio`, `ratatui`) is deferred for future phases.

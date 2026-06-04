@@ -8,6 +8,9 @@ To facilitate automation and downstream piping by software agents:
 ## 2. Structured JSON Output
 - When running with `--json` or `--output json`, all command-line outputs, errors, and run steps must be serialized into structured JSON objects on stdout.
 - Any output sent to stdout under JSON mode must validate against the target JSON schema.
+- `agy-ct run` generates a structured report at `reports/latest.json` mapping indices, stages, status, and generated SPARK context artifacts.
+- Generated `reports/latest.json` is a local runtime artifact and must not be committed to git.
+- No official SPARK compatibility, production readiness, or EU AI Act compliance claims are made.
 
 ## 3. Quiet and Plain Configurations
 - Under `--plain` or `--json` or `--non-interactive` flags, no ANSI formatting escape codes, progressive spinners, interactive loading lines, or ticker indicators may be printed to stdout or stderr.
