@@ -1,18 +1,13 @@
 # CompText-Sparkctl
 
-<p align="center">
-  <img src="assets/branding/sparkctl-logo.png" alt="CompText-Sparkctl logo" width="520">
-</p>
-
 <div align="center">
 
-[![GitHub Stars](https://img.shields.io/github/stars/ProfRandom92/comptext-sparkctl?style=for-the-badge&color=yellow)](https://github.com/ProfRandom92/comptext-sparkctl/stargazers)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Rust](https://img.shields.io/badge/Rust-CLI-000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![Security](https://img.shields.io/badge/Security-SHA--256%20Sidecar-red.svg?style=for-the-badge)](#-safety-boundaries--claim-hygiene)
-[![SPARK](https://img.shields.io/badge/SPARK-Context%20Artifacts-2b6cb0.svg?style=for-the-badge)](#-spark-context-artifacts)
-
 **Deterministic Rust CLI for CompText trace packaging, replay-sidecar validation, and SPARK-ready context artifacts.**
+
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
+![Rust CLI](https://img.shields.io/badge/Rust-CLI-000000.svg?style=flat-square&logo=rust&logoColor=white)
+![SHA-256 Sidecar](https://img.shields.io/badge/SHA--256-Sidecar-red.svg?style=flat-square)
+![SPARK Context Artifacts](https://img.shields.io/badge/SPARK-Context%20Artifacts-2b6cb0.svg?style=flat-square)
 
 </div>
 
