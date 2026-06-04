@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**Deterministic Rust CLI for CompText trace packaging, replay-sidecar validation, and SPARK-ready context artifacts.**
+**Deterministic Rust CLI for CompText trace packaging, replay-sidecar validation, and SPARK-style context artifacts.**
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 ![Rust CLI](https://img.shields.io/badge/Rust-CLI-000000.svg?style=flat-square&logo=rust&logoColor=white)
@@ -110,6 +110,18 @@ These artifacts are intended for local, reproducible validation and review workf
 Demo evidence:
 - SPARK challenge demo evidence: [DEMO_SPARK_EVIDENCE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/DEMO_SPARK_EVIDENCE.md)
 - Local performance baseline: [PERFORMANCE_BASELINE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/PERFORMANCE_BASELINE.md)
+
+#### Reviewer Quickstart
+
+To execute the reviewer evidence flow and local/offline validation check:
+
+```bash
+cd agy7rust
+cargo run --bin agy-ct -- run
+cargo run --bin agy-ct -- benchmark
+```
+
+Benchmark output is local and environment-specific, and generated report files under `reports/` are not required to be committed. These commands generate and verify SPARK-style evidence artifacts.
 
 ---
 
