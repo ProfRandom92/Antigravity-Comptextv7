@@ -43,9 +43,9 @@
     "contains_personal_data_risk": {
       "type": "string",
       "enum": [
-        "none",
         "low",
-        "review_required",
+        "medium",
+        "high",
         "unknown"
       ]
     },

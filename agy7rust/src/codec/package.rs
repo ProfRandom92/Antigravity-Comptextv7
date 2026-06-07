@@ -246,6 +246,13 @@ fn validate_pdf_extraction_document(document: &PdfExtractionDocument) -> anyhow:
         "PDF-EXTRACTION-V1",
     )?;
     require_non_empty("source_file", &document.source_file)?;
+    if let Some(risk) = &document.contains_personal_data_risk {
+        require_allowed(
+            "contains_personal_data_risk",
+            risk,
+            &["low", "medium", "high", "unknown"],
+        )?;
+    }
     require_non_empty("document_type", &document.document_type)?;
     require_allowed(
         "tool_metadata.converter",
@@ -367,6 +374,16 @@ fn require_non_empty_tables(tables: &[PdfExtractionTable]) -> anyhow::Result<()>
         require_non_empty_list("tables.columns", &table.columns)?;
         if table.rows.is_empty() {
             return Err(anyhow::anyhow!("missing tables.rows"));
+        }
+        for row in &table.rows {
+            if row.is_empty() {
+                return Err(anyhow::anyhow!("tables.rows row must not be empty"));
+            }
+            for cell in row {
+                if cell.trim().is_empty() {
+                    return Err(anyhow::anyhow!("tables.rows cell must not be empty"));
+                }
+            }
         }
     }
 

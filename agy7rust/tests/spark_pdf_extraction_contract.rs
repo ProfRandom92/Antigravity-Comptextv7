@@ -126,6 +126,39 @@ fn test_pdf_extraction_contract_rejects_unsupported_extraction_mode() {
 }
 
 #[test]
+fn test_pdf_extraction_contract_rejects_unsupported_personal_data_risk() {
+    let mut value = load_fixture_value();
+    value["contains_personal_data_risk"] = Value::String("review_required".to_string());
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "contains_personal_data_risk unsupported");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_empty_table_row() {
+    let mut value = load_fixture_value();
+    value["tables"][0]["rows"][0] = serde_json::json!([]);
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "tables.rows row must not be empty");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_blank_table_cell() {
+    let mut value = load_fixture_value();
+    value["tables"][0]["rows"][0][0] = Value::String("   ".to_string());
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "tables.rows cell must not be empty");
+}
+
+#[test]
 fn test_pdf_extraction_contract_rejects_blank_warning() {
     let mut value = load_fixture_value();
     value["warnings"] = serde_json::json!(["manual fixture", "   "]);
