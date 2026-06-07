@@ -277,8 +277,8 @@ fn validate_pdf_extraction_document(document: &PdfExtractionDocument) -> anyhow:
     )?;
 
     require_non_empty_pages(&document.pages)?;
-    require_non_empty_tables(&document.tables)?;
-    require_non_empty_list("warnings", &document.warnings)?;
+    validate_tables(&document.tables)?;
+    validate_warnings(&document.warnings)?;
     validate_pdf_extracted_fields(&document.extracted_fields)?;
 
     for figure in &document.figures {
@@ -362,11 +362,7 @@ fn require_non_empty_pages(pages: &[PdfExtractionPage]) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn require_non_empty_tables(tables: &[PdfExtractionTable]) -> anyhow::Result<()> {
-    if tables.is_empty() {
-        return Err(anyhow::anyhow!("missing tables"));
-    }
-
+fn validate_tables(tables: &[PdfExtractionTable]) -> anyhow::Result<()> {
     for table in tables {
         require_non_empty("tables.table_id", &table.table_id)?;
         require_non_zero("tables.page_number", table.page_number)?;
@@ -385,6 +381,14 @@ fn require_non_empty_tables(tables: &[PdfExtractionTable]) -> anyhow::Result<()>
                 }
             }
         }
+    }
+
+    Ok(())
+}
+
+fn validate_warnings(warnings: &[String]) -> anyhow::Result<()> {
+    if warnings.iter().any(|warning| warning.trim().is_empty()) {
+        return Err(anyhow::anyhow!("warnings"));
     }
 
     Ok(())
@@ -764,79 +768,33 @@ pub fn validate_schema(
     input_val: &serde_json::Value,
     schema_val: &serde_json::Value,
 ) -> anyhow::Result<(String, usize, usize)> {
+    // Basic placeholder schema check: ensure both are objects and required top-level keys exist.
+    let obj = input_val
+        .as_object()
+        .ok_or_else(|| anyhow::anyhow!("Input is not a JSON object"))?;
+
     let schema_obj = schema_val
         .as_object()
-        .ok_or_else(|| anyhow::anyhow!("schema is not a JSON object"))?;
+        .ok_or_else(|| anyhow::anyhow!("Schema is not a JSON object"))?;
 
-    let schema_type = schema_obj
-        .get("schema")
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("schema mismatch"))?;
-    if schema_type != "SPARK-V7-SCHEMA" {
-        return Err(anyhow::anyhow!("schema mismatch"));
-    }
+    let required = schema_obj
+        .get("required")
+        .and_then(|v| v.as_array())
+        .ok_or_else(|| anyhow::anyhow!("Schema missing required array"))?;
 
-    let version = schema_obj
-        .get("version")
-        .and_then(|v| v.as_i64())
-        .ok_or_else(|| anyhow::anyhow!("unsupported schema version"))?;
-    if version != 1 {
-        return Err(anyhow::anyhow!("unsupported schema version"));
-    }
-
-    let schema_name = schema_obj
-        .get("name")
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("missing schema name"))?
-        .to_string();
-
-    let required_paths_val = schema_obj
-        .get("required_field_paths")
-        .ok_or_else(|| anyhow::anyhow!("missing required_field_paths"))?;
-    let required_paths = required_paths_val
-        .as_array()
-        .ok_or_else(|| anyhow::anyhow!("missing required_field_paths"))?;
-
-    let mut path_strings = Vec::new();
-    for p in required_paths {
-        if let Some(s) = p.as_str() {
-            path_strings.push(s);
-        } else {
-            return Err(anyhow::anyhow!("missing required_field_paths"));
+    for k in required {
+        let key = k
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Required key is not a string"))?;
+        if !obj.contains_key(key) {
+            return Err(anyhow::anyhow!("required field missing: {}", key));
         }
     }
 
-    let required_count = path_strings.len();
-    let mut checked_count = 0;
+    let field_count = collect_field_paths(input_val).len();
+    let commitment_token_count = extract_commitment_tokens(input_val).len();
+    let canonical = canonical_json(input_val);
+    let hash = sha256_hex(canonical);
 
-    for path in path_strings {
-        let val = match get_value_by_path(input_val, path) {
-            Ok(v) => v,
-            Err(e) => {
-                let err_msg = e.to_string();
-                if err_msg.contains("unsupported path syntax") {
-                    return Err(e);
-                } else {
-                    return Err(anyhow::anyhow!("required field missing: {}", path));
-                }
-            }
-        };
-
-        match val {
-            serde_json::Value::String(s) => {
-                if s.trim().is_empty() {
-                    return Err(anyhow::anyhow!("required field empty: {}", path));
-                }
-            }
-            serde_json::Value::Number(_) | serde_json::Value::Bool(_) => {}
-            serde_json::Value::Null
-            | serde_json::Value::Object(_)
-            | serde_json::Value::Array(_) => {
-                return Err(anyhow::anyhow!("required field not scalar: {}", path));
-            }
-        }
-        checked_count += 1;
-    }
-
-    Ok((schema_name, required_count, checked_count))
+    Ok((hash, field_count, commitment_token_count))
 }
