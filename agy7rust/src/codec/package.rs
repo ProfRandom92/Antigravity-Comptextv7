@@ -768,33 +768,44 @@ pub fn validate_schema(
     input_val: &serde_json::Value,
     schema_val: &serde_json::Value,
 ) -> anyhow::Result<(String, usize, usize)> {
-    // Basic placeholder schema check: ensure both are objects and required top-level keys exist.
-    let obj = input_val
-        .as_object()
-        .ok_or_else(|| anyhow::anyhow!("Input is not a JSON object"))?;
-
     let schema_obj = schema_val
         .as_object()
         .ok_or_else(|| anyhow::anyhow!("Schema is not a JSON object"))?;
 
-    let required = schema_obj
-        .get("required")
-        .and_then(|v| v.as_array())
-        .ok_or_else(|| anyhow::anyhow!("Schema missing required array"))?;
+    let schema = schema_obj
+        .get("schema")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| anyhow::anyhow!("schema mismatch"))?;
+    if schema != "SPARK-V7-SCHEMA" {
+        return Err(anyhow::anyhow!("schema mismatch"));
+    }
 
-    for k in required {
-        let key = k
+    let name = schema_obj
+        .get("name")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| anyhow::anyhow!("schema name missing"))?
+        .to_string();
+
+    let required_paths = schema_obj
+        .get("required_field_paths")
+        .and_then(|v| v.as_array())
+        .ok_or_else(|| anyhow::anyhow!("Schema missing required_field_paths array"))?;
+
+    for path_value in required_paths {
+        let path = path_value
             .as_str()
-            .ok_or_else(|| anyhow::anyhow!("Required key is not a string"))?;
-        if !obj.contains_key(key) {
-            return Err(anyhow::anyhow!("required field missing: {}", key));
+            .ok_or_else(|| anyhow::anyhow!("Required path is not a string"))?;
+        let value = get_value_by_path(input_val, path)?;
+        match value {
+            serde_json::Value::String(text) => {
+                if text.trim().is_empty() {
+                    return Err(anyhow::anyhow!("required field empty: {}", path));
+                }
+            }
+            serde_json::Value::Number(_) | serde_json::Value::Bool(_) => {}
+            _ => return Err(anyhow::anyhow!("required field not scalar: {}", path)),
         }
     }
 
-    let field_count = collect_field_paths(input_val).len();
-    let commitment_token_count = extract_commitment_tokens(input_val).len();
-    let canonical = canonical_json(input_val);
-    let hash = sha256_hex(canonical);
-
-    Ok((hash, field_count, commitment_token_count))
+    Ok((name, required_paths.len(), required_paths.len()))
 }
