@@ -22,6 +22,16 @@ enum Commands {
     ContextAll,
     #[command(about = "Run complete end-to-end demo pipeline (compress, build, render, validate)")]
     SparkDemo,
+    #[command(about = "Write a deterministic SPARK Evidence Packet v1 demo envelope")]
+    SparkEvidenceDemo {
+        #[arg(short = 'o', long = "output")]
+        output: String,
+    },
+    #[command(about = "Validate a SPARK Evidence Packet v1 envelope")]
+    SparkEvidenceValidate {
+        #[arg(short = 'i', long = "input")]
+        input: String,
+    },
     #[command(about = "Verify local repository handoff readiness")]
     HandoffCheck,
 }
@@ -41,6 +51,12 @@ fn main() -> Result<()> {
         }
         Commands::SparkDemo => {
             sparkctl::spark_demo::run_spark_demo()?;
+        }
+        Commands::SparkEvidenceDemo { output } => {
+            sparkctl::spark_evidence::run_spark_evidence_demo(output)?;
+        }
+        Commands::SparkEvidenceValidate { input } => {
+            sparkctl::spark_evidence::run_spark_evidence_validate(input)?;
         }
         Commands::HandoffCheck => {
             sparkctl::handoff_check::run_handoff_check()?;

@@ -1,15 +1,28 @@
-# Agent Instruction Manual — Antigravity × CompText v7
+# CompText Agent Rules
 
-Welcome, Agent. You are pair programming inside the isolated SPARK Hackathon sandbox.
+This repository is part of CompText.
 
-> [!IMPORTANT]
-> **First Step:** You MUST read [.agent/skills/00_project_system.md](file:///.agent/skills/00_project_system.md) before performing any file reads, writes, edits, or terminal command executions.
+CompText is a deterministic Context Pack / proposal-gated evidence workflow, not a generic AI dashboard, not an agent memory product, and not an autonomous deployment agent.
 
-## Protocol Highlights
+Core line:
+Models are providers. Context is the product.
 
-1. **Read Guidelines First:** Open [.agent/skills/00_project_system.md](file:///.agent/skills/00_project_system.md) and choose the specific specialized skill matching your target task.
-2. **Keep Changes Scoped:** Work only within the allowed write paths for the current approved phase. Never modify existing Python core, benchmarks, reports, or the original repository `README.md`.
-3. **Phase-Gate Compliance:** Follow the `Implementation -> Audit -> Snapshot` loop. Do NOT advance to a new phase without explicit user approval.
-4. **Cargo Restrictions:** You have permission to run `cargo fmt`, `cargo check`, `cargo test`, `cargo clippy`, and `cargo run` inside `agy7rust/` only. Active entry points: `sparkctl` (legacy compatibility checks) and `agy-ct` (production workflow orchestrator writing to untracked `reports/latest.json`).
-5. **No Network or Git Remotes:** Web/network calls, git remote modifications, git fetch, git pull, or git push are strictly forbidden unless explicitly approved.
-6. **Structured Output:** All step results must be reported using the structured phase block format.
+Pipeline:
+Source / GitHub URL → Goal → Inspect → Context Pack → Policy Gate → Provider Boundary → Untrusted Proposal → Human Review → Artifacts
+
+Hard rules:
+- Treat GitHub as read-only unless the human explicitly asks otherwise.
+- Do not push, deploy, create PRs, create issues, or create remote branches.
+- Do not expose secrets.
+- Do not fake hashes.
+- Do not claim production-ready, EU AI Act compliance, legal certification, forensic proof, guaranteed correctness, or autonomous approval.
+- Provider output is untrusted until reviewed.
+- Proposals are never auto-applied.
+- Human review is the approval boundary.
+- Artifacts preserve the evidence trail.
+
+Before editing:
+1. Read AGENTS.md.
+2. Read `.agents/skills/**/SKILL.md` relevant to the task.
+3. Build a compact repo map.
+4. Stop for approval if the user asked for plan mode.
