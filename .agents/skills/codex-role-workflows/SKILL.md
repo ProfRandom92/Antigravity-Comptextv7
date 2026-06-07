@@ -26,6 +26,16 @@ Prepare validated local work for possible pull request review. Do not push, crea
 
 ## Required Gates
 
+Report gates using exactly one of:
+
+- `pass`
+- `fail`
+- `not_applicable`
+- `deferred`
+
+Use `not_applicable` only when a gate does not apply, and explain why.
+Use `deferred` when the gate is required but intentionally left for later human/tool review.
+
 Report these gates in the final answer or evidence packet when applicable:
 
 - `instructions_read`
@@ -35,8 +45,6 @@ Report these gates in the final answer or evidence packet when applicable:
 - `claim_boundary_check`
 - `replay_or_roundtrip_validation`
 - `human_review`
-
-Use `not_applicable` when a gate does not apply, and explain why.
 
 ## Connector Rules
 

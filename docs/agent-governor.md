@@ -2,11 +2,13 @@
 
 CompText Agent Governor is a lightweight policy layer for Codex-style role, plugin, connector, and skill workflows. It does not replace repository instructions, project policy, or human review. It gives agents and reviewers a shared vocabulary for allowed modes, policy gates, and evidence requirements before an agent run is treated as reviewable.
 
-The governor sits around the CompText pipeline:
+Canonical CompText pipeline:
 
-Source or task -> Instructions -> Role mode -> Policy gates -> Plugin and connector boundary -> Evidence packet -> Human review -> Artifacts
+Source / GitHub URL -> Goal -> Inspect -> Context Pack -> Policy Gate -> Provider Boundary -> Untrusted Proposal -> Human Review -> Artifacts
 
-Evidence packets remain the source of truth for what was requested, inspected, validated, and reviewed. Sites, dashboards, interactive views, comments, and annotations are presentation or review aids only unless their contents are also captured in the evidence packet or another declared artifact.
+Agent Governor adds role mode selection, connector/plugin boundaries, required gate reporting, and evidence-packet recording around that pipeline. Evidence packets record the governed run; they do not replace the Context Pack or Human Review.
+
+Evidence packets and declared artifacts remain the source of truth for what was requested, inspected, validated, and reviewed. Sites, dashboards, interactive views, comments, and annotations are presentation or review aids only unless their contents are captured in declared artifacts.
 
 ## Role Modes
 

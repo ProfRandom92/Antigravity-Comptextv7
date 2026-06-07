@@ -25,6 +25,7 @@ Select one:
 - no dependency update
 - no secret handling
 - no claim that human review has been replaced
+- no unauthorized write actions, including creating comments, issues, labels, remote branches, releases, deployments, or GitHub metadata changes
 
 ## Plugins, Connectors, And Skills
 
