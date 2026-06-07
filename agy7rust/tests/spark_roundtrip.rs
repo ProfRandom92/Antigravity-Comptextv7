@@ -137,6 +137,82 @@ fn test_spark_evidence_packet_rejects_missing_required_review_policy_goal_fields
     );
 }
 
+#[test]
+fn test_spark_evidence_packet_rejects_unknown_envelope_field() {
+    let envelope = build_spark_evidence_packet_envelope(sample_spark_evidence_preimage()).unwrap();
+    let mut envelope_value = serde_json::to_value(&envelope).unwrap();
+    envelope_value["unexpected_envelope_field"] = json!("tamper");
+
+    let err = validate_spark_evidence_packet_value(&envelope_value)
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("unknown field"));
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_unknown_preimage_field() {
+    let mut preimage_value = serde_json::to_value(sample_spark_evidence_preimage()).unwrap();
+    preimage_value["unexpected_preimage_field"] = json!("tamper");
+
+    let err = serde_json::from_value::<SparkEvidencePacketPreimage>(preimage_value)
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("unknown field"));
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_allowed_claim() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage
+        .claim_hygiene
+        .allowed_claims
+        .push("   ".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(
+        err,
+        "missing or empty claim in claim_hygiene.allowed_claims"
+    );
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_blocked_claim() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage.claim_hygiene.blocked_claims.push("".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(
+        err,
+        "missing or empty claim in claim_hygiene.blocked_claims"
+    );
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_warning() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage.warnings.push("\t".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "missing or empty warning");
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_limitation() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage.limitations.push("\n".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "missing or empty limitation");
+}
+
 fn sample_spark_evidence_preimage() -> SparkEvidencePacketPreimage {
     SparkEvidencePacketPreimage {
         schema_version: "SPARK-EVIDENCE-PACKET-V1".to_string(),

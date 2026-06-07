@@ -35,12 +35,14 @@ pub enum HumanReviewDecision {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct ClaimHygiene {
     pub allowed_claims: Vec<String>,
     pub blocked_claims: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct ArtifactManifestEntry {
     pub path: String,
     pub role: String,
@@ -48,6 +50,7 @@ pub struct ArtifactManifestEntry {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct SparkEvidencePacketPreimage {
     pub schema_version: String,
     pub local_id: String,
@@ -65,6 +68,7 @@ pub struct SparkEvidencePacketPreimage {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct SparkEvidencePacketEnvelope {
     #[serde(flatten)]
     pub preimage: SparkEvidencePacketPreimage,
@@ -149,21 +153,19 @@ fn validate_spark_evidence_preimage(preimage: &SparkEvidencePacketPreimage) -> a
     require_non_empty("context_pack_summary", &preimage.context_pack_summary)?;
     require_non_empty("untrusted_proposal", &preimage.untrusted_proposal)?;
 
-    if preimage.claim_hygiene.allowed_claims.is_empty() {
-        return Err(anyhow::anyhow!("missing claim_hygiene.allowed_claims"));
-    }
-    if preimage.claim_hygiene.blocked_claims.is_empty() {
-        return Err(anyhow::anyhow!("missing claim_hygiene.blocked_claims"));
-    }
+    require_non_empty_list(
+        "missing or empty claim in claim_hygiene.allowed_claims",
+        &preimage.claim_hygiene.allowed_claims,
+    )?;
+    require_non_empty_list(
+        "missing or empty claim in claim_hygiene.blocked_claims",
+        &preimage.claim_hygiene.blocked_claims,
+    )?;
     if preimage.artifact_manifest.is_empty() {
         return Err(anyhow::anyhow!("missing artifact_manifest"));
     }
-    if preimage.warnings.is_empty() {
-        return Err(anyhow::anyhow!("missing warnings"));
-    }
-    if preimage.limitations.is_empty() {
-        return Err(anyhow::anyhow!("missing limitations"));
-    }
+    require_non_empty_list("missing or empty warning", &preimage.warnings)?;
+    require_non_empty_list("missing or empty limitation", &preimage.limitations)?;
 
     for entry in &preimage.artifact_manifest {
         require_non_empty("artifact_manifest.path", &entry.path)?;
@@ -176,6 +178,13 @@ fn validate_spark_evidence_preimage(preimage: &SparkEvidencePacketPreimage) -> a
 fn require_non_empty(label: &str, value: &str) -> anyhow::Result<()> {
     if value.trim().is_empty() {
         return Err(anyhow::anyhow!("missing {}", label));
+    }
+    Ok(())
+}
+
+fn require_non_empty_list(label: &str, values: &[String]) -> anyhow::Result<()> {
+    if values.is_empty() || values.iter().any(|value| value.trim().is_empty()) {
+        return Err(anyhow::anyhow!(label.to_string()));
     }
     Ok(())
 }

@@ -64,10 +64,8 @@ pub fn run_spark_evidence_demo(output_path: &str) -> Result<()> {
 
     let output_path_buf = PathBuf::from(output_path);
     if let Some(parent) = output_path_buf.parent() {
-        if !parent.exists() {
-            fs::create_dir_all(parent)
-                .with_context(|| format!("Failed to create directory: {:?}", parent))?;
-        }
+        fs::create_dir_all(parent)
+            .with_context(|| format!("Failed to create directory: {:?}", parent))?;
     }
 
     fs::write(&output_path_buf, output_json)
