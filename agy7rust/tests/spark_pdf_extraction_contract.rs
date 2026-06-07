@@ -137,6 +137,17 @@ fn test_pdf_extraction_contract_rejects_unsupported_personal_data_risk() {
 }
 
 #[test]
+fn test_pdf_extraction_contract_allows_empty_tables() {
+    let mut value = load_fixture_value();
+    value["tables"] = serde_json::json!([]);
+
+    let validation = validate_pdf_extraction_contract_value(&value)
+        .expect("empty tables should be allowed");
+    assert_eq!(validation.table_count, 0);
+    assert_eq!(validation.first_table_row_count, 0);
+}
+
+#[test]
 fn test_pdf_extraction_contract_rejects_empty_table_row() {
     let mut value = load_fixture_value();
     value["tables"][0]["rows"][0] = serde_json::json!([]);
@@ -156,6 +167,15 @@ fn test_pdf_extraction_contract_rejects_blank_table_cell() {
         .unwrap_err()
         .to_string();
     assert_eq!(err, "tables.rows cell must not be empty");
+}
+
+#[test]
+fn test_pdf_extraction_contract_allows_empty_warnings() {
+    let mut value = load_fixture_value();
+    value["warnings"] = serde_json::json!([]);
+
+    let validation = validate_pdf_extraction_contract_value(&value);
+    assert!(validation.is_ok());
 }
 
 #[test]
