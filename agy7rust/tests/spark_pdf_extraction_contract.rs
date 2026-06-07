@@ -1,5 +1,4 @@
-use agy7rust::codec::package::canonical_json;
-use agy7rust::sha256_hex;
+use agy7rust::validate_pdf_extraction_contract_value;
 use serde_json::Value;
 use std::fs;
 
@@ -8,6 +7,8 @@ fn test_pdf_extraction_fixture_contract_shape() {
     let fixture = fs::read_to_string("../examples/spark/pdf_extraction_fixture.json")
         .expect("failed to read PDF extraction fixture");
     let value: Value = serde_json::from_str(&fixture).expect("fixture should parse as JSON");
+    let validation =
+        validate_pdf_extraction_contract_value(&value).expect("fixture contract should validate");
 
     assert_eq!(value["schema_version"], "PDF-EXTRACTION-V1");
     assert_non_empty_string(&value["source_file"], "source_file");
@@ -39,11 +40,47 @@ fn test_pdf_extraction_fixture_contract_shape() {
         .expect("first table rows should be an array");
     assert_eq!(first_table_rows.len(), 3);
 
-    let canonical = canonical_json(&value);
-    let hash_once = sha256_hex(&canonical);
-    let hash_twice = sha256_hex(canonical_json(&value));
-    assert_eq!(hash_once, hash_twice);
-    assert_eq!(hash_once.len(), 64);
+    assert_eq!(validation.page_count, 2);
+    assert_eq!(validation.table_count, 1);
+    assert_eq!(validation.first_table_row_count, 3);
+    assert_eq!(validation.canonical_hash.len(), 64);
+    assert!(!validation.canonical_json.is_empty());
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_wrong_schema_version() {
+    let mut value = load_fixture_value();
+    value["schema_version"] = Value::String("PDF-EXTRACTION-V0".to_string());
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "schema_version mismatch");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_missing_required_field() {
+    let mut value = load_fixture_value();
+    value["extracted_fields"]
+        .as_object_mut()
+        .expect("extracted_fields should be an object")
+        .remove("procedure_goal");
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("missing field `procedure_goal`"));
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_unsupported_converter() {
+    let mut value = load_fixture_value();
+    value["tool_metadata"]["converter"] = Value::String("unsupported".to_string());
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "tool_metadata.converter unsupported");
 }
 
 fn assert_non_empty_string(value: &Value, label: &str) {
@@ -58,4 +95,10 @@ fn assert_non_empty_array(value: &Value, label: &str) {
         value.as_array().is_some_and(|items| !items.is_empty()),
         "{label} should be a non-empty array"
     );
+}
+
+fn load_fixture_value() -> Value {
+    let fixture = fs::read_to_string("../examples/spark/pdf_extraction_fixture.json")
+        .expect("failed to read PDF extraction fixture");
+    serde_json::from_str(&fixture).expect("fixture should parse as JSON")
 }

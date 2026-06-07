@@ -12,6 +12,12 @@ PDF or text fixture -> PDF-EXTRACTION-V1 JSON -> Context Pack / Evidence Packet 
 
 The structured extraction can inform a Context Pack and be recorded in an Evidence Packet. It does not replace the Context Pack, the Policy Gate, or Human Review.
 
+## Runtime Contract Validation
+
+The Rust crate exposes local runtime validation for `PDF-EXTRACTION-V1` JSON values. The validator checks the declared fixture contract shape and computes a deterministic SHA-256 hash over canonical JSON with existing helpers.
+
+This validation is a local contract check. It does not perform OCR, parse PDFs, call providers, or verify that extracted text is true.
+
 ## Boundaries
 
 - This PR does not implement OCR.
