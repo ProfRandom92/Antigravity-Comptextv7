@@ -59,7 +59,38 @@ fn test_pdf_extraction_contract_rejects_wrong_schema_version() {
 }
 
 #[test]
-fn test_pdf_extraction_contract_rejects_missing_required_field() {
+fn test_pdf_extraction_contract_rejects_unknown_top_level_field() {
+    let mut value = load_fixture_value();
+    value
+        .as_object_mut()
+        .expect("fixture should be an object")
+        .insert(
+            "unexpected_field".to_string(),
+            Value::String("tamper".to_string()),
+        );
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("unknown field `unexpected_field`"));
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_missing_required_top_level_field() {
+    let mut value = load_fixture_value();
+    value
+        .as_object_mut()
+        .expect("fixture should be an object")
+        .remove("source_file");
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("missing field `source_file`"));
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_missing_required_extracted_field() {
     let mut value = load_fixture_value();
     value["extracted_fields"]
         .as_object_mut()
@@ -81,6 +112,64 @@ fn test_pdf_extraction_contract_rejects_unsupported_converter() {
         .unwrap_err()
         .to_string();
     assert_eq!(err, "tool_metadata.converter unsupported");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_unsupported_extraction_mode() {
+    let mut value = load_fixture_value();
+    value["tool_metadata"]["extraction_mode"] = Value::String("unsupported".to_string());
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "tool_metadata.extraction_mode unsupported");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_blank_warning() {
+    let mut value = load_fixture_value();
+    value["warnings"] = serde_json::json!(["manual fixture", "   "]);
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "warnings");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_blank_procedure_goal() {
+    let mut value = load_fixture_value();
+    value["extracted_fields"]["procedure_goal"] = Value::String("  ".to_string());
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "missing extracted_fields.procedure_goal");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_empty_decision_points() {
+    let mut value = load_fixture_value();
+    value["extracted_fields"]["decision_points"] = serde_json::json!([]);
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "extracted_fields.decision_points");
+}
+
+#[test]
+fn test_pdf_extraction_contract_rejects_review_required_false() {
+    let mut value = load_fixture_value();
+    value["extracted_fields"]["review_required"] = Value::Bool(false);
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(
+        err,
+        "PDF extraction extracted_fields.review_required must be true"
+    );
 }
 
 fn assert_non_empty_string(value: &Value, label: &str) {

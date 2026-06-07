@@ -295,6 +295,11 @@ fn validate_pdf_extracted_fields(fields: &PdfExtractedFields) -> anyhow::Result<
         "extracted_fields.required_documents",
         &fields.required_documents,
     )?;
+    if !fields.review_required {
+        return Err(anyhow::anyhow!(
+            "PDF extraction extracted_fields.review_required must be true"
+        ));
+    }
     require_non_empty(
         "extracted_fields.public_sector_context",
         &fields.public_sector_context,

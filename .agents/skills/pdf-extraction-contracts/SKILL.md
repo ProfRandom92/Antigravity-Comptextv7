@@ -69,6 +69,15 @@ Do not commit source PDFs unless a future task explicitly approves that artifact
 
 Prefer local runtime validation with `validate_pdf_extraction_contract_value` and deterministic canonical hashing with the existing `canonical_json` and `sha256_hex` helpers.
 
+Report Agent Governor gate states using exactly one of:
+
+- `pass`
+- `fail`
+- `not_applicable`
+- `deferred`
+
+Use `not_applicable` only when a gate does not apply, and explain why. Use `deferred` when the gate is required but intentionally left for later human/tool review.
+
 For Rust changes, run:
 
 - `cargo fmt --all --check`
