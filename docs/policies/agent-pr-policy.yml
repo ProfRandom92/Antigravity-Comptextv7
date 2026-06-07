@@ -1,0 +1,78 @@
+policy_version: agent_governor_policy_v1
+name: CompText Agent PR Candidate Policy
+description: >
+  Local policy for Codex-style agent work that may become a pull request
+  candidate after human review. This policy is documentation only and does not
+  mutate GitHub or grant approval.
+
+role_modes:
+  read_only_audit:
+    local_writes: false
+    commits: false
+    remote_mutation: false
+    purpose: Inspect and report without changing source files.
+  sandbox_autonomous:
+    local_writes: approved_paths_only
+    commits: task_policy_only
+    remote_mutation: false
+    purpose: Make local, reviewable changes inside approved paths.
+  pr_candidate:
+    local_writes: approved_paths_only
+    commits: task_policy_only
+    remote_mutation: explicit_human_approval_required
+    purpose: Prepare validated local work for possible PR review.
+
+connector_rules:
+  github_default: read_only
+  write_actions_require_explicit_approval:
+    - push
+    - pull_request_create
+    - issue_create
+    - comment_create
+    - label_update
+    - release_create
+    - deployment
+    - remote_branch_create
+  secrets:
+    handling: forbidden
+    frontend_exposure: forbidden
+  provider_output:
+    status: untrusted_proposal_until_human_review
+
+policy_gates:
+  instructions_read:
+    required: true
+    evidence: list_read_instructions_and_skills
+  secret_scan:
+    required: true
+    evidence: targeted_changed_file_scan_or_manual_review
+  artifact_schema_validation:
+    required: when_artifacts_or_schemas_change
+    evidence: schema_command_or_not_applicable_reason
+  canonical_hash_validation:
+    required: when_canonical_artifacts_change
+    evidence: recomputed_hash_command_or_not_applicable_reason
+  claim_boundary_check:
+    required: true
+    evidence: unsafe_claim_scan_and_manual_review
+  replay_or_roundtrip_validation:
+    required: when_behavior_or_artifacts_change
+    evidence: replay_roundtrip_command_or_not_applicable_reason
+  human_review:
+    required: true
+    evidence: pending_approved_rejected_or_not_requested
+
+presentation_surfaces:
+  sites_and_interactive_views: presentation_only
+  annotations: human_review_inputs_only
+  source_of_truth: evidence_packets_and_declared_artifacts
+
+blocked_claims:
+  - production_ready
+  - compliance_or_certification
+  - legal_evidentiary_status
+  - forensic_certainty
+  - official_spark_compatibility
+  - autonomous_approval
+  - replaces_human_review
+  - guaranteed_correctness
