@@ -17,7 +17,7 @@ pub fn run_spark_evidence_demo(output_path: &str) -> Result<()> {
         ("../artifacts/spark/extraction.spkg", "context_package"),
         ("../artifacts/spark/context.json", "context_pack_summary"),
         ("../artifacts/spark/context_render.txt", "review_render"),
-    ]);
+    ])?;
 
     let preimage = SparkEvidencePacketPreimage {
         schema_version: "SPARK-EVIDENCE-PACKET-V1".to_string(),
@@ -92,19 +92,23 @@ pub fn run_spark_evidence_validate(input_path: &str) -> Result<()> {
     Ok(())
 }
 
-fn build_artifact_manifest(paths: &[(&str, &str)]) -> Vec<ArtifactManifestEntry> {
+fn build_artifact_manifest(paths: &[(&str, &str)]) -> Result<Vec<ArtifactManifestEntry>> {
     paths
         .iter()
-        .map(|(path, role)| ArtifactManifestEntry {
-            path: normalize_manifest_path(path),
-            role: (*role).to_string(),
-            sha256: file_sha256(path),
+        .map(|(path, role)| {
+            Ok(ArtifactManifestEntry {
+                path: normalize_manifest_path(path),
+                role: (*role).to_string(),
+                sha256: Some(file_sha256(path)?),
+            })
         })
         .collect()
 }
 
-fn file_sha256(path: &str) -> Option<String> {
-    fs::read(Path::new(path)).ok().map(sha256_hex)
+fn file_sha256(path: &str) -> Result<String> {
+    let bytes = fs::read(Path::new(path))
+        .with_context(|| format!("Failed to read required demo artifact: {}", path))?;
+    Ok(sha256_hex(bytes))
 }
 
 fn normalize_manifest_path(path: &str) -> String {

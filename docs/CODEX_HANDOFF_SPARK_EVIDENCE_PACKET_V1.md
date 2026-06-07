@@ -5,38 +5,16 @@
 - Working folder: `C:\Users\contr\Desktop\comptext-sparkctl-codex-work`
 - Repo root: `C:\Users\contr\Desktop\comptext-sparkctl-codex-work\comptext-sparkctl`
 - Rust crate root: `C:\Users\contr\Desktop\comptext-sparkctl-codex-work\comptext-sparkctl\agy7rust`
-- Final ZIP path: `C:\Users\contr\Desktop\comptext-sparkctl-spark-ready.zip`
+- Final ZIP path, if separately produced: `C:\Users\contr\Desktop\comptext-sparkctl-spark-ready.zip`
 
-## 2. Current Git State
+## 2. Current Git / PR State
 
-- Current branch: `main`
-- Latest local commit: `c2f41e3`
-- `git remote -v`:
-
-```text
-origin	https://github.com/ProfRandom92/comptext-sparkctl (fetch)
-origin	DISABLED (push)
-```
-
-- Push URL status: `DISABLED`
-- `git status --short` summary at handoff creation:
-
-```text
- M AGENTS.md
- M agy7rust/src/bin/sparkctl.rs
- M agy7rust/src/codec/package.rs
- M agy7rust/src/lib.rs
- M agy7rust/src/sparkctl/mod.rs
- M agy7rust/tests/spark_roundtrip.rs
- M reports/performance_baseline.json
-?? .agents/
-?? agy7rust/src/sparkctl/spark_evidence.rs
-?? artifacts/spark/evidence_packet_v1.json
-?? docs/
-?? reports/latest.json
-```
-
-No local implementation commit has been created yet.
+- Branch: `spark-evidence-packet-v1`
+- Commit: `081a2cbb526d580c1143235f9cbfb1f4cc0df4aa`
+- PR: `#3`
+- Status: pushed, PR open, not merged.
+- Working tree was clean after push.
+- Push URL status after review setup: `DISABLED`.
 
 ## 3. Implemented Feature Summary
 
@@ -50,7 +28,7 @@ No local implementation commit has been created yet.
 - Added tamper validation tests for stale preimage, stale canonical JSON, stale hash, and missing required fields.
 - Added docs for SPARK alignment, artifact contract, safety/claims, implementation report, README update proposal, and this handoff.
 
-## 4. Intended Committed Files
+## 4. Intended PR Files
 
 - `AGENTS.md`
 - `.agents/skills/**`
@@ -78,7 +56,7 @@ No local implementation commit has been created yet.
 - secrets
 - unrelated files
 
-## 6. Validation Results Already Achieved
+## 6. Validation Results Achieved
 
 - `cargo fmt --all --check`: PASS
 - `cargo test`: PASS
@@ -97,24 +75,34 @@ No local implementation commit has been created yet.
 - Human Review remains the approval boundary.
 - Goal never bypasses Policy Gate, Provider Boundary, or Human Review.
 - No provider calls were added.
-- No GitHub writes were added.
-- No compliance, legal, forensic, or production claims were added.
+- No compliance, legal, forensic, official SPARK compatibility, autonomous approval, or production readiness claims were added.
 
-## 8. Remaining Next Step
+## 8. Current Next Step
 
-No local implementation commit exists yet.
+Review PR `#3`, wait for GitHub CI/check status if configured, and keep any follow-up changes small and review-gated.
 
-Recommended next safe sequence:
+## 9. Historical Pre-Commit Handoff Snapshot
 
-1. Clean generated report churn:
-   - remove `reports/latest.json`
-   - restore `reports/performance_baseline.json` if it is only validation churn
-2. Create local branch `spark-evidence-packet-v1`.
-3. Stage intended files only.
-4. Commit locally with:
+This section preserves the original pre-commit handoff state for audit context only. It is not the current branch state.
+
+- Current branch at that time: `main`
+- Latest local commit at that time: `c2f41e3`
+- Push URL status at that time: `DISABLED`
+- `git status --short` summary at handoff creation:
 
 ```text
-feat(sparkctl): add SPARK Evidence Packet v1
+ M AGENTS.md
+ M agy7rust/src/bin/sparkctl.rs
+ M agy7rust/src/codec/package.rs
+ M agy7rust/src/lib.rs
+ M agy7rust/src/sparkctl/mod.rs
+ M agy7rust/tests/spark_roundtrip.rs
+ M reports/performance_baseline.json
+?? .agents/
+?? agy7rust/src/sparkctl/spark_evidence.rs
+?? artifacts/spark/evidence_packet_v1.json
+?? docs/
+?? reports/latest.json
 ```
 
-5. Do not push without explicit push/PR approval.
+At that historical point, no local implementation commit had been created yet. The recommended sequence then was to clean generated report churn, create `spark-evidence-packet-v1`, stage intended files only, commit with `feat(sparkctl): add SPARK Evidence Packet v1`, and avoid push without explicit approval.
