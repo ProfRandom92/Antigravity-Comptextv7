@@ -141,8 +141,8 @@ fn test_pdf_extraction_contract_allows_empty_tables() {
     let mut value = load_fixture_value();
     value["tables"] = serde_json::json!([]);
 
-    let validation = validate_pdf_extraction_contract_value(&value)
-        .expect("empty tables should be allowed");
+    let validation =
+        validate_pdf_extraction_contract_value(&value).expect("empty tables should be allowed");
     assert_eq!(validation.table_count, 0);
     assert_eq!(validation.first_table_row_count, 0);
 }
