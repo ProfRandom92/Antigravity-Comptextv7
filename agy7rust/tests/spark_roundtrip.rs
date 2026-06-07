@@ -1,7 +1,11 @@
 use agy7rust::codec::package::{
-    build_package_from_value, canonical_json, collect_field_paths, extract_commitment_tokens,
-    replay_package_value, verify_package_value,
+    build_package_from_value, build_spark_evidence_packet_envelope, canonical_json,
+    collect_field_paths, extract_commitment_tokens, replay_package_value,
+    validate_spark_evidence_packet_envelope, validate_spark_evidence_packet_value,
+    verify_package_value, ArtifactManifestEntry, ClaimHygiene, HumanReviewDecision, PolicyResult,
+    ProviderBoundaryStatus, SparkEvidencePacketPreimage,
 };
+use agy7rust::sha256_hex;
 use serde_json::json;
 
 #[test]
@@ -19,6 +23,225 @@ fn test_canonical_json_sorting() {
     // Keys should be sorted alphabetically: a, m, z
     // Under a, keys should be sorted: b, c
     assert_eq!(canonical, r#"{"a":{"b":2,"c":3},"m":[4,5,6],"z":1}"#);
+}
+
+#[test]
+fn test_sha256_hex_known_input_is_stable() {
+    assert_eq!(
+        sha256_hex("abc"),
+        "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    );
+}
+
+#[test]
+fn test_spark_evidence_packet_demo_shape_validates() {
+    let preimage = sample_spark_evidence_preimage();
+    let envelope =
+        build_spark_evidence_packet_envelope(preimage).expect("evidence envelope should build");
+
+    assert_eq!(
+        envelope.preimage.goal,
+        "Review deterministic artifact packaging for SPARK Evidence Packet v1."
+    );
+    assert_eq!(envelope.preimage.policy_result, PolicyResult::ReviewNeeded);
+    assert_eq!(
+        envelope.preimage.provider_boundary_status,
+        ProviderBoundaryStatus::DEMO
+    );
+    assert_eq!(
+        envelope.preimage.human_review_decision,
+        HumanReviewDecision::NOTES
+    );
+    assert!(!envelope.preimage.claim_hygiene.allowed_claims.is_empty());
+    assert!(!envelope.preimage.claim_hygiene.blocked_claims.is_empty());
+    assert!(!envelope.preimage.artifact_manifest.is_empty());
+    assert!(!envelope.preimage.warnings.is_empty());
+    assert!(!envelope.preimage.limitations.is_empty());
+
+    let preimage_value = serde_json::to_value(&envelope.preimage).unwrap();
+    assert_eq!(envelope.canonical_json, canonical_json(&preimage_value));
+    assert_eq!(
+        envelope.canonical_hash,
+        sha256_hex(&envelope.canonical_json)
+    );
+    assert!(validate_spark_evidence_packet_envelope(&envelope).is_ok());
+
+    let envelope_value = serde_json::to_value(&envelope).unwrap();
+    assert!(validate_spark_evidence_packet_value(&envelope_value).is_ok());
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_changed_preimage_with_stale_canonical_json() {
+    let mut envelope =
+        build_spark_evidence_packet_envelope(sample_spark_evidence_preimage()).unwrap();
+    envelope.preimage.goal = "Tampered goal".to_string();
+
+    let err = validate_spark_evidence_packet_envelope(&envelope)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "canonical_json mismatch");
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_changed_canonical_json_with_stale_hash() {
+    let mut envelope =
+        build_spark_evidence_packet_envelope(sample_spark_evidence_preimage()).unwrap();
+    envelope.canonical_json = "{}".to_string();
+
+    let err = validate_spark_evidence_packet_envelope(&envelope)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "canonical_json mismatch");
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_changed_canonical_hash() {
+    let mut envelope =
+        build_spark_evidence_packet_envelope(sample_spark_evidence_preimage()).unwrap();
+    envelope.canonical_hash =
+        "0000000000000000000000000000000000000000000000000000000000000000".to_string();
+
+    let err = validate_spark_evidence_packet_envelope(&envelope)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "canonical_hash mismatch");
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_missing_required_review_policy_goal_fields() {
+    let mut missing_goal = sample_spark_evidence_preimage();
+    missing_goal.goal = " ".to_string();
+    assert_eq!(
+        build_spark_evidence_packet_envelope(missing_goal)
+            .unwrap_err()
+            .to_string(),
+        "missing goal"
+    );
+
+    let mut missing_review = sample_spark_evidence_preimage();
+    missing_review.untrusted_proposal = "".to_string();
+    assert_eq!(
+        build_spark_evidence_packet_envelope(missing_review)
+            .unwrap_err()
+            .to_string(),
+        "missing untrusted_proposal"
+    );
+
+    let mut missing_manifest = sample_spark_evidence_preimage();
+    missing_manifest.artifact_manifest.clear();
+    assert_eq!(
+        build_spark_evidence_packet_envelope(missing_manifest)
+            .unwrap_err()
+            .to_string(),
+        "missing artifact_manifest"
+    );
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_unknown_envelope_field() {
+    let envelope = build_spark_evidence_packet_envelope(sample_spark_evidence_preimage()).unwrap();
+    let mut envelope_value = serde_json::to_value(&envelope).unwrap();
+    envelope_value["unexpected_envelope_field"] = json!("tamper");
+
+    let err = validate_spark_evidence_packet_value(&envelope_value)
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("unknown field"));
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_unknown_preimage_field() {
+    let mut preimage_value = serde_json::to_value(sample_spark_evidence_preimage()).unwrap();
+    preimage_value["unexpected_preimage_field"] = json!("tamper");
+
+    let err = serde_json::from_value::<SparkEvidencePacketPreimage>(preimage_value)
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("unknown field"));
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_allowed_claim() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage
+        .claim_hygiene
+        .allowed_claims
+        .push("   ".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(
+        err,
+        "missing or empty claim in claim_hygiene.allowed_claims"
+    );
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_blocked_claim() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage.claim_hygiene.blocked_claims.push("".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(
+        err,
+        "missing or empty claim in claim_hygiene.blocked_claims"
+    );
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_warning() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage.warnings.push("\t".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "missing or empty warning");
+}
+
+#[test]
+fn test_spark_evidence_packet_rejects_blank_limitation() {
+    let mut preimage = sample_spark_evidence_preimage();
+    preimage.limitations.push("\n".to_string());
+
+    let err = build_spark_evidence_packet_envelope(preimage)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "missing or empty limitation");
+}
+
+fn sample_spark_evidence_preimage() -> SparkEvidencePacketPreimage {
+    SparkEvidencePacketPreimage {
+        schema_version: "SPARK-EVIDENCE-PACKET-V1".to_string(),
+        local_id: "unit-test-packet".to_string(),
+        goal: "Review deterministic artifact packaging for SPARK Evidence Packet v1.".to_string(),
+        source_summary: "Synthetic local fixture summary.".to_string(),
+        context_pack_summary: "Context pack summary for deterministic review.".to_string(),
+        policy_result: PolicyResult::ReviewNeeded,
+        provider_boundary_status: ProviderBoundaryStatus::DEMO,
+        untrusted_proposal: "Untrusted proposal requires human review.".to_string(),
+        human_review_decision: HumanReviewDecision::NOTES,
+        claim_hygiene: ClaimHygiene {
+            allowed_claims: vec![
+                "deterministic canonical packaging".to_string(),
+                "artifact manifest".to_string(),
+            ],
+            blocked_claims: vec![
+                "production-ready".to_string(),
+                "guaranteed correctness".to_string(),
+            ],
+        },
+        artifact_manifest: vec![ArtifactManifestEntry {
+            path: "artifacts/spark/evidence_packet_v1.json".to_string(),
+            role: "evidence_packet".to_string(),
+            sha256: None,
+        }],
+        warnings: vec!["Provider output is untrusted until reviewed.".to_string()],
+        limitations: vec!["No compliance or production claim is made.".to_string()],
+    }
 }
 
 #[test]
@@ -1128,7 +1351,7 @@ fn test_context_validate_invalid_shape_fails() {
 fn test_sparkctl_doctor_execution() {
     use std::process::Command;
     let output = Command::new("cargo")
-        .args(&["run", "--bin", "sparkctl", "--", "doctor"])
+        .args(["run", "--bin", "sparkctl", "--", "doctor"])
         .output()
         .expect("failed to execute cargo run");
 
@@ -1143,7 +1366,7 @@ fn test_sparkctl_rust_validate_execution() {
     use std::process::Command;
     let output = Command::new("cargo")
         .env("SPARKCTL_IN_TEST", "1")
-        .args(&["run", "--bin", "sparkctl", "--", "rust-validate"])
+        .args(["run", "--bin", "sparkctl", "--", "rust-validate"])
         .output()
         .expect("failed to execute cargo run");
 
@@ -1157,7 +1380,7 @@ fn test_sparkctl_rust_validate_execution() {
 fn test_sparkctl_context_all_execution() {
     use std::process::Command;
     let output = Command::new("cargo")
-        .args(&["run", "--bin", "sparkctl", "--", "context-all"])
+        .args(["run", "--bin", "sparkctl", "--", "context-all"])
         .output()
         .expect("failed to execute cargo run");
 
@@ -1171,7 +1394,7 @@ fn test_sparkctl_context_all_execution() {
 fn test_sparkctl_spark_demo_execution() {
     use std::process::Command;
     let output = Command::new("cargo")
-        .args(&["run", "--bin", "sparkctl", "--", "spark-demo"])
+        .args(["run", "--bin", "sparkctl", "--", "spark-demo"])
         .output()
         .expect("failed to execute cargo run");
 
@@ -1185,7 +1408,7 @@ fn test_sparkctl_spark_demo_execution() {
 fn test_sparkctl_handoff_check_execution() {
     use std::process::Command;
     let output = Command::new("cargo")
-        .args(&["run", "--bin", "sparkctl", "--", "handoff-check"])
+        .args(["run", "--bin", "sparkctl", "--", "handoff-check"])
         .output()
         .expect("failed to execute cargo run");
 

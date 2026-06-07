@@ -1,5 +1,80 @@
 use crate::codec::hash::sha256_hex;
+use serde::{Deserialize, Serialize};
 use serde_json;
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum PolicyResult {
+    #[serde(rename = "ALLOW")]
+    ALLOW,
+    #[serde(rename = "REVIEW_NEEDED")]
+    ReviewNeeded,
+    #[serde(rename = "BLOCK")]
+    BLOCK,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum ProviderBoundaryStatus {
+    #[serde(rename = "DEMO")]
+    DEMO,
+    #[serde(rename = "UNAVAILABLE")]
+    UNAVAILABLE,
+    #[serde(rename = "AVAILABLE")]
+    AVAILABLE,
+    #[serde(rename = "BLOCKED_BY_POLICY")]
+    BlockedByPolicy,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum HumanReviewDecision {
+    #[serde(rename = "PASS")]
+    PASS,
+    #[serde(rename = "NOTES")]
+    NOTES,
+    #[serde(rename = "BLOCKED")]
+    BLOCKED,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ClaimHygiene {
+    pub allowed_claims: Vec<String>,
+    pub blocked_claims: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ArtifactManifestEntry {
+    pub path: String,
+    pub role: String,
+    pub sha256: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct SparkEvidencePacketPreimage {
+    pub schema_version: String,
+    pub local_id: String,
+    pub goal: String,
+    pub source_summary: String,
+    pub context_pack_summary: String,
+    pub policy_result: PolicyResult,
+    pub provider_boundary_status: ProviderBoundaryStatus,
+    pub untrusted_proposal: String,
+    pub human_review_decision: HumanReviewDecision,
+    pub claim_hygiene: ClaimHygiene,
+    pub artifact_manifest: Vec<ArtifactManifestEntry>,
+    pub warnings: Vec<String>,
+    pub limitations: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct SparkEvidencePacketEnvelope {
+    #[serde(flatten)]
+    pub preimage: SparkEvidencePacketPreimage,
+    pub canonical_json: String,
+    pub canonical_hash: String,
+}
 
 pub fn sort_json_value(value: &serde_json::Value) -> serde_json::Value {
     match value {
@@ -25,6 +100,93 @@ pub fn sort_json_value(value: &serde_json::Value) -> serde_json::Value {
 pub fn canonical_json(value: &serde_json::Value) -> String {
     let sorted = sort_json_value(value);
     serde_json::to_string(&sorted).unwrap_or_default()
+}
+
+pub fn build_spark_evidence_packet_envelope(
+    preimage: SparkEvidencePacketPreimage,
+) -> anyhow::Result<SparkEvidencePacketEnvelope> {
+    validate_spark_evidence_preimage(&preimage)?;
+    let preimage_value = serde_json::to_value(&preimage)?;
+    let canonical = canonical_json(&preimage_value);
+    let canonical_hash = sha256_hex(&canonical);
+
+    Ok(SparkEvidencePacketEnvelope {
+        preimage,
+        canonical_json: canonical,
+        canonical_hash,
+    })
+}
+
+pub fn validate_spark_evidence_packet_envelope(
+    envelope: &SparkEvidencePacketEnvelope,
+) -> anyhow::Result<()> {
+    validate_spark_evidence_preimage(&envelope.preimage)?;
+    let preimage_value = serde_json::to_value(&envelope.preimage)?;
+    let calculated_canonical_json = canonical_json(&preimage_value);
+    if envelope.canonical_json != calculated_canonical_json {
+        return Err(anyhow::anyhow!("canonical_json mismatch"));
+    }
+
+    let calculated_hash = sha256_hex(&envelope.canonical_json);
+    if envelope.canonical_hash != calculated_hash {
+        return Err(anyhow::anyhow!("canonical_hash mismatch"));
+    }
+
+    Ok(())
+}
+
+pub fn validate_spark_evidence_packet_value(value: &serde_json::Value) -> anyhow::Result<()> {
+    let envelope: SparkEvidencePacketEnvelope = serde_json::from_value(value.clone())?;
+    validate_spark_evidence_packet_envelope(&envelope)
+}
+
+fn validate_spark_evidence_preimage(preimage: &SparkEvidencePacketPreimage) -> anyhow::Result<()> {
+    require_non_empty("schema_version", &preimage.schema_version)?;
+    if preimage.schema_version != "SPARK-EVIDENCE-PACKET-V1" {
+        return Err(anyhow::anyhow!(
+            "schema_version mismatch: expected SPARK-EVIDENCE-PACKET-V1"
+        ));
+    }
+    require_non_empty("local_id", &preimage.local_id)?;
+    require_non_empty("goal", &preimage.goal)?;
+    require_non_empty("source_summary", &preimage.source_summary)?;
+    require_non_empty("context_pack_summary", &preimage.context_pack_summary)?;
+    require_non_empty("untrusted_proposal", &preimage.untrusted_proposal)?;
+
+    require_non_empty_list(
+        "missing or empty claim in claim_hygiene.allowed_claims",
+        &preimage.claim_hygiene.allowed_claims,
+    )?;
+    require_non_empty_list(
+        "missing or empty claim in claim_hygiene.blocked_claims",
+        &preimage.claim_hygiene.blocked_claims,
+    )?;
+    if preimage.artifact_manifest.is_empty() {
+        return Err(anyhow::anyhow!("missing artifact_manifest"));
+    }
+    require_non_empty_list("missing or empty warning", &preimage.warnings)?;
+    require_non_empty_list("missing or empty limitation", &preimage.limitations)?;
+
+    for entry in &preimage.artifact_manifest {
+        require_non_empty("artifact_manifest.path", &entry.path)?;
+        require_non_empty("artifact_manifest.role", &entry.role)?;
+    }
+
+    Ok(())
+}
+
+fn require_non_empty(label: &str, value: &str) -> anyhow::Result<()> {
+    if value.trim().is_empty() {
+        return Err(anyhow::anyhow!("missing {}", label));
+    }
+    Ok(())
+}
+
+fn require_non_empty_list(label: &str, values: &[String]) -> anyhow::Result<()> {
+    if values.is_empty() || values.iter().any(|value| value.trim().is_empty()) {
+        return Err(anyhow::anyhow!(label.to_string()));
+    }
+    Ok(())
 }
 
 pub fn collect_field_paths(value: &serde_json::Value) -> Vec<String> {
