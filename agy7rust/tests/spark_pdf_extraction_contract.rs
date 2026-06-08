@@ -159,6 +159,17 @@ fn test_pdf_extraction_contract_rejects_empty_table_row() {
 }
 
 #[test]
+fn test_pdf_extraction_contract_rejects_empty_pages() {
+    let mut value = load_fixture_value();
+    value["pages"] = serde_json::json!([]);
+
+    let err = validate_pdf_extraction_contract_value(&value)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(err, "missing pages");
+}
+
+#[test]
 fn test_pdf_extraction_contract_rejects_blank_table_cell() {
     let mut value = load_fixture_value();
     value["tables"][0]["rows"][0][0] = Value::String("   ".to_string());

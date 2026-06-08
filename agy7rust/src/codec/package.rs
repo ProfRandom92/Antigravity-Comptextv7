@@ -780,6 +780,14 @@ pub fn validate_schema(
         return Err(anyhow::anyhow!("schema mismatch"));
     }
 
+    let version = schema_obj
+        .get("version")
+        .and_then(|v| v.as_i64())
+        .ok_or_else(|| anyhow::anyhow!("unsupported schema version"))?;
+    if version != 1 {
+        return Err(anyhow::anyhow!("unsupported schema version"));
+    }
+
     let name = schema_obj
         .get("name")
         .and_then(|v| v.as_str())

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://comptext.local/schemas/spark/pdf_extraction_v1.schema.json",
-  "title": "SPARK PDF Extraction V1",
+  "title": "SPARK-Style PDF Extraction V1",
   "description": "Deterministic structured-data contract for external or manual PDF extraction outputs used as input evidence.",
   "type": "object",
   "additionalProperties": false,
@@ -55,6 +55,7 @@
     },
     "pages": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "$ref": "#/$defs/page"
       }
@@ -73,7 +74,48 @@
     },
     "extracted_fields": {
       "type": "object",
-      "additionalProperties": true
+      "additionalProperties": true,
+      "required": [
+        "procedure_goal",
+        "authority",
+        "decision_points",
+        "required_documents",
+        "review_required",
+        "public_sector_context"
+      ],
+      "properties": {
+        "procedure_goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required_documents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "review_required": {
+          "const": true
+        },
+        "public_sector_context": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "warnings": {
       "type": "array",
@@ -145,10 +187,13 @@
         },
         "rows": {
           "type": "array",
+          "minItems": 1,
           "items": {
             "type": "array",
+            "minItems": 1,
             "items": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         }

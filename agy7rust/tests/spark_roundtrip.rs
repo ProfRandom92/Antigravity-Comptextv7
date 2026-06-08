@@ -474,7 +474,24 @@ fn test_schema_checking_scenarios() {
     assert!(res.is_err());
     assert_eq!(res.unwrap_err().to_string(), "schema mismatch");
 
-    // 6. Unsupported path syntax fails cleanly
+    // 6. Missing schema version fails cleanly
+    let mut missing_version_schema = valid_schema.clone();
+    missing_version_schema
+        .as_object_mut()
+        .unwrap()
+        .remove("version");
+    let res = agy7rust::codec::package::validate_schema(&valid_input, &missing_version_schema);
+    assert!(res.is_err());
+    assert_eq!(res.unwrap_err().to_string(), "unsupported schema version");
+
+    // 7. Unsupported schema version fails cleanly
+    let mut unsupported_version_schema = valid_schema.clone();
+    unsupported_version_schema["version"] = json!(2);
+    let res = agy7rust::codec::package::validate_schema(&valid_input, &unsupported_version_schema);
+    assert!(res.is_err());
+    assert_eq!(res.unwrap_err().to_string(), "unsupported schema version");
+
+    // 8. Unsupported path syntax fails cleanly
     let mut unsupported_path_schema = valid_schema.clone();
     unsupported_path_schema["required_field_paths"] = json!(["$.extraction.fields[0].parcel_id"]);
     let res = agy7rust::codec::package::validate_schema(&valid_input, &unsupported_path_schema);
