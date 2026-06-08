@@ -63,12 +63,17 @@ SAFE_CARGO = (
 
 def load_event() -> dict:
     try:
-        return json.load(sys.stdin)
+        event = json.load(sys.stdin)
     except json.JSONDecodeError:
         return {}
+    if not isinstance(event, dict):
+        return {}
+    return event
 
 
-def normalize_path(value: str) -> str:
+def normalize_path(value: object) -> str:
+    if not isinstance(value, str):
+        return ""
     return value.replace("\\", "/").lstrip("./")
 
 
@@ -127,10 +132,10 @@ def is_safe_cargo(tokens: list[str], cwd: str) -> bool:
 
 
 def command_has_secret_read(command: str) -> bool:
-    lowered = command.lower()
+    lowered = normalize_path(command).lower()
     if re.search(r"\b(printenv|env)\b", lowered) or "get-childitem env:" in lowered:
         return True
-    if re.search(r"\b(get-content|type|cat|more|less|gc)\b", lowered):
+    if re.search(r"\b(get-content|type|cat|more|less|gc|grep|egrep|fgrep|awk|sed|head|tail|jq|yq)\b", lowered):
         return any(re.search(pattern, lowered) for pattern in SECRET_PATTERNS)
     return False
 
@@ -149,6 +154,7 @@ def main() -> None:
         return
 
     lowered = command.lower()
+    normalized_lowered = normalize_path(command).lower()
     tokens = split_command(command)
     token0 = tokens[0].lower() if tokens else ""
     token1 = tokens[1].lower() if len(tokens) > 1 else ""
@@ -171,7 +177,7 @@ def main() -> None:
     if token0 == "cargo" and not is_safe_cargo(tokens, event.get("cwd", "")):
         warn("Cargo command is outside the documented validation allowlist; run cargo only inside agy7rust/.")
 
-    touched = [path for path in PROTECTED_WARN_PATHS if path.lower() in lowered]
+    touched = [path for path in PROTECTED_WARN_PATHS if path.lower() in normalized_lowered]
     if touched:
         warn("Protected path mentioned; verify human approval and artifact hygiene before editing: " + ", ".join(touched))
 

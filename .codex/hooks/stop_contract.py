@@ -27,6 +27,9 @@ def main() -> None:
     except json.JSONDecodeError:
         print(json.dumps({"continue": True}))
         return
+    if not isinstance(event, dict):
+        print(json.dumps({"continue": True}))
+        return
 
     message = event.get("last_assistant_message") or ""
     missing = [label for label in REQUIRED_LABELS if label not in message]

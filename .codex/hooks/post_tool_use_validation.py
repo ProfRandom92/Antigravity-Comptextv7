@@ -30,6 +30,8 @@ def main() -> None:
         event = json.load(sys.stdin)
     except json.JSONDecodeError:
         return
+    if not isinstance(event, dict):
+        return
 
     data = " ".join(
         [
