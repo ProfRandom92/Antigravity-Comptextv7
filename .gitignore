@@ -1,0 +1,5 @@
+reports/latest.json
+reports/performance_baseline.json
+artifacts/spark/
+__pycache__/
+*.pyc

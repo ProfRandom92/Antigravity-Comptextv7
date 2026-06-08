@@ -1,0 +1,44 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|shell_command|functions.shell_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .codex/hooks/pre_tool_use_policy.py",
+            "commandWindows": "py -3 .codex\\hooks\\pre_tool_use_policy.py",
+            "timeout": 10,
+            "statusMessage": "Checking repo policy"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|shell_command|functions.shell_command|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .codex/hooks/post_tool_use_validation.py",
+            "commandWindows": "py -3 .codex\\hooks\\post_tool_use_validation.py",
+            "timeout": 10,
+            "statusMessage": "Checking protected paths"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .codex/hooks/stop_contract.py",
+            "commandWindows": "py -3 .codex\\hooks\\stop_contract.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
