@@ -1,6 +1,7 @@
 use crate::codec::hash::sha256_hex;
 use serde::{Deserialize, Serialize};
 use serde_json;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PolicyResult {
@@ -76,6 +77,81 @@ pub struct SparkEvidencePacketEnvelope {
     pub canonical_hash: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PdfExtractionDocument {
+    pub schema_version: String,
+    pub source_file: String,
+    pub source_sha256: Option<String>,
+    pub source_url: Option<String>,
+    pub license_or_usage_note: Option<String>,
+    pub sanitization_status: Option<String>,
+    pub contains_personal_data_risk: Option<String>,
+    pub document_type: String,
+    pub pages: Vec<PdfExtractionPage>,
+    pub tables: Vec<PdfExtractionTable>,
+    pub figures: Vec<PdfExtractionFigure>,
+    pub extracted_fields: PdfExtractedFields,
+    pub warnings: Vec<String>,
+    pub tool_metadata: PdfExtractionToolMetadata,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PdfExtractionPage {
+    pub page_number: u64,
+    pub text_summary: String,
+    pub field_refs: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PdfExtractionTable {
+    pub table_id: String,
+    pub page_number: u64,
+    pub caption: String,
+    pub columns: Vec<String>,
+    pub rows: Vec<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PdfExtractionFigure {
+    pub figure_id: String,
+    pub page_number: u64,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct PdfExtractedFields {
+    pub procedure_goal: String,
+    pub authority: String,
+    pub decision_points: Vec<String>,
+    pub required_documents: Vec<String>,
+    pub review_required: bool,
+    pub public_sector_context: String,
+    #[serde(flatten)]
+    pub additional_fields: BTreeMap<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PdfExtractionToolMetadata {
+    pub converter: String,
+    pub converter_version: String,
+    pub extraction_mode: String,
+    pub notes: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PdfExtractionValidation {
+    pub canonical_json: String,
+    pub canonical_hash: String,
+    pub page_count: usize,
+    pub table_count: usize,
+    pub first_table_row_count: usize,
+}
+
 pub fn sort_json_value(value: &serde_json::Value) -> serde_json::Value {
     match value {
         serde_json::Value::Object(map) => {
@@ -138,6 +214,184 @@ pub fn validate_spark_evidence_packet_envelope(
 pub fn validate_spark_evidence_packet_value(value: &serde_json::Value) -> anyhow::Result<()> {
     let envelope: SparkEvidencePacketEnvelope = serde_json::from_value(value.clone())?;
     validate_spark_evidence_packet_envelope(&envelope)
+}
+
+pub fn validate_pdf_extraction_contract_value(
+    value: &serde_json::Value,
+) -> anyhow::Result<PdfExtractionValidation> {
+    let document: PdfExtractionDocument = serde_json::from_value(value.clone())?;
+    validate_pdf_extraction_document(&document)?;
+
+    let canonical = canonical_json(value);
+    let canonical_hash = sha256_hex(&canonical);
+    let first_table_row_count = document
+        .tables
+        .first()
+        .map(|table| table.rows.len())
+        .unwrap_or(0);
+
+    Ok(PdfExtractionValidation {
+        canonical_json: canonical,
+        canonical_hash,
+        page_count: document.pages.len(),
+        table_count: document.tables.len(),
+        first_table_row_count,
+    })
+}
+
+fn validate_pdf_extraction_document(document: &PdfExtractionDocument) -> anyhow::Result<()> {
+    require_exact(
+        "schema_version",
+        &document.schema_version,
+        "PDF-EXTRACTION-V1",
+    )?;
+    require_non_empty("source_file", &document.source_file)?;
+    if let Some(risk) = &document.contains_personal_data_risk {
+        require_allowed(
+            "contains_personal_data_risk",
+            risk,
+            &["low", "medium", "high", "unknown"],
+        )?;
+    }
+    require_non_empty("document_type", &document.document_type)?;
+    require_allowed(
+        "tool_metadata.converter",
+        &document.tool_metadata.converter,
+        &[
+            "manual",
+            "docling",
+            "mineru",
+            "marker",
+            "pdftotext",
+            "other",
+        ],
+    )?;
+    require_non_empty(
+        "tool_metadata.converter_version",
+        &document.tool_metadata.converter_version,
+    )?;
+    require_allowed(
+        "tool_metadata.extraction_mode",
+        &document.tool_metadata.extraction_mode,
+        &["synthetic_fixture", "manual_fixture", "external_tool"],
+    )?;
+
+    require_non_empty_pages(&document.pages)?;
+    validate_tables(&document.tables)?;
+    validate_warnings(&document.warnings)?;
+    validate_pdf_extracted_fields(&document.extracted_fields)?;
+
+    for figure in &document.figures {
+        require_non_empty("figures.figure_id", &figure.figure_id)?;
+        require_non_zero("figures.page_number", figure.page_number)?;
+        require_non_empty("figures.description", &figure.description)?;
+    }
+
+    if let Some(hash) = &document.source_sha256 {
+        validate_sha256_hex("source_sha256", hash)?;
+    }
+
+    Ok(())
+}
+
+fn validate_pdf_extracted_fields(fields: &PdfExtractedFields) -> anyhow::Result<()> {
+    require_non_empty("extracted_fields.procedure_goal", &fields.procedure_goal)?;
+    require_non_empty("extracted_fields.authority", &fields.authority)?;
+    require_non_empty_list("extracted_fields.decision_points", &fields.decision_points)?;
+    require_non_empty_list(
+        "extracted_fields.required_documents",
+        &fields.required_documents,
+    )?;
+    if !fields.review_required {
+        return Err(anyhow::anyhow!(
+            "PDF extraction extracted_fields.review_required must be true"
+        ));
+    }
+    require_non_empty(
+        "extracted_fields.public_sector_context",
+        &fields.public_sector_context,
+    )?;
+
+    Ok(())
+}
+
+fn require_exact(label: &str, value: &str, expected: &str) -> anyhow::Result<()> {
+    if value != expected {
+        return Err(anyhow::anyhow!("{} mismatch", label));
+    }
+    Ok(())
+}
+
+fn require_allowed(label: &str, value: &str, allowed: &[&str]) -> anyhow::Result<()> {
+    if !allowed.contains(&value) {
+        return Err(anyhow::anyhow!("{} unsupported", label));
+    }
+    Ok(())
+}
+
+fn require_non_zero(label: &str, value: u64) -> anyhow::Result<()> {
+    if value == 0 {
+        return Err(anyhow::anyhow!("{} must be greater than zero", label));
+    }
+    Ok(())
+}
+
+fn validate_sha256_hex(label: &str, value: &str) -> anyhow::Result<()> {
+    if value.len() != 64 || !value.chars().all(|ch| ch.is_ascii_hexdigit()) {
+        return Err(anyhow::anyhow!("{} must be lowercase SHA-256 hex", label));
+    }
+    if value.chars().any(|ch| ch.is_ascii_uppercase()) {
+        return Err(anyhow::anyhow!("{} must be lowercase SHA-256 hex", label));
+    }
+    Ok(())
+}
+
+fn require_non_empty_pages(pages: &[PdfExtractionPage]) -> anyhow::Result<()> {
+    if pages.is_empty() {
+        return Err(anyhow::anyhow!("missing pages"));
+    }
+
+    for page in pages {
+        require_non_zero("pages.page_number", page.page_number)?;
+        require_non_empty("pages.text_summary", &page.text_summary)?;
+        if let Some(field_refs) = &page.field_refs {
+            require_non_empty_list("pages.field_refs", field_refs)?;
+        }
+    }
+
+    Ok(())
+}
+
+fn validate_tables(tables: &[PdfExtractionTable]) -> anyhow::Result<()> {
+    for table in tables {
+        require_non_empty("tables.table_id", &table.table_id)?;
+        require_non_zero("tables.page_number", table.page_number)?;
+        require_non_empty("tables.caption", &table.caption)?;
+        require_non_empty_list("tables.columns", &table.columns)?;
+        if table.rows.is_empty() {
+            return Err(anyhow::anyhow!("missing tables.rows"));
+        }
+        for row in &table.rows {
+            if row.is_empty() {
+                return Err(anyhow::anyhow!("tables.rows row must not be empty"));
+            }
+            for cell in row {
+                if cell.trim().is_empty() {
+                    return Err(anyhow::anyhow!("tables.rows cell must not be empty"));
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn validate_warnings(warnings: &[String]) -> anyhow::Result<()> {
+    if warnings.iter().any(|warning| warning.trim().is_empty()) {
+        return Err(anyhow::anyhow!("warnings"));
+    }
+
+    Ok(())
 }
 
 fn validate_spark_evidence_preimage(preimage: &SparkEvidencePacketPreimage) -> anyhow::Result<()> {
@@ -516,13 +770,13 @@ pub fn validate_schema(
 ) -> anyhow::Result<(String, usize, usize)> {
     let schema_obj = schema_val
         .as_object()
-        .ok_or_else(|| anyhow::anyhow!("schema is not a JSON object"))?;
+        .ok_or_else(|| anyhow::anyhow!("Schema is not a JSON object"))?;
 
-    let schema_type = schema_obj
+    let schema = schema_obj
         .get("schema")
         .and_then(|v| v.as_str())
         .ok_or_else(|| anyhow::anyhow!("schema mismatch"))?;
-    if schema_type != "SPARK-V7-SCHEMA" {
+    if schema != "SPARK-V7-SCHEMA" {
         return Err(anyhow::anyhow!("schema mismatch"));
     }
 
@@ -534,59 +788,32 @@ pub fn validate_schema(
         return Err(anyhow::anyhow!("unsupported schema version"));
     }
 
-    let schema_name = schema_obj
+    let name = schema_obj
         .get("name")
         .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("missing schema name"))?
+        .ok_or_else(|| anyhow::anyhow!("schema name missing"))?
         .to_string();
 
-    let required_paths_val = schema_obj
+    let required_paths = schema_obj
         .get("required_field_paths")
-        .ok_or_else(|| anyhow::anyhow!("missing required_field_paths"))?;
-    let required_paths = required_paths_val
-        .as_array()
-        .ok_or_else(|| anyhow::anyhow!("missing required_field_paths"))?;
+        .and_then(|v| v.as_array())
+        .ok_or_else(|| anyhow::anyhow!("Schema missing required_field_paths array"))?;
 
-    let mut path_strings = Vec::new();
-    for p in required_paths {
-        if let Some(s) = p.as_str() {
-            path_strings.push(s);
-        } else {
-            return Err(anyhow::anyhow!("missing required_field_paths"));
-        }
-    }
-
-    let required_count = path_strings.len();
-    let mut checked_count = 0;
-
-    for path in path_strings {
-        let val = match get_value_by_path(input_val, path) {
-            Ok(v) => v,
-            Err(e) => {
-                let err_msg = e.to_string();
-                if err_msg.contains("unsupported path syntax") {
-                    return Err(e);
-                } else {
-                    return Err(anyhow::anyhow!("required field missing: {}", path));
-                }
-            }
-        };
-
-        match val {
-            serde_json::Value::String(s) => {
-                if s.trim().is_empty() {
+    for path_value in required_paths {
+        let path = path_value
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Required path is not a string"))?;
+        let value = get_value_by_path(input_val, path)?;
+        match value {
+            serde_json::Value::String(text) => {
+                if text.trim().is_empty() {
                     return Err(anyhow::anyhow!("required field empty: {}", path));
                 }
             }
             serde_json::Value::Number(_) | serde_json::Value::Bool(_) => {}
-            serde_json::Value::Null
-            | serde_json::Value::Object(_)
-            | serde_json::Value::Array(_) => {
-                return Err(anyhow::anyhow!("required field not scalar: {}", path));
-            }
+            _ => return Err(anyhow::anyhow!("required field not scalar: {}", path)),
         }
-        checked_count += 1;
     }
 
-    Ok((schema_name, required_count, checked_count))
+    Ok((name, required_paths.len(), required_paths.len()))
 }
