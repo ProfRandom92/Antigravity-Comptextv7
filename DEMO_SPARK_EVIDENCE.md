@@ -25,17 +25,17 @@ CompText-Sparkctl turns extraction and context artifacts into a local validation
 
 The workspace organizes generated and static artifacts across the following paths:
 
-- [artifacts/spark/extraction.spkg](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/artifacts/spark/extraction.spkg) — Binary SPARK-style compressed package.
-- [artifacts/spark/context.json](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/artifacts/spark/context.json) — JSON operational context layout.
-- [artifacts/spark/context_render.txt](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/artifacts/spark/context_render.txt) — Rendered text overview of the context layers.
-- [reports/latest.json](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/reports/latest.json) — Local orchestrator step run log (untracked).
-- [reports/performance_baseline.json](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/reports/performance_baseline.json) — Recorded local execution baseline timings.
+- [artifacts/spark/extraction.spkg](artifacts/spark/extraction.spkg) — Binary SPARK-style compressed package.
+- [artifacts/spark/context.json](artifacts/spark/context.json) — JSON operational context layout.
+- [artifacts/spark/context_render.txt](artifacts/spark/context_render.txt) — Rendered text overview of the context layers.
+- [reports/latest.json](reports/latest.json) — Local orchestrator step run log (untracked).
+- [reports/performance_baseline.json](reports/performance_baseline.json) — Recorded local execution baseline timings.
 
 ## 6. Expected Reviewer Path
 
 Reviewers are recommended to follow these verification steps:
 
-1. **Inspect README.md:** Read the core design specifications and command mappings in [README.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/README.md).
+1. **Inspect README.md:** Read the core design specifications and command mappings in [README.md](README.md).
 2. **Execute Orchestrator:** Run the main pipeline orchestrator:
    ```bash
    cargo run --bin agy-ct -- run
@@ -44,9 +44,9 @@ Reviewers are recommended to follow these verification steps:
    ```bash
    python -m json.tool ../reports/latest.json
    ```
-4. **Inspect Context Layout:** Verify the generated model structure in [context.json](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/artifacts/spark/context.json).
-5. **Inspect Render Output:** Open [context_render.txt](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/artifacts/spark/context_render.txt) to see the printed text log.
-6. **Inspect Performance Baseline:** Read [PERFORMANCE_BASELINE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/PERFORMANCE_BASELINE.md) to compare timings.
+4. **Inspect Context Layout:** Verify the generated model structure in [context.json](artifacts/spark/context.json).
+5. **Inspect Render Output:** Open [context_render.txt](artifacts/spark/context_render.txt) to see the printed text log.
+6. **Inspect Performance Baseline:** Read [PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md) to compare timings.
 
 ## 7. Exact Commands for Reviewers
 

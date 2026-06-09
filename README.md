@@ -108,8 +108,8 @@ These artifacts are intended for local, reproducible validation and review workf
 ### Demo Evidence
 
 Demo evidence:
-- SPARK challenge demo evidence: [DEMO_SPARK_EVIDENCE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/DEMO_SPARK_EVIDENCE.md)
-- Local performance baseline: [PERFORMANCE_BASELINE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/PERFORMANCE_BASELINE.md)
+- SPARK challenge demo evidence: [DEMO_SPARK_EVIDENCE.md](DEMO_SPARK_EVIDENCE.md)
+- Local performance baseline: [PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md)
 
 #### Reviewer Quickstart
 

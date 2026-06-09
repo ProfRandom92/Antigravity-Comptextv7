@@ -4,13 +4,14 @@ This skill defines the repository structure, active directories, permissions, an
 
 ## 1. Operating Boundaries
 
-- **Sandbox Root:** `C:\Users\contr\sandbox_workspace\Antigravity-Comptextv7-unified`
+- **Sandbox Root:** current workspace clone
 - **Allowed Write Paths:**
   - `agy7rust/` (Rust crate)
   - `examples/spark/` (Synthetic SPARK-style fixtures)
   - `artifacts/spark/` (Verification and demo outputs)
   - `.agent/skills/` (Local agent instructions)
-- **Forbidden Paths:** Any parent directory (e.g. `C:\Users\contr`), desktop (`C:\Users\contr\Desktop`), sibling workspaces (e.g., `rustcomptext`), and the `.git` metadata of the system.
+- **Forbidden Paths:** Any parent directory, desktop, sibling workspaces, and the `.git` metadata of the system. Agents must not inspect, modify, copy, move, delete, or index any CompText-related files outside the current workspace clone.
+- **Historical Evidence Paths:** Old Antigravity-Comptextv7 paths, `C:\Users\contr` paths, Termux paths, `git_post_push_verification` paths, and `file:///C:/` links are historical evidence only and must not be used as valid active paths.
 - **Search Boundaries:** Do NOT perform global searches, recursive searches, or file indexing outside the sandbox root.
 
 ## 2. Command Permissions

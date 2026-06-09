@@ -26,6 +26,11 @@ Verify each of the following:
 2. **Artifact Existence:** Ensure that `context.json`, `context_render.txt`, and `extraction.spkg` exist in `artifacts/spark/`.
 3. **Render Check:** Verify that the rendered context `context_render.txt` is non-empty and correctly formatted.
 4. **Git Untracked State:** Confirm that the generated latest report `reports/latest.json` remains untracked in git.
+5. **Ledger and Hash Chain Validation:** Verify that `ledger_root` matches the final entry hash in the cryptographic chain.
+6. **Pre-Replay Validation Guardrail:** Ensure that package verification is executed as a prerequisite before running step simulations.
+7. **Failure Label Analysis:** If validation or replay fails, map the error using structured labels:
+   - `EVIDENCE_LOSS`: Critical metadata or tool sequence records are missing.
+   - `CONSTRAINT_DRIFT`: Decoded state commits or hashes diverge from baseline values.
 
 ## 4. Standard Return Format
 

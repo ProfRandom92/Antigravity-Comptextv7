@@ -25,6 +25,17 @@ The SPARK Evidence Packet v1 demo records a reviewable trail with:
 
 ## Boundaries
 
-The packet does not replace human review. Provider output remains untrusted until reviewed, and the goal does not bypass the Policy Gate or authorize auto-apply behavior.
+The packet does not replace human review. Provider output remains untrusted until reviewed, and the goal does not bypass the Policy Gate or authorize auto-apply behavior. All planning workflows terminate at a mandatory human-in-the-loop review boundary.
 
-The demo is local and bounded. It makes no provider calls and does not claim production readiness, compliance certification, legal validation, forensic proof, guaranteed correctness, or certified government use.
+The demo is local, offline, and bounded. It makes no provider calls and operates exclusively against synthetic/mock fixtures. It does not process real citizen or administrative case data.
+
+We explicitly do **not** claim:
+- production readiness or enterprise setup deployment
+- regulatory compliance certification (such as the EU AI Act)
+- legal or judicial proof admissibility
+- official SPARK schema compatibility or compliance
+- autonomous administrative decisions or approval
+- data repair, recovery, or forensic certainty helpers
+
+Legacy / future concepts such as XENTRY/OBD log sandwich models, consonant signature mapping, sparse micro-frame synopsis, and error correction layers are completely excluded from the active SPARK alignment scope.
+

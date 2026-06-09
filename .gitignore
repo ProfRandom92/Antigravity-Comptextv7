@@ -3,3 +3,4 @@ reports/performance_baseline.json
 artifacts/spark/
 __pycache__/
 *.pyc
+.antigravitycli/workspace_config.json
