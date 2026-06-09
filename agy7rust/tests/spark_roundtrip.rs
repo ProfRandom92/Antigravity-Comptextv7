@@ -1542,3 +1542,29 @@ fn test_package_verify_and_replay_with_structured_errors_and_ledger() {
     assert!(err.to_string().contains("CONSTRAINT_DRIFT"));
     assert!(err.to_string().contains("ledger root anchoring mismatch"));
 }
+
+#[test]
+fn test_agy_ct_package_inspect_execution() {
+    use std::process::Command;
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "inspect",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("schema: SPARK-V7-PACKAGE"));
+    assert!(stdout_str.contains("source_type: spark_extraction_json"));
+    assert!(stdout_str.contains("field_paths count:"));
+    assert!(stdout_str.contains("commitment_tokens count:"));
+    assert!(stdout_str.contains("tool_sequence count:"));
+}

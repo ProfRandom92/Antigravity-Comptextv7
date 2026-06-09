@@ -204,8 +204,8 @@ fn main() -> Result<()> {
             PackageCommands::Compress { .. } => {
                 println!("Placeholder: package compress");
             }
-            PackageCommands::Inspect { .. } => {
-                println!("Placeholder: package inspect");
+            PackageCommands::Inspect { input } => {
+                agy7rust::commands::inspect::run(input)?;
             }
             PackageCommands::Verify { input } => {
                 agy7rust::commands::verify_cmd::run(input)?;
