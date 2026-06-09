@@ -63,7 +63,19 @@ The following operations are strictly forbidden in this workspace and are blocke
 * Reading secrets or keys (`.env`, credentials, SSH files)
 * Web server deployments (`vercel`, `netlify`, `wrangler deploy`, etc.)
 
-## 5. Validation Plan
+## 5. Hook and Skill Governance
+
+The workspace enforces governance and boundaries using a combination of local skills and client hook configurations:
+
+* **Active Skill Path:** The `.agents/skills` directory is the active Antigravity-compatible skill path for workspace-specific slash command registration.
+* **Legacy Path:** The `.agent/skills` directory is kept for legacy compatibility metadata only.
+* **Codex-Specific Hooks:** The scripts located in `.codex/hooks/` and configured in `.codex/hooks.json` are Codex-specific guardrails. They are not natively executed or loaded by the Antigravity CLI.
+* **Optional Antigravity Customizations:** Native Antigravity plugins or global hooks (in the user's home configuration) are optional and not currently required for local work in this repository.
+* **Governing Local Control:** The policies in `AGENTS.md` and the compiled instructions under `.agents/skills/` serve as the primary local control and operating boundaries for active agent sessions.
+* **Recommended Execution Mode:** The `proceed-in-sandbox` execution configuration is the recommended local operating mode to ensure native OS process containment (AppContainer on Windows, nsjail on Linux, sandbox-exec on macOS).
+* **No Absolute Security Guarantees:** Hooks and sandbox settings serve as developer-facing guardrails and process-isolation mechanisms. They do not constitute an absolute security guarantee or certification against intentional bypasses or underlying system vulnerabilities.
+
+## 6. Validation Plan
 
 To validate the code offline, run the safe local check suite:
 1. Run `cargo fmt --all --check` to verify code style formatting.
@@ -73,11 +85,11 @@ To validate the code offline, run the safe local check suite:
 
 Do not run `agy-ct run`, `agy-ct demo`, or `agy-ct benchmark` unless the final reports and artifacts are specifically requested for human review.
 
-## 6. Synthetic-Data-Only Rule
+## 7. Synthetic-Data-Only Rule
 
 All planning modules, extractors, and validators operate exclusively against static mock datasets (e.g. `examples/spark/extraction.json`). Processing of real citizen, administrator, or live public-sector cases is strictly prohibited.
 
-## 7. Safety Non-Claims & Technology Exclusions
+## 8. Safety Non-Claims & Technology Exclusions
 
 The `CompText-Sparkctl` workflow enforces the following non-claims and exclusions:
 * **No Official SPARK Schema Compatibility:** All SPARK-oriented terminology is conceptual mock-up and synthetic schema alignment.
