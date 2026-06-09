@@ -1691,3 +1691,103 @@ fn test_agy_ct_schema_check_execution() {
 
     assert!(!output_fail.status.success());
 }
+
+#[test]
+fn test_agy_ct_context_validate_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let valid_path = temp_dir.join("test_valid_context.json");
+    let invalid_path = temp_dir.join("test_invalid_context.json");
+
+    // 1. Create a minimal valid context JSON
+    let valid_ctx = json!({
+        "context_id": "ctx-valid-123",
+        "source_package_hash": "hash-123",
+        "schema_name": "schema-123",
+        "schema_version": 1,
+        "required_field_paths": ["$.field1"],
+        "satisfied_field_paths": ["$.field1"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": ["some_claim"]
+    });
+
+    fs::write(&valid_path, serde_json::to_string(&valid_ctx).unwrap()).unwrap();
+
+    // 2. Create a minimal invalid context JSON
+    let invalid_ctx = json!({
+        "context_id": "ctx-invalid-123",
+        "source_package_hash": "hash-123",
+        "schema_name": "schema-123",
+        "schema_version": 1,
+        "required_field_paths": ["$.field1"],
+        "satisfied_field_paths": [],
+        "missing_field_paths": ["$.field1"],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": false,
+            "failure_labels": ["MISSING_REQUIRED_FIELD"],
+            "issues": ["field1 is missing"]
+        },
+        "non_claims": ["some_claim"]
+    });
+
+    fs::write(&invalid_path, serde_json::to_string(&invalid_ctx).unwrap()).unwrap();
+
+    // 3. Test valid context validation (should return exit status success)
+    let output_valid = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "validate",
+            "-i",
+            valid_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_valid.status.success());
+    let stdout_str = String::from_utf8_lossy(&output_valid.stdout);
+    assert!(stdout_str.contains("OK: context-validate passed"));
+    assert!(stdout_str.contains("context: ctx-valid-123"));
+
+    // 4. Test invalid context validation (should fail)
+    let output_invalid = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "validate",
+            "-i",
+            invalid_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_invalid.status.success());
+
+    // 5. Cleanup
+    let _ = fs::remove_file(valid_path);
+    let _ = fs::remove_file(invalid_path);
+}

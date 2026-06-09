@@ -229,8 +229,8 @@ fn main() -> Result<()> {
             ContextCommands::Render { .. } => {
                 println!("Placeholder: context render");
             }
-            ContextCommands::Validate { .. } => {
-                println!("Placeholder: context validate");
+            ContextCommands::Validate { input, schema: _ } => {
+                agy7rust::commands::context_validate::run(input)?;
             }
             ContextCommands::All => {
                 sparkctl::context_all::run_context_all()?;
