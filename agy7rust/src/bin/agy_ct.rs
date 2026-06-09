@@ -237,8 +237,8 @@ fn main() -> Result<()> {
             }
         },
         Commands::Schema { subcommand } => match subcommand {
-            SchemaCommands::Check { .. } => {
-                println!("Placeholder: schema check");
+            SchemaCommands::Check { input, schema } => {
+                agy7rust::commands::schema_check::run(input, schema)?;
             }
         },
         Commands::Report { subcommand } => match subcommand {

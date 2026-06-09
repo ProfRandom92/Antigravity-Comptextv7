@@ -1645,3 +1645,49 @@ fn test_agy_ct_package_replay_output_streams() {
     assert!(stderr_plain.contains("Replaying sidecar trace"));
     assert!(!stderr_plain.contains("\x1b["));
 }
+
+#[test]
+fn test_agy_ct_schema_check_execution() {
+    use std::process::Command;
+
+    // 1. Valid call (should return exit status success)
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "schema",
+            "check",
+            "-i",
+            "../examples/spark/extraction.json",
+            "-s",
+            "../schemas/genehmigung_v1.json",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("OK: schema-check passed"));
+    assert!(stdout_str.contains("schema: genehmigung_v1"));
+
+    // 2. Invalid call (should fail)
+    let output_fail = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "schema",
+            "check",
+            "-i",
+            "../examples/spark/pdf_extraction_fixture.json",
+            "-s",
+            "../schemas/genehmigung_v1.json",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_fail.status.success());
+}
