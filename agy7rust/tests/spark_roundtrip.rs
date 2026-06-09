@@ -1434,3 +1434,111 @@ fn test_sparkctl_handoff_check_execution() {
     assert!(stdout_str.contains("=== sparkctl handoff-check ==="));
     assert!(stdout_str.contains("handoff-check result: PASS"));
 }
+
+#[test]
+fn test_package_verify_and_replay_with_structured_errors_and_ledger() {
+    use agy7rust::codec::package::{replay_package_value, verify_package_value};
+    use serde_json::json;
+
+    // Helper to construct a valid package envelope
+    let make_pkg = |payload: serde_json::Value,
+                    ledger: Option<serde_json::Value>,
+                    ledger_root: Option<&str>|
+     -> serde_json::Value {
+        use agy7rust::codec::hash::sha256_hex;
+        use agy7rust::codec::package::canonical_json;
+
+        let payload_canonical = canonical_json(&payload);
+        let payload_sha256 = sha256_hex(&payload_canonical);
+
+        let mut sidecar_pre = json!({
+            "schema_version": "KVTC7-SPARK-1",
+            "source_type": "spark_extraction_json",
+            "payload_sha256": payload_sha256
+        });
+
+        let sidecar_canonical = canonical_json(&sidecar_pre);
+        let final_state_hash = sha256_hex(&sidecar_canonical);
+
+        sidecar_pre["final_state_hash"] = serde_json::Value::String(final_state_hash);
+
+        let mut pkg = json!({
+            "schema": "SPARK-V7-PACKAGE",
+            "version": 1,
+            "payload": payload,
+            "sidecar": sidecar_pre
+        });
+
+        if let Some(l) = ledger {
+            pkg["ledger"] = l;
+        }
+        if let Some(r) = ledger_root {
+            pkg["ledger_root"] = serde_json::Value::String(r.to_string());
+        }
+
+        let pkg_canonical = canonical_json(&pkg);
+        let integrity_hash = sha256_hex(&pkg_canonical);
+        pkg["integrity_hash"] = serde_json::Value::String(integrity_hash);
+
+        pkg
+    };
+
+    // 1. Valid package without ledger
+    let valid_pkg = make_pkg(json!({"case_id": "SPARK-123"}), None, None);
+    assert!(verify_package_value(&valid_pkg).is_ok());
+    assert!(replay_package_value(&valid_pkg).is_ok());
+
+    // 2. Missing evidence field -> returns EVIDENCE_LOSS
+    let mut missing_field_pkg = valid_pkg.clone();
+    missing_field_pkg.as_object_mut().unwrap().remove("payload");
+    let err = verify_package_value(&missing_field_pkg).unwrap_err();
+    assert!(err.to_string().contains("EVIDENCE_LOSS"));
+
+    // 3. Hash manipulation -> returns CONSTRAINT_DRIFT
+    let mut manipulated_pkg = valid_pkg.clone();
+    manipulated_pkg["sidecar"]["payload_sha256"] =
+        json!("wronghashwronghashwronghashwronghashwronghashwronghashwronghash");
+    let err = verify_package_value(&manipulated_pkg).unwrap_err();
+    assert!(err.to_string().contains("CONSTRAINT_DRIFT"));
+
+    // 4. Replay fails on verify failure
+    let err_replay = replay_package_value(&manipulated_pkg).unwrap_err();
+    assert!(err_replay.to_string().contains("CONSTRAINT_DRIFT"));
+
+    // 5. Valid package with ledger
+    let valid_pkg_with_ledger = make_pkg(
+        json!({"case_id": "SPARK-123"}),
+        Some(json!([
+            {"entry_hash": "hash1", "previous_hash": "0"},
+            {"entry_hash": "hash2", "previous_hash": "hash1"}
+        ])),
+        Some("hash2"),
+    );
+    assert!(verify_package_value(&valid_pkg_with_ledger).is_ok());
+
+    // 6. Ledger chaining mismatch -> returns CONSTRAINT_DRIFT
+    let manipulated_ledger_pkg = make_pkg(
+        json!({"case_id": "SPARK-123"}),
+        Some(json!([
+            {"entry_hash": "hash1", "previous_hash": "0"},
+            {"entry_hash": "hash2", "previous_hash": "wrongchainhash"}
+        ])),
+        Some("hash2"),
+    );
+    let err = verify_package_value(&manipulated_ledger_pkg).unwrap_err();
+    assert!(err.to_string().contains("CONSTRAINT_DRIFT"));
+    assert!(err.to_string().contains("ledger chaining mismatch"));
+
+    // 7. Ledger anchoring mismatch -> returns CONSTRAINT_DRIFT
+    let manipulated_ledger_root_pkg = make_pkg(
+        json!({"case_id": "SPARK-123"}),
+        Some(json!([
+            {"entry_hash": "hash1", "previous_hash": "0"},
+            {"entry_hash": "hash2", "previous_hash": "hash1"}
+        ])),
+        Some("wrongroot"),
+    );
+    let err = verify_package_value(&manipulated_ledger_root_pkg).unwrap_err();
+    assert!(err.to_string().contains("CONSTRAINT_DRIFT"));
+    assert!(err.to_string().contains("ledger root anchoring mismatch"));
+}

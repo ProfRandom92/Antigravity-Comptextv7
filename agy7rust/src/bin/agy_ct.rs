@@ -207,11 +207,11 @@ fn main() -> Result<()> {
             PackageCommands::Inspect { .. } => {
                 println!("Placeholder: package inspect");
             }
-            PackageCommands::Verify { .. } => {
-                println!("Placeholder: package verify");
+            PackageCommands::Verify { input } => {
+                agy7rust::commands::verify_cmd::run(input)?;
             }
-            PackageCommands::Replay { .. } => {
-                println!("Placeholder: package replay");
+            PackageCommands::Replay { input } => {
+                agy7rust::commands::replay_cmd::run(input)?;
             }
             PackageCommands::Adversarial { .. } => {
                 println!("Placeholder: package adversarial");

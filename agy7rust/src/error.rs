@@ -4,6 +4,8 @@ use std::fmt;
 pub enum SparkError {
     ValidationError(String),
     SerializationError(String),
+    EvidenceLoss(String),
+    ConstraintDrift(String),
 }
 
 impl fmt::Display for SparkError {
@@ -11,6 +13,8 @@ impl fmt::Display for SparkError {
         match self {
             Self::ValidationError(msg) => write!(f, "Validation Error: {}", msg),
             Self::SerializationError(msg) => write!(f, "Serialization Error: {}", msg),
+            Self::EvidenceLoss(msg) => write!(f, "EVIDENCE_LOSS: {}", msg),
+            Self::ConstraintDrift(msg) => write!(f, "CONSTRAINT_DRIFT: {}", msg),
         }
     }
 }
