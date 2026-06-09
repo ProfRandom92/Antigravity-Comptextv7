@@ -1568,3 +1568,80 @@ fn test_agy_ct_package_inspect_execution() {
     assert!(stdout_str.contains("commitment_tokens count:"));
     assert!(stdout_str.contains("tool_sequence count:"));
 }
+
+#[test]
+fn test_agy_ct_package_replay_output_streams() {
+    use std::process::Command;
+
+    // 1. Standard run (should output status on stderr with color codes, and JSON on stdout)
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "replay",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    let stderr_str = String::from_utf8_lossy(&output.stderr);
+
+    // Verify stdout contains the replayed JSON schema
+    assert!(stdout_str.contains("\"schema\": \"SPARK-V7-REPLAY\""));
+    // Verify stderr contains status and color escapes
+    assert!(stderr_str.contains("Replaying sidecar trace"));
+    assert!(stderr_str.contains("\x1b[36m")); // cyan color code for status
+
+    // 2. Quiet run (should output JSON on stdout, but stderr should be empty/contain no status messages)
+    let output_quiet = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "--quiet",
+            "package",
+            "replay",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_quiet.status.success());
+    let stdout_quiet = String::from_utf8_lossy(&output_quiet.stdout);
+    let stderr_quiet = String::from_utf8_lossy(&output_quiet.stderr);
+
+    assert!(stdout_quiet.contains("\"schema\": \"SPARK-V7-REPLAY\""));
+    assert!(!stderr_quiet.contains("Replaying sidecar trace"));
+
+    // 3. Plain run (should output JSON on stdout, status on stderr but without ANSI escapes)
+    let output_plain = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "--plain",
+            "package",
+            "replay",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_plain.status.success());
+    let stdout_plain = String::from_utf8_lossy(&output_plain.stdout);
+    let stderr_plain = String::from_utf8_lossy(&output_plain.stderr);
+
+    assert!(stdout_plain.contains("\"schema\": \"SPARK-V7-REPLAY\""));
+    assert!(stderr_plain.contains("Replaying sidecar trace"));
+    assert!(!stderr_plain.contains("\x1b["));
+}

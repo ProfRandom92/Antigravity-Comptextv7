@@ -211,7 +211,12 @@ fn main() -> Result<()> {
                 agy7rust::commands::verify_cmd::run(input)?;
             }
             PackageCommands::Replay { input } => {
-                agy7rust::commands::replay_cmd::run(input)?;
+                let options = agy7rust::commands::replay_cmd::ReplayOptions {
+                    quiet: cli.quiet,
+                    plain: cli.plain,
+                    no_color: cli.no_color,
+                };
+                agy7rust::commands::replay_cmd::run(input, options)?;
             }
             PackageCommands::Adversarial { .. } => {
                 println!("Placeholder: package adversarial");
