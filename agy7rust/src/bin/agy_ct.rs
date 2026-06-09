@@ -223,8 +223,12 @@ fn main() -> Result<()> {
             }
         },
         Commands::Context { subcommand } => match subcommand {
-            ContextCommands::Build { .. } => {
-                println!("Placeholder: context build");
+            ContextCommands::Build {
+                input,
+                schema,
+                output,
+            } => {
+                agy7rust::commands::context_build::run(input, schema, output)?;
             }
             ContextCommands::Render { .. } => {
                 println!("Placeholder: context render");

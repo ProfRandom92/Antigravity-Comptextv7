@@ -1791,3 +1791,56 @@ fn test_agy_ct_context_validate_execution() {
     let _ = fs::remove_file(valid_path);
     let _ = fs::remove_file(invalid_path);
 }
+
+#[test]
+fn test_agy_ct_context_build_execution() {
+    use agy7rust::codec::package::build_package_from_value;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_package_path = temp_dir.join("test_package.spkg");
+    let temp_context_path = temp_dir.join("test_context.json");
+
+    // 1. Read and parse extraction.json, build spkg dynamically in memory
+    let input_content = fs::read_to_string("../examples/spark/extraction.json").unwrap();
+    let input_value: serde_json::Value = serde_json::from_str(&input_content).unwrap();
+    let package_value = build_package_from_value(&input_value).unwrap();
+
+    // 2. Write spkg to tempdir
+    let package_json = serde_json::to_string(&package_value).unwrap();
+    fs::write(&temp_package_path, &package_json).unwrap();
+
+    // 3. Invoke context build CLI (should return exit status success)
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "build",
+            "-i",
+            temp_package_path.to_str().unwrap(),
+            "-s",
+            "../schemas/genehmigung_v1.json",
+            "-o",
+            temp_context_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("OK: context-build passed"));
+    assert!(stdout_str.contains("context:"));
+
+    // 4. Verify context was created in temp dir and is readable
+    assert!(temp_context_path.exists());
+    let context_content = fs::read_to_string(&temp_context_path).unwrap();
+    assert!(context_content.contains("\"context_id\":"));
+
+    // 5. Cleanup
+    let _ = fs::remove_file(temp_package_path);
+    let _ = fs::remove_file(temp_context_path);
+}
