@@ -1,3 +1,8 @@
+---
+name: security-readonly-boundaries
+description: "Prevent unsafe actions while working with Codex Desktop, GitHub, MCP/connectors, and local repositories."
+---
+
 # Skill: Security and Read-Only Boundaries
 
 ## Purpose

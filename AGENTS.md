@@ -33,7 +33,7 @@ Codex Desktop governance:
 
 Before editing:
 1. Read AGENTS.md.
-2. Read `.agent/skills/*.md` relevant to the task; treat `.agents/skills/**/SKILL.md` as legacy/compatibility metadata only if present.
-3. If `.agent/skills/00_project_system.md` exists, read it too.
+2. Read `.agents/skills/**/SKILL.md` relevant to the task; treat `.agent/skills/*.md` as legacy/compatibility metadata only if present.
+3. If `.agents/skills/00_project_system/SKILL.md` exists, read it too.
 4. Build a compact repo map.
 5. Stop for approval if the user asked for plan mode.

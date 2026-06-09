@@ -1,3 +1,8 @@
+---
+name: codex-token-saving
+description: "Reduce context waste and avoid repo-drift during Codex Desktop work."
+---
+
 # Skill: Codex Token-Saving Workflow
 
 ## Purpose

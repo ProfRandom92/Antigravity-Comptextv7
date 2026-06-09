@@ -1,3 +1,8 @@
+---
+name: comptext-governance
+description: "Preserve the CompText product contract during any code, UI, CLI, documentation, or artifact work."
+---
+
 # Skill: CompText Governance
 
 ## Purpose

@@ -1,3 +1,8 @@
+---
+name: reviewer-final-report
+description: "Ensure every Codex Desktop run ends with an auditable, reviewer-grade report."
+---
+
 # Skill: Reviewer Final Report
 
 ## Purpose

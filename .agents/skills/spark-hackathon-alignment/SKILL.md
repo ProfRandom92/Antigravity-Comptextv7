@@ -1,3 +1,8 @@
+---
+name: spark-hackathon-alignment
+description: "Align CompText work with SPARK / Safe & Stable positioning without overclaiming."
+---
+
 # Skill: SPARK Hackathon Alignment
 
 ## Purpose
