@@ -56,6 +56,8 @@ cargo run --bin sparkctl -- doctor
 cargo run --bin sparkctl -- rust-validate
 cargo run --bin sparkctl -- context-all
 cargo run --bin sparkctl -- spark-demo
+cargo run --bin sparkctl -- spark-evidence-demo --output <path>
+cargo run --bin sparkctl -- spark-evidence-validate --input <path>
 cargo run --bin sparkctl -- handoff-check
 ```
 
@@ -65,6 +67,8 @@ Validated command responsibilities:
 - `sparkctl rust-validate` runs local Rust quality checks.
 - `sparkctl context-all` runs the local context build/render/validate sequence.
 - `sparkctl spark-demo` runs the local end-to-end demonstration flow.
+- `sparkctl spark-evidence-demo` writes a deterministic SPARK Evidence Packet v1 demo envelope.
+- `sparkctl spark-evidence-validate` validates a SPARK Evidence Packet v1 envelope.
 - `sparkctl handoff-check` checks local repository handoff readiness.
 
 ### `agy-ct`
@@ -91,7 +95,7 @@ Current wrapper mapping:
 | `agy-ct demo` | `sparkctl::spark_demo::run_spark_demo()` |
 | `agy-ct context all` | `sparkctl::context_all::run_context_all()` |
 
-Other `agy-ct` commands remain explicit placeholders until their implementation phase is approved.
+Other `agy-ct` commands remain scaffolded placeholders until their implementation phase is approved.
 
 ---
 
@@ -108,8 +112,8 @@ These artifacts are intended for local, reproducible validation and review workf
 ### Demo Evidence
 
 Demo evidence:
-- SPARK challenge demo evidence: [DEMO_SPARK_EVIDENCE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/DEMO_SPARK_EVIDENCE.md)
-- Local performance baseline: [PERFORMANCE_BASELINE.md](file:///C:/Users/contr/sandbox_workspace/Antigravity-Comptextv7-unified/git_post_push_verification/repo/PERFORMANCE_BASELINE.md)
+- SPARK challenge demo evidence: [DEMO_SPARK_EVIDENCE.md](DEMO_SPARK_EVIDENCE.md)
+- Local performance baseline: [PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md)
 
 #### Reviewer Quickstart
 

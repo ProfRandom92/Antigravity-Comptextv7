@@ -1,0 +1,24 @@
+{
+  "status": "inert",
+  "scope": "repo-local",
+  "governance": "review-gated",
+  "runtime": "not active runtime",
+  "project": {
+    "name": "comptext-sparkctl",
+    "root_dir": "./",
+    "rust_dir": "./agy7rust"
+  },
+  "antigravity": {
+    "skills_dir": "./.agents/skills",
+    "hooks_dir": "./.antigravity/hooks",
+    "plugins_dir": "./.antigravity/plugins"
+  },
+  "safety_rules": {
+    "provider_output_untrusted": true,
+    "human_review_required": true,
+    "repo_relative_only": true,
+    "allow_push": false,
+    "allow_deploy": false,
+    "expose_secrets": false
+  }
+}
