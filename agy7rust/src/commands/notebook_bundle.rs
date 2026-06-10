@@ -165,7 +165,7 @@ pub fn run(
 
     let output_path_buf = Path::new(output_path);
     if let Some(parent) = output_path_buf.parent() {
-        if !parent.exists() {
+        if !parent.as_os_str().is_empty() && !parent.exists() {
             fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create directory: {:?}", parent))?;
         }

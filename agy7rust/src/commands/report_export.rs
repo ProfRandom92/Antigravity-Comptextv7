@@ -45,7 +45,7 @@ pub fn run(input_path: &str, output_path: &str) -> Result<()> {
                 md.push_str(&format!("- **{}**: {}\n", name, status));
             }
         }
-        md.push_str("\n");
+        md.push('\n');
     }
 
     if let Some(artifacts) = value.get("artifacts").and_then(|v| v.as_array()) {
@@ -55,13 +55,13 @@ pub fn run(input_path: &str, output_path: &str) -> Result<()> {
                 md.push_str(&format!("- {}\n", art_str));
             }
         }
-        md.push_str("\n");
+        md.push('\n');
     }
 
     // Atomic write pattern
     let output_path_buf = Path::new(output_path);
     if let Some(parent) = output_path_buf.parent() {
-        if !parent.exists() {
+        if !parent.as_os_str().is_empty() && !parent.exists() {
             fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create directory: {:?}", parent))?;
         }

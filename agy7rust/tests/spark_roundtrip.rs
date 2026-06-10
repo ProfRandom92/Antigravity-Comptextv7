@@ -1623,6 +1623,7 @@ fn test_agy_ct_package_replay_output_streams() {
 
     // 3. Plain run (should output JSON on stdout, status on stderr but without ANSI escapes)
     let output_plain = Command::new("cargo")
+        .env("CARGO_TERM_COLOR", "never")
         .args([
             "run",
             "--bin",
@@ -2487,5 +2488,101 @@ fn test_agy_ct_notebook_bundle_execution() {
     let _ = fs::remove_file(&temp_render_path);
     let _ = fs::remove_file(&temp_output_path);
     let _ = fs::remove_file(&temp_output_no_render_path);
-    let _ = fs::remove_file(&temp_bad_context_path);
+}
+
+#[test]
+fn test_plain_output_path_no_parent() {
+    use serde_json::json;
+    use std::env;
+    use std::fs;
+
+    let original_dir = env::current_dir().unwrap();
+    let temp_dir = std::env::temp_dir();
+
+    let pid = std::process::id();
+    let time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let subdir_name = format!("test_plain_dir_{}_{}", pid, time);
+    let run_dir = temp_dir.join(&subdir_name);
+    fs::create_dir_all(&run_dir).unwrap();
+
+    env::set_current_dir(&run_dir).unwrap();
+
+    // Mock files
+    let mock_report = json!({
+        "tool": "agy-ct",
+        "project": "CompText-Sparkctl",
+        "phase": "6E",
+        "result": "PASS"
+    });
+    fs::write(
+        "mock_report.json",
+        serde_json::to_string(&mock_report).unwrap(),
+    )
+    .unwrap();
+
+    let mock_context = json!({
+        "context_id": "mock-ctx-123",
+        "source_package_hash": "abc123hash",
+        "schema_name": "genehmigung_v1",
+        "schema_version": 1,
+        "required_field_paths": ["field_a"],
+        "satisfied_field_paths": ["field_a"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": []
+    });
+    fs::write(
+        "mock_context.json",
+        serde_json::to_string(&mock_context).unwrap(),
+    )
+    .unwrap();
+
+    // 1. Report export test
+    let res_report = agy7rust::commands::report_export::run("mock_report.json", "report.md");
+    assert!(
+        res_report.is_ok(),
+        "Report export failed: {:?}",
+        res_report.err()
+    );
+    assert!(
+        fs::metadata("report.md").is_ok(),
+        "report.md does not exist"
+    );
+    assert!(
+        fs::metadata("report.md").unwrap().len() > 0,
+        "report.md is empty"
+    );
+
+    // 2. Notebook bundle test
+    let res_bundle =
+        agy7rust::commands::notebook_bundle::run("mock_context.json", None, "bundle.ipynb");
+    assert!(
+        res_bundle.is_ok(),
+        "Notebook bundle failed: {:?}",
+        res_bundle.err()
+    );
+    assert!(
+        fs::metadata("bundle.ipynb").is_ok(),
+        "bundle.ipynb does not exist"
+    );
+    assert!(
+        fs::metadata("bundle.ipynb").unwrap().len() > 0,
+        "bundle.ipynb is empty"
+    );
+
+    // Restore original current dir and cleanup
+    env::set_current_dir(&original_dir).unwrap();
+    let _ = fs::remove_dir_all(&run_dir);
 }
