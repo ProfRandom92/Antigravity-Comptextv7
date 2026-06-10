@@ -21,16 +21,13 @@
 
 ```mermaid
 flowchart LR
-    A[Synthetischer Verwaltungs-Trace] --> B[Schema Check]
-    B --> C[Context Build]
-    C --> D[Evidence Package]
-    D --> E[Package Verify]
-    E --> F[Replay]
-    F --> G[Human Review Gate]
-
-    E --> H{Fehler?}
-    H -->|EVIDENCE_LOSS| I[Nachweis fehlt]
-    H -->|CONSTRAINT_DRIFT| J[Hash/Constraint Drift]
+    A["Raw JSON Trace"] --> B["schema check"]
+    B --> C["package compress"]
+    C --> D["package verify"]
+    C --> E["package inspect"]
+    C --> F["package adversarial"]
+    A --> G["report export"]
+    G --> H["Markdown Report"]
 ```
 
 ---
@@ -50,20 +47,35 @@ Dies ermöglicht sichere, transparente und nachvollziehbare Prototyp-Workflows f
 
 ## Was der Prototyp lokal kann
 
-Sparkctl implementiert folgende Mechanismen zur Absicherung synthetischer Planungsdaten:
+Sparkctl implementiert Mechanismen zur Absicherung synthetischer Planungsdaten. 
 
-- **Verify-before-Replay:** Vor jedem Replay-Durchlauf wird die strukturelle Integrität des Pakets verifiziert.
-- **Fehlererkennung:**
-  - `EVIDENCE_LOSS`: Erkennt, wenn für die Wiederholung notwendige Nachweise im Paket fehlen.
-  - `CONSTRAINT_DRIFT`: Erkennt Manipulationen an Hashes oder verankerten Integritätsbedingungen.
-- **Kryptografische Absicherung:** Nutzung von *canonical JSON* zur deterministischen Serialisierung und einer darauf aufbauenden *SHA-256 Hash-Chain* zur lückenlosen Protokollierung.
-- **Grobübersicht der implementierten Befehle:**
-  - `agy-ct package verify`: Prüft SHA-256 Signaturen und Verkettungen.
-  - `agy-ct package replay`: Rekonstruiert die aufgezeichnete Trace deterministisch (strikte stdout/stderr Kanaltrennung).
-  - `agy-ct package inspect`: Zeigt Metadaten und Header-Einträge.
-  - `agy-ct schema check`: Abgleich von Traces gegen JSON-Schemas.
-  - `agy-ct context validate`: Führt strukturelle Validierung und Leckprüfungen auf Kontextmodellen durch.
-  - `agy-ct context build`: Erzeugt strukturierte operative Kontextmodelle.
+### Implementierte Befehle:
+- **`agy-ct package compress`** — Komprimiert Roh-Traces zu einer `.spkg`-Datei unter Erhalt kritischer Hashes.
+- **`agy-ct package inspect`** — Liest Sidecar-Eigenschaften und Header-Einträge aus `.spkg`.
+- **`agy-ct package verify`** — Führt kryptografische SHA-256 Validierungen von `.spkg`-Evidence-Paketen durch.
+- **`agy-ct package replay`** — Rekonstruiert die aufgezeichnete Trace deterministisch (strikte stdout/stderr Kanaltrennung).
+- **`agy-ct package adversarial`** — Simuliert manipulierte Attribute zur Überprüfung der Manipulationserkennung.
+- **`agy-ct report export`** — Exportiert JSON-Pipeline-Berichte als formatierten Markdown-Report.
+- **`agy-ct schema check`** — Gleicht rohe Trace-Dateien gegen JSON-Schemas ab.
+- **`agy-ct context validate`** — Führt strukturelle Validierung und Leckprüfungen auf Kontextmodellen durch.
+- **`agy-ct context build`** — Erzeugt strukturierte operative Kontextmodelle.
+- **`agy-ct context render`** — Rendert operative Kontextdaten in token-sparenden Fließtext.
+
+### Command Status Matrix
+
+| Bereich | Befehl | Backend/Modul | Status | Output | Teststatus |
+|---|---|---|---|---|---|
+| **Package** | `package compress` | `compress::run` | Wired | `.spkg` Evidence-Paket | 100% PASS |
+| **Package** | `package inspect` | `inspect::run` | Wired | Eigenschafts-Zusammenfassung | 100% PASS |
+| **Package** | `package verify` | `verify_cmd::run` | Wired | Signatur-/Hash-Status | 100% PASS |
+| **Package** | `package replay` | `replay_cmd::run` | Wired | Trace-Rekonstruktion (stdout/stderr) | 100% PASS |
+| **Package** | `package adversarial` | `adversarial::run` | Wired | Manipulationserkennungs-Bericht | 100% PASS |
+| **Schema** | `schema check` | `schema_check::run` | Wired | Validierungsergebnis | 100% PASS |
+| **Context** | `context build` | `context_build::run` | Wired | Operatives Kontextmodell (JSON) | 100% PASS |
+| **Context** | `context render` | `context_render::run` | Wired | Token-reduzierter Text | 100% PASS |
+| **Context** | `context validate` | `context_validate::run` | Wired | Leck- und Strukturprüfungsbericht | 100% PASS |
+| **Report** | `report export` | `report_export::run` | Wired | Markdown-Export (`.md`) | 100% PASS |
+| **Notebook** | `notebook bundle` | N/A | Placeholder | Unified payload | Ausstehend |
 
 ---
 
@@ -75,14 +87,42 @@ Führen Sie die folgenden sicheren lokalen Befehle im Rust-Unterverzeichnis aus:
 # In das Rust-Verzeichnis wechseln
 cd agy7rust
 
-# Testsuite ausführen (67+ Tests)
+# Testsuite ausführen (72 PASS Tests)
 cargo test
 
-# Schema-Check mit synthetischen Beispieldaten ausführen
-cargo run --bin agy-ct -- schema check --input ../examples/spark/extraction.json --schema ../schemas/genehmigung_v1.json
+# Berichtsexport mit einer synthetischen Beispieldokumentation ausführen
+cargo run --bin agy-ct -- report export -i ../examples/spark/report_sample.json -o ../temp_output.md
 ```
 
 *Hinweis: Befehle, die Berichte oder veränderte Artefakte generieren, sind optional und dienen dem manuellen Review-Prozess.*
+
+---
+
+## Kryptografische Absicherung und Integrität
+
+Sparkctl nutzt eine Reihe technischer Mechanismen, um die Integrität synthetischer Planungsdaten nachzuweisen:
+- **Canonical JSON:** Um Abweichungen durch Formatierung, Leerzeichen oder Keys-Sortierung zu verhindern, werden JSON-Strukturen deterministisch sortiert und serialisiert.
+- **SHA-256 Hashing:** Die Verifikation stützt sich auf SHA-256 Hashes der serialisierten Daten.
+- **Integrity Chain:** Der Hash des Preimages (`payload_sha256`) wird mit dem Zustand des Sidecars verknüpft, um ein manipulationssensitives Evidence Package zu erzeugen.
+- **Adversarial-Simulation:** Der `package adversarial`-Befehl simuliert gezielte Manipulationen an Paketstrukturen, um zu demonstrieren, wie Abweichungen vom kanonischen Hash sofort erkannt werden.
+- **Keine Sicherheits- oder Rechtsgarantie:** Diese Absicherung dient ausschließlich der Erkennung unbeabsichtigter Datenverluste oder struktureller Abweichungen (*tamper-sensitive validation*). Sie stellt keine kryptografische Signatur im Sinne des Signaturgesetzes und kein forensisch unumstößliches Beweismittel dar.
+
+---
+
+## Grenzen und Non-Claims
+
+Um Missverständnisse im Rahmen des SPARK-Hackathons auszuschließen, gelten folgende Grenzen:
+
+### Matrix der Non-Claims
+
+| Eigenschaft | Scope-Abgrenzung / Non-Claim |
+|---|---|
+| **Einsatzbereich** | Kein Produktivsystem. Reine Prototyp- & Konzept-Demo. |
+| **Rechtskonformität** | Keine Rechtsberatung, rechtliche Zertifizierung oder forensische Absicherung. |
+| **Konformitätsstufe** | Keine amtliche Konformität (z. B. EU AI Act). Nur Unterstützung des Art.-12-orientierten Record-Keeping. |
+| **Systemzugehörigkeit** | Kein offizielles BMDS-Produkt und keine offizielle SPARK-Konformitätsgarantie. |
+| **Datenbasis** | Ausschließlich synthetische Testdaten. Verarbeitung von Echtdaten ist ausgeschlossen. |
+| **Entscheidungskompetenz** | Keine autonome Entscheidungsfindung. Ein menschlicher Review ist zwingend erforderlich (*Human-in-the-Loop*). |
 
 ---
 
@@ -97,26 +137,10 @@ Dieses Repository nutzt klare Richtlinien für die lokale Ausführung von KI-Ent
 
 ---
 
-## Grenzen und Non-Claims
-
-Um Missverständnisse im Rahmen des SPARK-Hackathons auszuschließen, gelten folgende Grenzen:
-
-- **Kein offizielles Produkt:** Sparkctl ist kein offizielles Produkt des BMDS (Bundesministerium für Digitales und Verkehr) oder seiner Partner.
-- **Keine Produktivfreigabe:** Der Code ist ein reiner Prototyp für Testzwecke.
-- **Keine Rechts- oder Compliance-Garantie:** Es wird keine rechtliche Beratung oder forensische Nachweissicherheit geboten.
-- **Keine EU-AI-Act-Konformität:** Es wird keine Konformitätsbewertung oder Konformitätsgarantie nach dem EU AI Act gegeben.
-- **Keine autonomen Entscheidungen:** Das System ersetzt zu keinem Zeitpunkt den menschlichen Review (*Mandatory Human-in-the-Loop*).
-- **Keine Echtdaten:** Es werden ausschließlich künstliche (synthetische) Testdaten verarbeitet. Die Verarbeitung realer Bürger- oder Behördendaten ist ausgeschlossen.
-- **Kein Diagnosefokus:** Legacy-Konzepte wie XENTRY, OBD-II oder X-Engine-Diagnoseschnittstellen sind ausdrücklich nicht Teil des aktiven SPARK-Scopes.
-
----
-
 ## Roadmap
 
 ### Aktuell Offen (Platzhalter-Befehle):
-- `context render`: Generierung sprachlich reduzierter Zusammenfassungen.
-- `package compress`: Algorithmen zur verlustbehafteten Trace-Kompression unter Beibehaltung kritischer Hashes.
-- `package adversarial`: Robustheitstests gegen gezielte Manipulationen.
+- **`agy-ct notebook bundle`** — Bündelt Kontext-Zustände und Textrenderings in einen zusammenhängenden Dokumentations-Payload.
 
 ### Zukünftige Schritte:
 - Erweiterung der synthetischen Planungs-Fixtures.
