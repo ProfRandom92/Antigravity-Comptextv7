@@ -44,7 +44,7 @@ flowchart LR
     schema --> report["report export"]
     report --> md["Markdown-Review-Report"]
 
-    schema --> build["context build"]
+    spkg --> build["context build"]
     build --> render["context render"]
     build --> notebook["notebook bundle"]
     render --> notebook
