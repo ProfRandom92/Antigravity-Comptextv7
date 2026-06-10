@@ -1,19 +1,30 @@
 # Sparkctl
 
-**Lokaler Prototyp im Kontext des BMDS/SPARK-Hackathons: Evidence-, Replay- und Validierungsschicht für SPARK-artige Verwaltungs-KI-Workflows.**
+![Rust-Validierung](https://github.com/ProfRandom92/comptext-sparkctl/actions/workflows/rust-validation.yml/badge.svg)
+![Rust](https://img.shields.io/badge/Rust-CLI-orange)
+![Status](https://img.shields.io/badge/Status-Prototyp-blue)
+![Daten](https://img.shields.io/badge/Daten-synthetisch--only-purple)
+![Prüfung](https://img.shields.io/badge/Prüfung-Human--in--the--Loop-green)
+![Claims](https://img.shields.io/badge/Claims-keine%20Produktiv%2FRechts%2FCompliance--Claims-lightgrey)
+
+**Lokale Rust-CLI für synthetische Evidence-Pakete, deterministisches Replay, Kontext-Rendering und überprüfbare KI-Workflow-Artefakte.**
+
+**Prototyp im Kontext des BMDS/SPARK-Hackathons: Evidence-, Replay- und Validierungsschicht für SPARK-artige Verwaltungs-KI-Workflows.**
+
+> Modelle sind Provider. Kontext ist das Produkt.
 
 ---
 
-## Status und Eigenschaften
+## Snapshot
 
-- **Typ:** Prototyp / Konzept-Demo
-- **Datenbasis:** Rein synthetisch (*Synthetic-only*)
-- **Freigabe:** Erfordert menschliche Prüfung (*Human Review Required / Human-in-the-Loop*)
-- **Technologie:** Rust CLI (`agy-ct` und `sparkctl`)
-- **Architektur:** Lokal-first (*Local-first / Offline*)
-- **Einschränkung:** Keine Aussage zur Produktivreife, Rechtskonformität oder behördlichen Zertifizierung (*No production/legal/compliance claims*)
-
-*Kernsatz: Modelle sind Provider, Kontext ist das Produkt.*
+| Dimension | Sparkctl-Scope |
+|---|---|
+| **Typ** | Prototyp / Konzept-Demo |
+| **Datenbasis** | Rein synthetisch (*Synthetic-only*) |
+| **Freigabe** | Erfordert menschliche Prüfung (*Human Review Required / Human-in-the-Loop*) |
+| **Technologie** | Rust CLI (`agy-ct` und `sparkctl`) |
+| **Architektur** | Lokal-first (*Local-first / Offline*) |
+| **Einschränkung** | Keine Aussage zur Produktivreife, Rechtskonformität oder behördlichen Zertifizierung (*No production/legal/compliance claims*) |
 
 ---
 
@@ -21,19 +32,65 @@
 
 ```mermaid
 flowchart LR
-    A["Raw JSON Trace"] --> B["schema check"]
-    B --> C["package compress"]
-    C --> D["package verify"]
-    C --> E["package inspect"]
-    C --> F["package adversarial"]
-    C --> I["context build"]
-    I --> J["context render"]
-    I --> K["notebook bundle"]
-    J --> K
-    K --> L[".ipynb Notebook"]
-    A --> G["report export"]
-    G --> H["Markdown Report"]
+    roh["Synthetischer JSON-Trace"] --> schema["schema check"]
+    schema --> compress["package compress"]
+    compress --> spkg[".spkg Evidence-Paket"]
+
+    spkg --> inspect["package inspect"]
+    spkg --> verify["package verify"]
+    spkg --> replay["package replay"]
+    spkg --> adversarial["package adversarial"]
+
+    schema --> report["report export"]
+    report --> md["Markdown-Review-Report"]
+
+    spkg --> build["context build"]
+    build --> render["context render"]
+    build --> notebook["notebook bundle"]
+    render --> notebook
+    notebook --> ipynb[".ipynb Review-Notebook"]
+
+    classDef guard fill:#111827,stroke:#60a5fa,color:#e5e7eb;
+    classDef artifact fill:#1f2937,stroke:#34d399,color:#e5e7eb;
+    class schema,verify,adversarial guard;
+    class spkg,md,ipynb artifact;
 ```
+
+---
+
+## Evidence-Workflow als Wissensgraph
+
+Sparkctl lässt sich als kleiner Evidence-Graph lesen:
+
+```mermaid
+flowchart TB
+    sparkctl["Sparkctl"] --> cli["agy-ct CLI"]
+    cli --> package["Package-Lifecycle"]
+    cli --> context["Context-Lifecycle"]
+    cli --> review["Review-Artefakte"]
+
+    package --> spkg2[".spkg Evidence-Paket"]
+    spkg2 --> integrity["Hash- und Ledger-Prüfungen"]
+    spkg2 --> replay2["Deterministisches Replay"]
+    spkg2 --> adversarial2["Adversarial-Simulation"]
+
+    context --> build2["Strukturierter Kontext"]
+    build2 --> render2["Token-sparendes Rendering"]
+    build2 --> notebook2["Notebook-Bundle"]
+
+    review --> report2["Markdown-Report"]
+    review --> notebook2
+
+    governance["Governance-Grenzen"] --> synthetic["Synthetic-only"]
+    governance --> human["Human Review"]
+    governance --> nonclaims["Keine Produktiv-/Rechts-/Compliance-Claims"]
+
+    synthetic --> sparkctl
+    human --> sparkctl
+    nonclaims --> sparkctl
+```
+
+Dieser Graph ist bewusst README-nativ gehalten. Eine interaktive Ace-Knowledge-Graph-Variante kann später aus derselben Struktur generiert werden; die README bleibt jedoch ohne externe Runtime vollständig lesbar.
 
 ---
 
@@ -93,7 +150,7 @@ Führen Sie die folgenden sicheren lokalen Befehle im Rust-Unterverzeichnis aus:
 # In das Rust-Verzeichnis wechseln
 cd agy7rust
 
-# Testsuite ausführen (73 PASS Tests)
+# Testsuite ausführen
 cargo test
 
 # Berichtsexport mit einer synthetischen Beispieldokumentation ausführen
@@ -118,6 +175,20 @@ Sparkctl nutzt eine Reihe technischer Mechanismen, um die Integrität synthetisc
 ## Grenzen und Non-Claims
 
 Um Missverständnisse im Rahmen des SPARK-Hackathons auszuschließen, gelten folgende Grenzen:
+
+```mermaid
+flowchart TB
+    prototype["Prototyp / Konzept-Demo"]
+    synthetic2["Rein synthetische Daten"]
+    human2["Menschliche Prüfung erforderlich"]
+    local["Lokal-first / Offline"]
+    noClaims["Keine Produktiv-, Rechts-, Forensik- oder Compliance-Claims"]
+
+    prototype --> noClaims
+    synthetic2 --> noClaims
+    human2 --> noClaims
+    local --> noClaims
+```
 
 ### Matrix der Non-Claims
 
@@ -152,6 +223,7 @@ Dieses Repository nutzt klare Richtlinien für die lokale Ausführung von KI-Ent
 - Erweiterung der synthetischen Planungs-Fixtures.
 - Evaluierung von Community-Feedback zu Evidence-Strukturen.
 - Optionale native Plugin- und Hook-Integrationen für verbesserte Absicherung.
+- Optionaler Repo-Hygiene-Fix für alte Submodule-/Workflow-Warnungen.
 
 ---
 
