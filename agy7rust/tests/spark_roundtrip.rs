@@ -1844,3 +1844,106 @@ fn test_agy_ct_context_build_execution() {
     let _ = fs::remove_file(temp_package_path);
     let _ = fs::remove_file(temp_context_path);
 }
+
+#[test]
+fn test_agy_ct_context_render_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_input_path = temp_dir.join("test_render_input.json");
+    let temp_output_path = temp_dir.join("test_render_output.txt");
+    let temp_bad_input_path = temp_dir.join("test_render_bad_input.json");
+    let temp_bad_output_path = temp_dir.join("test_render_bad_output.txt");
+
+    // Ensure we clean up any pre-existing output files
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_bad_output_path);
+
+    // ============================================
+    // 1. Success Test: Valid context JSON
+    // ============================================
+    let valid_ctx = json!({
+        "context_id": "ctx-render-test-123",
+        "source_package_hash": "hash-999",
+        "schema_name": "genehmigung_v1",
+        "schema_version": 1,
+        "required_field_paths": ["$.case_id"],
+        "satisfied_field_paths": ["$.case_id"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": []
+    });
+
+    fs::write(&temp_input_path, serde_json::to_string(&valid_ctx).unwrap()).unwrap();
+
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "render",
+            "-i",
+            temp_input_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    let stdout_str = String::from_utf8_lossy(&output_success.stdout);
+    assert!(stdout_str.contains("OK: context-render passed"));
+    assert!(stdout_str.contains("context: ctx-render-test-123"));
+
+    assert!(temp_output_path.exists());
+    let render_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!render_content.is_empty());
+    assert!(render_content.contains("ctx-render-test-123"));
+    assert!(render_content.contains("genehmigung_v1"));
+
+    // ============================================
+    // 2. Failure Test: Corrupted context JSON
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "render",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+            "-o",
+            temp_bad_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure.status.success());
+    // Verify that the bad output file was not written (or doesn't exist)
+    assert!(!temp_bad_output_path.exists());
+
+    // ============================================
+    // 3. Cleanup
+    // ============================================
+    let _ = fs::remove_file(temp_input_path);
+    let _ = fs::remove_file(temp_output_path);
+    let _ = fs::remove_file(temp_bad_input_path);
+    let _ = fs::remove_file(temp_bad_output_path);
+}

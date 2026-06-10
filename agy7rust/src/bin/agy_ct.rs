@@ -230,8 +230,8 @@ fn main() -> Result<()> {
             } => {
                 agy7rust::commands::context_build::run(input, schema, output)?;
             }
-            ContextCommands::Render { .. } => {
-                println!("Placeholder: context render");
+            ContextCommands::Render { input, output } => {
+                agy7rust::commands::context_render::run(input, output)?;
             }
             ContextCommands::Validate { input, schema: _ } => {
                 agy7rust::commands::context_validate::run(input)?;
