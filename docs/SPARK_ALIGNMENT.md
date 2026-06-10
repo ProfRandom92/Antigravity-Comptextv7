@@ -48,10 +48,13 @@ This checkpoint records the current local development state. Current checkpoint 
 * **Legacy Compatibility:** The `.agent/skills` directory remains as legacy/compatibility metadata only.
 
 ### 2. CLI Command Wiring
-The following `agy-ct package` subcommands are fully wired and functional:
+The following `agy-ct` subcommands are fully wired and functional:
 * **`agy-ct package verify`** — wired to `verify_cmd::run`
 * **`agy-ct package replay`** — wired to `replay_cmd::run`
 * **`agy-ct package inspect`** — wired to `inspect::run`
+* **`agy-ct schema check`** — wired to `schema_check::run`
+* **`agy-ct context validate`** — wired to `context_validate::run`
+* **`agy-ct context build`** — wired to `context_build::run`
 
 ### 3. Replay UX Stream Separation
 The `package replay` command implements a strict separation of output streams:
@@ -60,8 +63,8 @@ The `package replay` command implements a strict separation of output streams:
 * Global CLI flags `--quiet` (suppresses status output), `--plain` (strips ANSI escapes), and `--no-color` (disables terminal color codes) are explicitly supported.
 
 ### 4. Test and Placeholders Status
-* **Validation Status:** The local Rust test suite executes successfully with **65 PASS** tests.
-* **Remaining Placeholders:** The subcommands `package compress`, `package adversarial`, `context build`, `context render`, `context validate`, and `schema check` remain as placeholders.
+* **Validation Status:** The local Rust test suite executes successfully with **68 PASS** tests.
+* **Remaining Placeholders:** The subcommands `package compress`, `package adversarial`, and `context render` remain as placeholders.
 
 ### 5. Exclusion and Alignment Boundaries
 * **XENTRY/OBD/X-Engine:** Legacy/future diagnostic components (including OBD-II logs and X-Engine sandwich parsers) remain completely excluded from the active scope.
