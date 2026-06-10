@@ -1,0 +1,35 @@
+{
+  "status": "inert",
+  "scope": "repo-local",
+  "governance": "review-gated",
+  "runtime": "not active runtime",
+  "description": "Example Antigravity hooks policy for validating local agent actions before and after tool usage",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command|execute_url",
+        "action": "warn_or_block",
+        "policy_path": "./.antigravity/hooks/pre_tool_policy_example.py"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "write_file|replace_file_content|run_command",
+        "action": "validate",
+        "validation_path": "./.antigravity/hooks/post_tool_validation_example.py"
+      }
+    ]
+  },
+  "blocked_commands": [
+    "git push",
+    "git commit",
+    "cargo run --bin agy-ct -- run",
+    "cargo run --bin agy-ct -- benchmark"
+  ],
+  "protected_paths": [
+    "./README.md",
+    "./agy7rust/src/",
+    "./reports/",
+    "./artifacts/spark/"
+  ]
+}

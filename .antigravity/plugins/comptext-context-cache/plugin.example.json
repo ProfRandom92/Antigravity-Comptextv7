@@ -1,0 +1,15 @@
+{
+  "name": "comptext-context-cache",
+  "status": "inert",
+  "scope": "repo-local",
+  "governance": "review-gated",
+  "runtime": "not active runtime",
+  "description": "Antigravity plugin to manage local caching of CompText context artifacts",
+  "version": "1.0.0",
+  "cache_settings": {
+    "enabled": false,
+    "cache_dir": "./artifacts/cache",
+    "retention_days": 7,
+    "verify_hashes": true
+  }
+}
