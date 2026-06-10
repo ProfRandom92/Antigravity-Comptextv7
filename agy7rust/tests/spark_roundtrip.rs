@@ -2067,3 +2067,117 @@ fn test_agy_ct_package_compress_execution() {
     let _ = fs::remove_file(temp_bad_input_path);
     let _ = fs::remove_file(temp_bad_output_path);
 }
+
+#[test]
+fn test_agy_ct_package_adversarial_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_bad_input_path = temp_dir.join("test_adversarial_bad_input.json");
+    let temp_missing_fields_path = temp_dir.join("test_adversarial_missing_fields.json");
+
+    // ============================================
+    // 1. Success Test: Valid raw input JSON trace
+    // ============================================
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            "../examples/spark/extraction.json",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    let stdout_str = String::from_utf8_lossy(&output_success.stdout);
+    assert!(stdout_str.contains("adversarial: 5/5 detected"));
+
+    // ============================================
+    // 2. Failure Test 1: Missing input file
+    // ============================================
+    let non_existent_input = temp_dir.join("test_adversarial_non_existent.json");
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            non_existent_input.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+
+    // ============================================
+    // 3. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+
+    // ============================================
+    // 4. Failure Test 3: Missing Required Fields (missing parcel_id)
+    // ============================================
+    let bad_ctx_missing_fields = json!({
+        "case_id": "test-123",
+        "extraction": {
+            "fields": {
+                // missing parcel_id and decision_recommendation
+            }
+        }
+    });
+    fs::write(
+        &temp_missing_fields_path,
+        serde_json::to_string(&bad_ctx_missing_fields).unwrap(),
+    )
+    .unwrap();
+
+    let output_failure_fields = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            temp_missing_fields_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_fields.status.success());
+
+    // ============================================
+    // 5. Cleanup
+    // ============================================
+    let _ = fs::remove_file(temp_bad_input_path);
+    let _ = fs::remove_file(temp_missing_fields_path);
+}

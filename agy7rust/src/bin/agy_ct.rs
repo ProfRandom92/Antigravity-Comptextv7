@@ -218,8 +218,8 @@ fn main() -> Result<()> {
                 };
                 agy7rust::commands::replay_cmd::run(input, options)?;
             }
-            PackageCommands::Adversarial { .. } => {
-                println!("Placeholder: package adversarial");
+            PackageCommands::Adversarial { input } => {
+                agy7rust::commands::adversarial::run(input)?;
             }
         },
         Commands::Context { subcommand } => match subcommand {
