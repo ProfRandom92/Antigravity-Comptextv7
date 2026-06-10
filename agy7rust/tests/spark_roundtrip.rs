@@ -1947,3 +1947,123 @@ fn test_agy_ct_context_render_execution() {
     let _ = fs::remove_file(temp_bad_input_path);
     let _ = fs::remove_file(temp_bad_output_path);
 }
+
+#[test]
+fn test_agy_ct_package_compress_execution() {
+    use agy7rust::codec::package::verify_package_value;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_output_path = temp_dir.join("test_compressed.spkg");
+    let temp_bad_input_path = temp_dir.join("test_compress_bad_input.json");
+    let temp_bad_output_path = temp_dir.join("test_compress_bad_output.spkg");
+
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_bad_output_path);
+
+    // Ensure no residual temp file exists
+    let expected_tmp_success = temp_dir.join(".test_compressed.spkg.tmp");
+    let expected_tmp_failure = temp_dir.join(".test_compress_bad_output.spkg.tmp");
+    let _ = fs::remove_file(&expected_tmp_success);
+    let _ = fs::remove_file(&expected_tmp_failure);
+
+    // ============================================
+    // 1. Success Test: Valid JSON input
+    // ============================================
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "compress",
+            "-i",
+            "../examples/spark/extraction.json",
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    assert!(temp_output_path.exists());
+    assert!(
+        !expected_tmp_success.exists(),
+        "Temporary write file must not persist on success"
+    );
+
+    let package_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!package_content.is_empty());
+
+    let package_value: serde_json::Value = serde_json::from_str(&package_content).unwrap();
+    assert!(
+        verify_package_value(&package_value).is_ok(),
+        "Generated package must verify successfully"
+    );
+
+    // ============================================
+    // 2. Failure Test 1: Missing input
+    // ============================================
+    let non_existent_input = temp_dir.join("test_compress_non_existent.json");
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "compress",
+            "-i",
+            non_existent_input.to_str().unwrap(),
+            "-o",
+            temp_bad_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+    assert!(!temp_bad_output_path.exists());
+    assert!(
+        !expected_tmp_failure.exists(),
+        "Temporary write file must not persist on missing input failure"
+    );
+
+    // ============================================
+    // 3. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "compress",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+            "-o",
+            temp_bad_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+    assert!(!temp_bad_output_path.exists());
+    assert!(
+        !expected_tmp_failure.exists(),
+        "Temporary write file must not persist on corrupt JSON failure"
+    );
+
+    // ============================================
+    // 4. Cleanup
+    // ============================================
+    let _ = fs::remove_file(temp_output_path);
+    let _ = fs::remove_file(temp_bad_input_path);
+    let _ = fs::remove_file(temp_bad_output_path);
+}

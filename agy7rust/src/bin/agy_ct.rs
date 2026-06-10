@@ -201,8 +201,8 @@ fn main() -> Result<()> {
             sparkctl::handoff_check::run_handoff_check()?;
         }
         Commands::Package { subcommand } => match subcommand {
-            PackageCommands::Compress { .. } => {
-                println!("Placeholder: package compress");
+            PackageCommands::Compress { input, output } => {
+                agy7rust::commands::compress::run(input, output)?;
             }
             PackageCommands::Inspect { input } => {
                 agy7rust::commands::inspect::run(input)?;
