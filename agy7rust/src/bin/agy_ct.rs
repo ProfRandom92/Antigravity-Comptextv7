@@ -170,7 +170,12 @@ enum SchemaCommands {
 #[derive(Subcommand)]
 enum ReportCommands {
     #[command(about = "Exporter for generated pipeline JSON reports")]
-    Export,
+    Export {
+        #[arg(long, short)]
+        input: String,
+        #[arg(long, short)]
+        output: String,
+    },
 }
 
 #[derive(Subcommand)]
@@ -246,8 +251,8 @@ fn main() -> Result<()> {
             }
         },
         Commands::Report { subcommand } => match subcommand {
-            ReportCommands::Export => {
-                println!("Placeholder: report export");
+            ReportCommands::Export { input, output } => {
+                agy7rust::commands::report_export::run(input, output)?;
             }
         },
         Commands::Notebook { subcommand } => match subcommand {

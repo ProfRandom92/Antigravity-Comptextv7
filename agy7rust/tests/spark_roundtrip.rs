@@ -2181,3 +2181,130 @@ fn test_agy_ct_package_adversarial_execution() {
     let _ = fs::remove_file(temp_bad_input_path);
     let _ = fs::remove_file(temp_missing_fields_path);
 }
+
+#[test]
+fn test_agy_ct_report_export_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let pid = std::process::id();
+    let time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let suffix = format!("{}_{}", pid, time);
+
+    let temp_dir = std::env::temp_dir();
+    let temp_input_path = temp_dir.join(format!("test_report_input_{}.json", suffix));
+    let temp_output_path = temp_dir.join(format!("test_report_output_{}.md", suffix));
+    let temp_bad_input_path = temp_dir.join(format!("test_report_bad_input_{}.json", suffix));
+
+    // Clean up from previous runs
+    let _ = fs::remove_file(&temp_input_path);
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_bad_input_path);
+
+    // ============================================
+    // 1. Success Test: Valid JSON report
+    // ============================================
+    let mock_report = json!({
+        "tool": "agy-ct",
+        "project": "CompText-Sparkctl",
+        "phase": "6E",
+        "result": "PASS",
+        "stages": [
+            {
+                "index": 1,
+                "name": "workspace doctor",
+                "status": "PASS"
+            }
+        ]
+    });
+    fs::write(
+        &temp_input_path,
+        serde_json::to_string_pretty(&mock_report).unwrap(),
+    )
+    .unwrap();
+
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "report",
+            "export",
+            "-i",
+            temp_input_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    assert!(temp_output_path.exists());
+    let md_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!md_content.is_empty());
+    assert!(md_content.contains("# CompText-Sparkctl Execution Report"));
+    assert!(md_content.contains("workspace doctor"));
+    assert!(md_content.contains("PASS"));
+
+    // Clean up output
+    let _ = fs::remove_file(&temp_output_path);
+
+    // ============================================
+    // 2. Failure Test 1: Missing input file
+    // ============================================
+    let non_existent_input = temp_dir.join(format!("test_report_non_existent_{}.json", suffix));
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "report",
+            "export",
+            "-i",
+            non_existent_input.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+    assert!(!temp_output_path.exists());
+
+    // ============================================
+    // 3. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "report",
+            "export",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+    assert!(!temp_output_path.exists());
+
+    // Clean up temporary files
+    let _ = fs::remove_file(&temp_input_path);
+    let _ = fs::remove_file(&temp_bad_input_path);
+    let _ = fs::remove_file(&temp_output_path);
+}
