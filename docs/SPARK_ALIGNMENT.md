@@ -55,6 +55,7 @@ The following `agy-ct` subcommands are fully wired and functional:
 * **`agy-ct schema check`** — wired to `schema_check::run`
 * **`agy-ct context validate`** — wired to `context_validate::run`
 * **`agy-ct context build`** — wired to `context_build::run`
+* **`agy-ct context render`** — wired to `context_render::run`
 
 ### 3. Replay UX Stream Separation
 The `package replay` command implements a strict separation of output streams:
@@ -63,8 +64,8 @@ The `package replay` command implements a strict separation of output streams:
 * Global CLI flags `--quiet` (suppresses status output), `--plain` (strips ANSI escapes), and `--no-color` (disables terminal color codes) are explicitly supported.
 
 ### 4. Test and Placeholders Status
-* **Validation Status:** The local Rust test suite executes successfully with **68 PASS** tests.
-* **Remaining Placeholders:** The subcommands `package compress`, `package adversarial`, and `context render` remain as placeholders.
+* **Validation Status:** The local Rust test suite executes successfully with **69 PASS** tests.
+* **Remaining Placeholders:** The subcommands `package compress`, `package adversarial`, `report export`, and `notebook bundle` remain as placeholders.
 
 ### 5. Exclusion and Alignment Boundaries
 * **XENTRY/OBD/X-Engine:** Legacy/future diagnostic components (including OBD-II logs and X-Engine sandwich parsers) remain completely excluded from the active scope.
