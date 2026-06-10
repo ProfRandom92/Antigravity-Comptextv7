@@ -183,7 +183,24 @@ enum NotebookCommands {
     #[command(
         about = "Bundles context state and text renderings into a unified documentation payload"
     )]
-    Bundle,
+    Bundle {
+        #[arg(
+            short = 'c',
+            long = "input-context",
+            help = "Path to input context JSON"
+        )]
+        input_context: String,
+
+        #[arg(
+            short = 'r',
+            long = "input-render",
+            help = "Path to optional input render text"
+        )]
+        input_render: Option<String>,
+
+        #[arg(short = 'o', long = "output", help = "Path to output bundle .ipynb")]
+        output: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -256,8 +273,16 @@ fn main() -> Result<()> {
             }
         },
         Commands::Notebook { subcommand } => match subcommand {
-            NotebookCommands::Bundle => {
-                println!("Placeholder: notebook bundle");
+            NotebookCommands::Bundle {
+                input_context,
+                input_render,
+                output,
+            } => {
+                agy7rust::commands::notebook_bundle::run(
+                    input_context,
+                    input_render.as_deref(),
+                    output,
+                )?;
             }
         },
         Commands::Benchmark => {

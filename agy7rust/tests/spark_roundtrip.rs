@@ -2308,3 +2308,184 @@ fn test_agy_ct_report_export_execution() {
     let _ = fs::remove_file(&temp_bad_input_path);
     let _ = fs::remove_file(&temp_output_path);
 }
+
+#[test]
+fn test_agy_ct_notebook_bundle_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let pid = std::process::id();
+    let time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let suffix = format!("{}_{}", pid, time);
+
+    let temp_dir = std::env::temp_dir();
+    let temp_context_path = temp_dir.join(format!("test_context_{}.json", suffix));
+    let temp_render_path = temp_dir.join(format!("test_render_{}.txt", suffix));
+    let temp_output_path = temp_dir.join(format!("test_bundle_{}.ipynb", suffix));
+    let temp_output_no_render_path =
+        temp_dir.join(format!("test_bundle_no_render_{}.ipynb", suffix));
+    let temp_bad_context_path = temp_dir.join(format!("test_bad_context_{}.json", suffix));
+
+    // Clean up from previous runs
+    let _ = fs::remove_file(&temp_context_path);
+    let _ = fs::remove_file(&temp_render_path);
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_output_no_render_path);
+    let _ = fs::remove_file(&temp_bad_context_path);
+
+    // Mock operational context JSON
+    let mock_context = json!({
+        "context_id": "mock-ctx-123",
+        "source_package_hash": "abc123hash",
+        "schema_name": "genehmigung_v1",
+        "schema_version": 1,
+        "required_field_paths": ["field_a"],
+        "satisfied_field_paths": ["field_a"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": ["No production claim"]
+    });
+
+    fs::write(
+        &temp_context_path,
+        serde_json::to_string_pretty(&mock_context).unwrap(),
+    )
+    .unwrap();
+
+    let mock_render = "This is a mock render text summary.";
+    fs::write(&temp_render_path, mock_render).unwrap();
+
+    // ============================================
+    // 1. Success Test: With Render Output
+    // ============================================
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            temp_context_path.to_str().unwrap(),
+            "-r",
+            temp_render_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    assert!(temp_output_path.exists());
+    let ipynb_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!ipynb_content.is_empty());
+
+    let ipynb_json: serde_json::Value = serde_json::from_str(&ipynb_content).unwrap();
+    assert_eq!(ipynb_json["nbformat"].as_u64(), Some(4));
+    let cells = ipynb_json["cells"]
+        .as_array()
+        .expect("cells should be an array");
+    assert!(!cells.is_empty());
+
+    // Check cells content
+    let cells_str = ipynb_content.to_string();
+    assert!(cells_str.contains("CompText-Sparkctl Operational Notebook Bundle"));
+    assert!(cells_str.contains("mock-ctx-123"));
+    assert!(cells_str.contains("This is a mock render text summary."));
+
+    // ============================================
+    // 2. Success Test: Without Render Output
+    // ============================================
+    let output_success_no_render = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            temp_context_path.to_str().unwrap(),
+            "-o",
+            temp_output_no_render_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success_no_render.status.success());
+    assert!(temp_output_no_render_path.exists());
+    let ipynb_no_render_content = fs::read_to_string(&temp_output_no_render_path).unwrap();
+    assert!(!ipynb_no_render_content.is_empty());
+    assert!(ipynb_no_render_content.contains("CompText-Sparkctl Operational Notebook Bundle"));
+    assert!(!ipynb_no_render_content.contains("This is a mock render text summary."));
+
+    // ============================================
+    // 3. Failure Test 1: Missing input file
+    // ============================================
+    let non_existent_input = temp_dir.join(format!("test_context_non_existent_{}.json", suffix));
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            non_existent_input.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+
+    // ============================================
+    // 4. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_context_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            temp_bad_context_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+
+    // ============================================
+    // 5. Cleanup
+    // ============================================
+    let _ = fs::remove_file(&temp_context_path);
+    let _ = fs::remove_file(&temp_render_path);
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_output_no_render_path);
+    let _ = fs::remove_file(&temp_bad_context_path);
+}
