@@ -1,3 +1,8 @@
+---
+name: sparkctl-evidence-packet
+description: "Guide comptext-sparkctl work toward a SPARK Evidence Packet v1: a deterministic, reviewable artifact package for CompText."
+---
+
 # Skill: sparkctl Evidence Packet
 
 ## Purpose

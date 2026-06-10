@@ -1,0 +1,23 @@
+{
+  "governance": {
+    "rules": [
+      "Operate only inside the current workspace clone.",
+      "Request human review before making any file edits.",
+      "No network access by default. Run completely offline.",
+      "No secret reads (do not read .env, credentials, SSH keys).",
+      "No git writes (do not commit, push, pull, or create remote branches).",
+      "Do not use or process real citizen/admin case data.",
+      "Operate exclusively on synthetic mock fixtures.",
+      "Do not make legal, compliance, production-readiness, or official SPARK compatibility claims.",
+      "Cargo commands must be executed only inside the agy7rust/ subdirectory."
+    ],
+    "sandbox": {
+      "offline": true,
+      "read_only_git": true
+    }
+  },
+  "review": {
+    "boundary": "human_review",
+    "require_approval_before_patch": true
+  }
+}

@@ -1434,3 +1434,1155 @@ fn test_sparkctl_handoff_check_execution() {
     assert!(stdout_str.contains("=== sparkctl handoff-check ==="));
     assert!(stdout_str.contains("handoff-check result: PASS"));
 }
+
+#[test]
+fn test_package_verify_and_replay_with_structured_errors_and_ledger() {
+    use agy7rust::codec::package::{replay_package_value, verify_package_value};
+    use serde_json::json;
+
+    // Helper to construct a valid package envelope
+    let make_pkg = |payload: serde_json::Value,
+                    ledger: Option<serde_json::Value>,
+                    ledger_root: Option<&str>|
+     -> serde_json::Value {
+        use agy7rust::codec::hash::sha256_hex;
+        use agy7rust::codec::package::canonical_json;
+
+        let payload_canonical = canonical_json(&payload);
+        let payload_sha256 = sha256_hex(&payload_canonical);
+
+        let mut sidecar_pre = json!({
+            "schema_version": "KVTC7-SPARK-1",
+            "source_type": "spark_extraction_json",
+            "payload_sha256": payload_sha256
+        });
+
+        let sidecar_canonical = canonical_json(&sidecar_pre);
+        let final_state_hash = sha256_hex(&sidecar_canonical);
+
+        sidecar_pre["final_state_hash"] = serde_json::Value::String(final_state_hash);
+
+        let mut pkg = json!({
+            "schema": "SPARK-V7-PACKAGE",
+            "version": 1,
+            "payload": payload,
+            "sidecar": sidecar_pre
+        });
+
+        if let Some(l) = ledger {
+            pkg["ledger"] = l;
+        }
+        if let Some(r) = ledger_root {
+            pkg["ledger_root"] = serde_json::Value::String(r.to_string());
+        }
+
+        let pkg_canonical = canonical_json(&pkg);
+        let integrity_hash = sha256_hex(&pkg_canonical);
+        pkg["integrity_hash"] = serde_json::Value::String(integrity_hash);
+
+        pkg
+    };
+
+    // 1. Valid package without ledger
+    let valid_pkg = make_pkg(json!({"case_id": "SPARK-123"}), None, None);
+    assert!(verify_package_value(&valid_pkg).is_ok());
+    assert!(replay_package_value(&valid_pkg).is_ok());
+
+    // 2. Missing evidence field -> returns EVIDENCE_LOSS
+    let mut missing_field_pkg = valid_pkg.clone();
+    missing_field_pkg.as_object_mut().unwrap().remove("payload");
+    let err = verify_package_value(&missing_field_pkg).unwrap_err();
+    assert!(err.to_string().contains("EVIDENCE_LOSS"));
+
+    // 3. Hash manipulation -> returns CONSTRAINT_DRIFT
+    let mut manipulated_pkg = valid_pkg.clone();
+    manipulated_pkg["sidecar"]["payload_sha256"] =
+        json!("wronghashwronghashwronghashwronghashwronghashwronghashwronghash");
+    let err = verify_package_value(&manipulated_pkg).unwrap_err();
+    assert!(err.to_string().contains("CONSTRAINT_DRIFT"));
+
+    // 4. Replay fails on verify failure
+    let err_replay = replay_package_value(&manipulated_pkg).unwrap_err();
+    assert!(err_replay.to_string().contains("CONSTRAINT_DRIFT"));
+
+    // 5. Valid package with ledger
+    let valid_pkg_with_ledger = make_pkg(
+        json!({"case_id": "SPARK-123"}),
+        Some(json!([
+            {"entry_hash": "hash1", "previous_hash": "0"},
+            {"entry_hash": "hash2", "previous_hash": "hash1"}
+        ])),
+        Some("hash2"),
+    );
+    assert!(verify_package_value(&valid_pkg_with_ledger).is_ok());
+
+    // 6. Ledger chaining mismatch -> returns CONSTRAINT_DRIFT
+    let manipulated_ledger_pkg = make_pkg(
+        json!({"case_id": "SPARK-123"}),
+        Some(json!([
+            {"entry_hash": "hash1", "previous_hash": "0"},
+            {"entry_hash": "hash2", "previous_hash": "wrongchainhash"}
+        ])),
+        Some("hash2"),
+    );
+    let err = verify_package_value(&manipulated_ledger_pkg).unwrap_err();
+    assert!(err.to_string().contains("CONSTRAINT_DRIFT"));
+    assert!(err.to_string().contains("ledger chaining mismatch"));
+
+    // 7. Ledger anchoring mismatch -> returns CONSTRAINT_DRIFT
+    let manipulated_ledger_root_pkg = make_pkg(
+        json!({"case_id": "SPARK-123"}),
+        Some(json!([
+            {"entry_hash": "hash1", "previous_hash": "0"},
+            {"entry_hash": "hash2", "previous_hash": "hash1"}
+        ])),
+        Some("wrongroot"),
+    );
+    let err = verify_package_value(&manipulated_ledger_root_pkg).unwrap_err();
+    assert!(err.to_string().contains("CONSTRAINT_DRIFT"));
+    assert!(err.to_string().contains("ledger root anchoring mismatch"));
+}
+
+#[test]
+fn test_agy_ct_package_inspect_execution() {
+    use std::process::Command;
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "inspect",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("schema: SPARK-V7-PACKAGE"));
+    assert!(stdout_str.contains("source_type: spark_extraction_json"));
+    assert!(stdout_str.contains("field_paths count:"));
+    assert!(stdout_str.contains("commitment_tokens count:"));
+    assert!(stdout_str.contains("tool_sequence count:"));
+}
+
+#[test]
+fn test_agy_ct_package_replay_output_streams() {
+    use std::process::Command;
+
+    // 1. Standard run (should output status on stderr with color codes, and JSON on stdout)
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "replay",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    let stderr_str = String::from_utf8_lossy(&output.stderr);
+
+    // Verify stdout contains the replayed JSON schema
+    assert!(stdout_str.contains("\"schema\": \"SPARK-V7-REPLAY\""));
+    // Verify stderr contains status and color escapes
+    assert!(stderr_str.contains("Replaying sidecar trace"));
+    assert!(stderr_str.contains("\x1b[36m")); // cyan color code for status
+
+    // 2. Quiet run (should output JSON on stdout, but stderr should be empty/contain no status messages)
+    let output_quiet = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "--quiet",
+            "package",
+            "replay",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_quiet.status.success());
+    let stdout_quiet = String::from_utf8_lossy(&output_quiet.stdout);
+    let stderr_quiet = String::from_utf8_lossy(&output_quiet.stderr);
+
+    assert!(stdout_quiet.contains("\"schema\": \"SPARK-V7-REPLAY\""));
+    assert!(!stderr_quiet.contains("Replaying sidecar trace"));
+
+    // 3. Plain run (should output JSON on stdout, status on stderr but without ANSI escapes)
+    let output_plain = Command::new("cargo")
+        .env("CARGO_TERM_COLOR", "never")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "--plain",
+            "package",
+            "replay",
+            "-i",
+            "../artifacts/spark/extraction.spkg",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_plain.status.success());
+    let stdout_plain = String::from_utf8_lossy(&output_plain.stdout);
+    let stderr_plain = String::from_utf8_lossy(&output_plain.stderr);
+
+    assert!(stdout_plain.contains("\"schema\": \"SPARK-V7-REPLAY\""));
+    assert!(stderr_plain.contains("Replaying sidecar trace"));
+    assert!(!stderr_plain.contains("\x1b["));
+}
+
+#[test]
+fn test_agy_ct_schema_check_execution() {
+    use std::process::Command;
+
+    // 1. Valid call (should return exit status success)
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "schema",
+            "check",
+            "-i",
+            "../examples/spark/extraction.json",
+            "-s",
+            "../schemas/genehmigung_v1.json",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("OK: schema-check passed"));
+    assert!(stdout_str.contains("schema: genehmigung_v1"));
+
+    // 2. Invalid call (should fail)
+    let output_fail = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "schema",
+            "check",
+            "-i",
+            "../examples/spark/pdf_extraction_fixture.json",
+            "-s",
+            "../schemas/genehmigung_v1.json",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_fail.status.success());
+}
+
+#[test]
+fn test_agy_ct_context_validate_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let valid_path = temp_dir.join("test_valid_context.json");
+    let invalid_path = temp_dir.join("test_invalid_context.json");
+
+    // 1. Create a minimal valid context JSON
+    let valid_ctx = json!({
+        "context_id": "ctx-valid-123",
+        "source_package_hash": "hash-123",
+        "schema_name": "schema-123",
+        "schema_version": 1,
+        "required_field_paths": ["$.field1"],
+        "satisfied_field_paths": ["$.field1"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": ["some_claim"]
+    });
+
+    fs::write(&valid_path, serde_json::to_string(&valid_ctx).unwrap()).unwrap();
+
+    // 2. Create a minimal invalid context JSON
+    let invalid_ctx = json!({
+        "context_id": "ctx-invalid-123",
+        "source_package_hash": "hash-123",
+        "schema_name": "schema-123",
+        "schema_version": 1,
+        "required_field_paths": ["$.field1"],
+        "satisfied_field_paths": [],
+        "missing_field_paths": ["$.field1"],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": false,
+            "failure_labels": ["MISSING_REQUIRED_FIELD"],
+            "issues": ["field1 is missing"]
+        },
+        "non_claims": ["some_claim"]
+    });
+
+    fs::write(&invalid_path, serde_json::to_string(&invalid_ctx).unwrap()).unwrap();
+
+    // 3. Test valid context validation (should return exit status success)
+    let output_valid = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "validate",
+            "-i",
+            valid_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_valid.status.success());
+    let stdout_str = String::from_utf8_lossy(&output_valid.stdout);
+    assert!(stdout_str.contains("OK: context-validate passed"));
+    assert!(stdout_str.contains("context: ctx-valid-123"));
+
+    // 4. Test invalid context validation (should fail)
+    let output_invalid = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "validate",
+            "-i",
+            invalid_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_invalid.status.success());
+
+    // 5. Cleanup
+    let _ = fs::remove_file(valid_path);
+    let _ = fs::remove_file(invalid_path);
+}
+
+#[test]
+fn test_agy_ct_context_build_execution() {
+    use agy7rust::codec::package::build_package_from_value;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_package_path = temp_dir.join("test_package.spkg");
+    let temp_context_path = temp_dir.join("test_context.json");
+
+    // 1. Read and parse extraction.json, build spkg dynamically in memory
+    let input_content = fs::read_to_string("../examples/spark/extraction.json").unwrap();
+    let input_value: serde_json::Value = serde_json::from_str(&input_content).unwrap();
+    let package_value = build_package_from_value(&input_value).unwrap();
+
+    // 2. Write spkg to tempdir
+    let package_json = serde_json::to_string(&package_value).unwrap();
+    fs::write(&temp_package_path, &package_json).unwrap();
+
+    // 3. Invoke context build CLI (should return exit status success)
+    let output = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "build",
+            "-i",
+            temp_package_path.to_str().unwrap(),
+            "-s",
+            "../schemas/genehmigung_v1.json",
+            "-o",
+            temp_context_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output.status.success());
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout_str.contains("OK: context-build passed"));
+    assert!(stdout_str.contains("context:"));
+
+    // 4. Verify context was created in temp dir and is readable
+    assert!(temp_context_path.exists());
+    let context_content = fs::read_to_string(&temp_context_path).unwrap();
+    assert!(context_content.contains("\"context_id\":"));
+
+    // 5. Cleanup
+    let _ = fs::remove_file(temp_package_path);
+    let _ = fs::remove_file(temp_context_path);
+}
+
+#[test]
+fn test_agy_ct_context_render_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_input_path = temp_dir.join("test_render_input.json");
+    let temp_output_path = temp_dir.join("test_render_output.txt");
+    let temp_bad_input_path = temp_dir.join("test_render_bad_input.json");
+    let temp_bad_output_path = temp_dir.join("test_render_bad_output.txt");
+
+    // Ensure we clean up any pre-existing output files
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_bad_output_path);
+
+    // ============================================
+    // 1. Success Test: Valid context JSON
+    // ============================================
+    let valid_ctx = json!({
+        "context_id": "ctx-render-test-123",
+        "source_package_hash": "hash-999",
+        "schema_name": "genehmigung_v1",
+        "schema_version": 1,
+        "required_field_paths": ["$.case_id"],
+        "satisfied_field_paths": ["$.case_id"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": []
+    });
+
+    fs::write(&temp_input_path, serde_json::to_string(&valid_ctx).unwrap()).unwrap();
+
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "render",
+            "-i",
+            temp_input_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    let stdout_str = String::from_utf8_lossy(&output_success.stdout);
+    assert!(stdout_str.contains("OK: context-render passed"));
+    assert!(stdout_str.contains("context: ctx-render-test-123"));
+
+    assert!(temp_output_path.exists());
+    let render_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!render_content.is_empty());
+    assert!(render_content.contains("ctx-render-test-123"));
+    assert!(render_content.contains("genehmigung_v1"));
+
+    // ============================================
+    // 2. Failure Test: Corrupted context JSON
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "context",
+            "render",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+            "-o",
+            temp_bad_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure.status.success());
+    // Verify that the bad output file was not written (or doesn't exist)
+    assert!(!temp_bad_output_path.exists());
+
+    // ============================================
+    // 3. Cleanup
+    // ============================================
+    let _ = fs::remove_file(temp_input_path);
+    let _ = fs::remove_file(temp_output_path);
+    let _ = fs::remove_file(temp_bad_input_path);
+    let _ = fs::remove_file(temp_bad_output_path);
+}
+
+#[test]
+fn test_agy_ct_package_compress_execution() {
+    use agy7rust::codec::package::verify_package_value;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_output_path = temp_dir.join("test_compressed.spkg");
+    let temp_bad_input_path = temp_dir.join("test_compress_bad_input.json");
+    let temp_bad_output_path = temp_dir.join("test_compress_bad_output.spkg");
+
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_bad_output_path);
+
+    // Ensure no residual temp file exists
+    let expected_tmp_success = temp_dir.join(".test_compressed.spkg.tmp");
+    let expected_tmp_failure = temp_dir.join(".test_compress_bad_output.spkg.tmp");
+    let _ = fs::remove_file(&expected_tmp_success);
+    let _ = fs::remove_file(&expected_tmp_failure);
+
+    // ============================================
+    // 1. Success Test: Valid JSON input
+    // ============================================
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "compress",
+            "-i",
+            "../examples/spark/extraction.json",
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    assert!(temp_output_path.exists());
+    assert!(
+        !expected_tmp_success.exists(),
+        "Temporary write file must not persist on success"
+    );
+
+    let package_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!package_content.is_empty());
+
+    let package_value: serde_json::Value = serde_json::from_str(&package_content).unwrap();
+    assert!(
+        verify_package_value(&package_value).is_ok(),
+        "Generated package must verify successfully"
+    );
+
+    // ============================================
+    // 2. Failure Test 1: Missing input
+    // ============================================
+    let non_existent_input = temp_dir.join("test_compress_non_existent.json");
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "compress",
+            "-i",
+            non_existent_input.to_str().unwrap(),
+            "-o",
+            temp_bad_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+    assert!(!temp_bad_output_path.exists());
+    assert!(
+        !expected_tmp_failure.exists(),
+        "Temporary write file must not persist on missing input failure"
+    );
+
+    // ============================================
+    // 3. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "compress",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+            "-o",
+            temp_bad_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+    assert!(!temp_bad_output_path.exists());
+    assert!(
+        !expected_tmp_failure.exists(),
+        "Temporary write file must not persist on corrupt JSON failure"
+    );
+
+    // ============================================
+    // 4. Cleanup
+    // ============================================
+    let _ = fs::remove_file(temp_output_path);
+    let _ = fs::remove_file(temp_bad_input_path);
+    let _ = fs::remove_file(temp_bad_output_path);
+}
+
+#[test]
+fn test_agy_ct_package_adversarial_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let temp_dir = std::env::temp_dir();
+    let temp_bad_input_path = temp_dir.join("test_adversarial_bad_input.json");
+    let temp_missing_fields_path = temp_dir.join("test_adversarial_missing_fields.json");
+
+    // ============================================
+    // 1. Success Test: Valid raw input JSON trace
+    // ============================================
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            "../examples/spark/extraction.json",
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    let stdout_str = String::from_utf8_lossy(&output_success.stdout);
+    assert!(stdout_str.contains("adversarial: 5/5 detected"));
+
+    // ============================================
+    // 2. Failure Test 1: Missing input file
+    // ============================================
+    let non_existent_input = temp_dir.join("test_adversarial_non_existent.json");
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            non_existent_input.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+
+    // ============================================
+    // 3. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+
+    // ============================================
+    // 4. Failure Test 3: Missing Required Fields (missing parcel_id)
+    // ============================================
+    let bad_ctx_missing_fields = json!({
+        "case_id": "test-123",
+        "extraction": {
+            "fields": {
+                // missing parcel_id and decision_recommendation
+            }
+        }
+    });
+    fs::write(
+        &temp_missing_fields_path,
+        serde_json::to_string(&bad_ctx_missing_fields).unwrap(),
+    )
+    .unwrap();
+
+    let output_failure_fields = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "package",
+            "adversarial",
+            "-i",
+            temp_missing_fields_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_fields.status.success());
+
+    // ============================================
+    // 5. Cleanup
+    // ============================================
+    let _ = fs::remove_file(temp_bad_input_path);
+    let _ = fs::remove_file(temp_missing_fields_path);
+}
+
+#[test]
+fn test_agy_ct_report_export_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let pid = std::process::id();
+    let time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let suffix = format!("{}_{}", pid, time);
+
+    let temp_dir = std::env::temp_dir();
+    let temp_input_path = temp_dir.join(format!("test_report_input_{}.json", suffix));
+    let temp_output_path = temp_dir.join(format!("test_report_output_{}.md", suffix));
+    let temp_bad_input_path = temp_dir.join(format!("test_report_bad_input_{}.json", suffix));
+
+    // Clean up from previous runs
+    let _ = fs::remove_file(&temp_input_path);
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_bad_input_path);
+
+    // ============================================
+    // 1. Success Test: Valid JSON report
+    // ============================================
+    let mock_report = json!({
+        "tool": "agy-ct",
+        "project": "CompText-Sparkctl",
+        "phase": "6E",
+        "result": "PASS",
+        "stages": [
+            {
+                "index": 1,
+                "name": "workspace doctor",
+                "status": "PASS"
+            }
+        ]
+    });
+    fs::write(
+        &temp_input_path,
+        serde_json::to_string_pretty(&mock_report).unwrap(),
+    )
+    .unwrap();
+
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "report",
+            "export",
+            "-i",
+            temp_input_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    assert!(temp_output_path.exists());
+    let md_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!md_content.is_empty());
+    assert!(md_content.contains("# CompText-Sparkctl Execution Report"));
+    assert!(md_content.contains("workspace doctor"));
+    assert!(md_content.contains("PASS"));
+
+    // Clean up output
+    let _ = fs::remove_file(&temp_output_path);
+
+    // ============================================
+    // 2. Failure Test 1: Missing input file
+    // ============================================
+    let non_existent_input = temp_dir.join(format!("test_report_non_existent_{}.json", suffix));
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "report",
+            "export",
+            "-i",
+            non_existent_input.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+    assert!(!temp_output_path.exists());
+
+    // ============================================
+    // 3. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_input_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "report",
+            "export",
+            "-i",
+            temp_bad_input_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+    assert!(!temp_output_path.exists());
+
+    // Clean up temporary files
+    let _ = fs::remove_file(&temp_input_path);
+    let _ = fs::remove_file(&temp_bad_input_path);
+    let _ = fs::remove_file(&temp_output_path);
+}
+
+#[test]
+fn test_agy_ct_notebook_bundle_execution() {
+    use serde_json::json;
+    use std::fs;
+    use std::process::Command;
+
+    let pid = std::process::id();
+    let time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let suffix = format!("{}_{}", pid, time);
+
+    let temp_dir = std::env::temp_dir();
+    let temp_context_path = temp_dir.join(format!("test_context_{}.json", suffix));
+    let temp_render_path = temp_dir.join(format!("test_render_{}.txt", suffix));
+    let temp_output_path = temp_dir.join(format!("test_bundle_{}.ipynb", suffix));
+    let temp_output_no_render_path =
+        temp_dir.join(format!("test_bundle_no_render_{}.ipynb", suffix));
+    let temp_bad_context_path = temp_dir.join(format!("test_bad_context_{}.json", suffix));
+
+    // Clean up from previous runs
+    let _ = fs::remove_file(&temp_context_path);
+    let _ = fs::remove_file(&temp_render_path);
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_output_no_render_path);
+    let _ = fs::remove_file(&temp_bad_context_path);
+
+    // Mock operational context JSON
+    let mock_context = json!({
+        "context_id": "mock-ctx-123",
+        "source_package_hash": "abc123hash",
+        "schema_name": "genehmigung_v1",
+        "schema_version": 1,
+        "required_field_paths": ["field_a"],
+        "satisfied_field_paths": ["field_a"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": ["No production claim"]
+    });
+
+    fs::write(
+        &temp_context_path,
+        serde_json::to_string_pretty(&mock_context).unwrap(),
+    )
+    .unwrap();
+
+    let mock_render = "This is a mock render text summary.";
+    fs::write(&temp_render_path, mock_render).unwrap();
+
+    // ============================================
+    // 1. Success Test: With Render Output
+    // ============================================
+    let output_success = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            temp_context_path.to_str().unwrap(),
+            "-r",
+            temp_render_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success.status.success());
+    assert!(temp_output_path.exists());
+    let ipynb_content = fs::read_to_string(&temp_output_path).unwrap();
+    assert!(!ipynb_content.is_empty());
+
+    let ipynb_json: serde_json::Value = serde_json::from_str(&ipynb_content).unwrap();
+    assert_eq!(ipynb_json["nbformat"].as_u64(), Some(4));
+    let cells = ipynb_json["cells"]
+        .as_array()
+        .expect("cells should be an array");
+    assert!(!cells.is_empty());
+
+    // Check cells content
+    let cells_str = ipynb_content.to_string();
+    assert!(cells_str.contains("CompText-Sparkctl Operational Notebook Bundle"));
+    assert!(cells_str.contains("mock-ctx-123"));
+    assert!(cells_str.contains("This is a mock render text summary."));
+
+    // ============================================
+    // 2. Success Test: Without Render Output
+    // ============================================
+    let output_success_no_render = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            temp_context_path.to_str().unwrap(),
+            "-o",
+            temp_output_no_render_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(output_success_no_render.status.success());
+    assert!(temp_output_no_render_path.exists());
+    let ipynb_no_render_content = fs::read_to_string(&temp_output_no_render_path).unwrap();
+    assert!(!ipynb_no_render_content.is_empty());
+    assert!(ipynb_no_render_content.contains("CompText-Sparkctl Operational Notebook Bundle"));
+    assert!(!ipynb_no_render_content.contains("This is a mock render text summary."));
+
+    // ============================================
+    // 3. Failure Test 1: Missing input file
+    // ============================================
+    let non_existent_input = temp_dir.join(format!("test_context_non_existent_{}.json", suffix));
+    let _ = fs::remove_file(&non_existent_input);
+
+    let output_failure_missing = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            non_existent_input.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_missing.status.success());
+
+    // ============================================
+    // 4. Failure Test 2: Corrupted JSON input
+    // ============================================
+    fs::write(&temp_bad_context_path, "{ \"invalid\": ").unwrap();
+
+    let output_failure_corrupt = Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "agy-ct",
+            "--",
+            "notebook",
+            "bundle",
+            "-c",
+            temp_bad_context_path.to_str().unwrap(),
+            "-o",
+            temp_output_path.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute cargo run");
+
+    assert!(!output_failure_corrupt.status.success());
+
+    // ============================================
+    // 5. Cleanup
+    // ============================================
+    let _ = fs::remove_file(&temp_context_path);
+    let _ = fs::remove_file(&temp_render_path);
+    let _ = fs::remove_file(&temp_output_path);
+    let _ = fs::remove_file(&temp_output_no_render_path);
+}
+
+#[test]
+fn test_plain_output_path_no_parent() {
+    use serde_json::json;
+    use std::env;
+    use std::fs;
+
+    let original_dir = env::current_dir().unwrap();
+    let temp_dir = std::env::temp_dir();
+
+    let pid = std::process::id();
+    let time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let subdir_name = format!("test_plain_dir_{}_{}", pid, time);
+    let run_dir = temp_dir.join(&subdir_name);
+    fs::create_dir_all(&run_dir).unwrap();
+
+    env::set_current_dir(&run_dir).unwrap();
+
+    // Mock files
+    let mock_report = json!({
+        "tool": "agy-ct",
+        "project": "CompText-Sparkctl",
+        "phase": "6E",
+        "result": "PASS"
+    });
+    fs::write(
+        "mock_report.json",
+        serde_json::to_string(&mock_report).unwrap(),
+    )
+    .unwrap();
+
+    let mock_context = json!({
+        "context_id": "mock-ctx-123",
+        "source_package_hash": "abc123hash",
+        "schema_name": "genehmigung_v1",
+        "schema_version": 1,
+        "required_field_paths": ["field_a"],
+        "satisfied_field_paths": ["field_a"],
+        "missing_field_paths": [],
+        "constraints": [],
+        "required_order": [],
+        "dependency_edges": [],
+        "blockers": [],
+        "recovery_paths": [],
+        "validation": {
+            "valid": true,
+            "failure_labels": [],
+            "issues": []
+        },
+        "non_claims": []
+    });
+    fs::write(
+        "mock_context.json",
+        serde_json::to_string(&mock_context).unwrap(),
+    )
+    .unwrap();
+
+    // 1. Report export test
+    let res_report = agy7rust::commands::report_export::run("mock_report.json", "report.md");
+    assert!(
+        res_report.is_ok(),
+        "Report export failed: {:?}",
+        res_report.err()
+    );
+    assert!(
+        fs::metadata("report.md").is_ok(),
+        "report.md does not exist"
+    );
+    assert!(
+        fs::metadata("report.md").unwrap().len() > 0,
+        "report.md is empty"
+    );
+
+    // 2. Notebook bundle test
+    let res_bundle =
+        agy7rust::commands::notebook_bundle::run("mock_context.json", None, "bundle.ipynb");
+    assert!(
+        res_bundle.is_ok(),
+        "Notebook bundle failed: {:?}",
+        res_bundle.err()
+    );
+    assert!(
+        fs::metadata("bundle.ipynb").is_ok(),
+        "bundle.ipynb does not exist"
+    );
+    assert!(
+        fs::metadata("bundle.ipynb").unwrap().len() > 0,
+        "bundle.ipynb is empty"
+    );
+
+    // Restore original current dir and cleanup
+    env::set_current_dir(&original_dir).unwrap();
+    let _ = fs::remove_dir_all(&run_dir);
+}

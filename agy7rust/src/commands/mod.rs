@@ -6,7 +6,9 @@ pub mod context_build;
 pub mod context_render;
 pub mod context_validate;
 pub mod inspect;
+pub mod notebook_bundle;
 pub mod replay_cmd;
+pub mod report_export;
 pub mod schema_check;
 pub mod verify_cmd;
 

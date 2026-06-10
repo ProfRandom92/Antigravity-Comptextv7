@@ -15,7 +15,7 @@ fn main() -> anyhow::Result<()> {
             agy7rust::commands::verify_cmd::run(&input)?;
         }
         Commands::Replay { input } => {
-            agy7rust::commands::replay_cmd::run(&input)?;
+            agy7rust::commands::replay_cmd::run(&input, Default::default())?;
         }
         Commands::Adversarial { input } => {
             agy7rust::commands::adversarial::run(&input)?;

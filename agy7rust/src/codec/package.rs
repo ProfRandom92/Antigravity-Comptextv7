@@ -572,65 +572,79 @@ pub fn build_package_from_value(value: &serde_json::Value) -> anyhow::Result<ser
 }
 
 pub fn verify_package_value(value: &serde_json::Value) -> anyhow::Result<()> {
-    let pkg = value
-        .as_object()
-        .ok_or_else(|| anyhow::anyhow!("Package is not a JSON object"))?;
+    use crate::error::SparkError;
 
-    let schema = pkg
-        .get("schema")
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("schema mismatch: Missing schema"))?;
+    let pkg = value.as_object().ok_or_else(|| {
+        anyhow::Error::new(SparkError::EvidenceLoss(
+            "Package is not a JSON object".to_string(),
+        ))
+    })?;
+
+    let schema = pkg.get("schema").and_then(|v| v.as_str()).ok_or_else(|| {
+        anyhow::Error::new(SparkError::EvidenceLoss(
+            "schema mismatch: Missing schema".to_string(),
+        ))
+    })?;
     if schema != "SPARK-V7-PACKAGE" {
-        return Err(anyhow::anyhow!(
+        return Err(anyhow::Error::new(SparkError::ConstraintDrift(format!(
             "schema mismatch: expected SPARK-V7-PACKAGE, got {}",
             schema
-        ));
+        ))));
     }
 
-    let version = pkg
-        .get("version")
-        .and_then(|v| v.as_i64())
-        .ok_or_else(|| anyhow::anyhow!("version mismatch: Missing version"))?;
+    let version = pkg.get("version").and_then(|v| v.as_i64()).ok_or_else(|| {
+        anyhow::Error::new(SparkError::EvidenceLoss(
+            "version mismatch: Missing version".to_string(),
+        ))
+    })?;
     if version != 1 {
-        return Err(anyhow::anyhow!(
+        return Err(anyhow::Error::new(SparkError::ConstraintDrift(format!(
             "version mismatch: expected 1, got {}",
             version
-        ));
+        ))));
     }
 
-    let payload = pkg
-        .get("payload")
-        .ok_or_else(|| anyhow::anyhow!("Missing payload"))?;
+    let payload = pkg.get("payload").ok_or_else(|| {
+        anyhow::Error::new(SparkError::EvidenceLoss("Missing payload".to_string()))
+    })?;
 
-    let sidecar_val = pkg
-        .get("sidecar")
-        .ok_or_else(|| anyhow::anyhow!("Missing sidecar"))?;
-    let sidecar = sidecar_val
-        .as_object()
-        .ok_or_else(|| anyhow::anyhow!("sidecar is not a JSON object"))?;
+    let sidecar_val = pkg.get("sidecar").ok_or_else(|| {
+        anyhow::Error::new(SparkError::EvidenceLoss("Missing sidecar".to_string()))
+    })?;
+    let sidecar = sidecar_val.as_object().ok_or_else(|| {
+        anyhow::Error::new(SparkError::EvidenceLoss(
+            "sidecar is not a JSON object".to_string(),
+        ))
+    })?;
 
     let schema_version = sidecar
         .get("schema_version")
         .and_then(|v| v.as_str())
         .ok_or_else(|| {
-            anyhow::anyhow!("schema_version mismatch: Missing sidecar schema_version")
+            anyhow::Error::new(SparkError::EvidenceLoss(
+                "schema_version mismatch: Missing sidecar schema_version".to_string(),
+            ))
         })?;
     if schema_version != "KVTC7-SPARK-1" {
-        return Err(anyhow::anyhow!(
+        return Err(anyhow::Error::new(SparkError::ConstraintDrift(format!(
             "schema_version mismatch: expected KVTC7-SPARK-1, got {}",
             schema_version
-        ));
+        ))));
     }
 
     let source_type = sidecar
         .get("source_type")
         .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("source_type mismatch: Missing sidecar source_type"))?;
+        .ok_or_else(|| {
+            anyhow::Error::new(SparkError::EvidenceLoss(
+                "source_type mismatch: Missing sidecar source_type".to_string(),
+            ))
+        })?;
     if source_type != "spark_extraction_json" {
-        return Err(anyhow::anyhow!(
+        return Err(anyhow::Error::new(SparkError::ConstraintDrift(format!(
             "source_type mismatch: expected spark_extraction_json, got {}",
             source_type
-        ));
+        ))));
     }
 
     let payload_canonical = canonical_json(payload);
@@ -640,17 +654,23 @@ pub fn verify_package_value(value: &serde_json::Value) -> anyhow::Result<()> {
         .get("payload_sha256")
         .and_then(|v| v.as_str())
         .ok_or_else(|| {
-            anyhow::anyhow!("payload_sha256 mismatch: Missing sidecar payload_sha256")
+            anyhow::Error::new(SparkError::EvidenceLoss(
+                "payload_sha256 mismatch: Missing sidecar payload_sha256".to_string(),
+            ))
         })?;
     if calculated_payload_sha256 != expected_payload_sha256 {
-        return Err(anyhow::anyhow!("payload_sha256 mismatch"));
+        return Err(anyhow::Error::new(SparkError::ConstraintDrift(
+            "payload_sha256 mismatch".to_string(),
+        )));
     }
 
     let expected_final_state_hash = sidecar
         .get("final_state_hash")
         .and_then(|v| v.as_str())
         .ok_or_else(|| {
-            anyhow::anyhow!("final_state_hash mismatch: Missing sidecar final_state_hash")
+            anyhow::Error::new(SparkError::EvidenceLoss(
+                "final_state_hash mismatch: Missing sidecar final_state_hash".to_string(),
+            ))
         })?;
 
     let mut sidecar_preimage = sidecar_val.clone();
@@ -661,13 +681,19 @@ pub fn verify_package_value(value: &serde_json::Value) -> anyhow::Result<()> {
     let calculated_final_state_hash = sha256_hex(sidecar_preimage_canonical);
 
     if calculated_final_state_hash != expected_final_state_hash {
-        return Err(anyhow::anyhow!("final_state_hash mismatch"));
+        return Err(anyhow::Error::new(SparkError::ConstraintDrift(
+            "final_state_hash mismatch".to_string(),
+        )));
     }
 
     let expected_integrity_hash = pkg
         .get("integrity_hash")
         .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("integrity_hash mismatch: Missing integrity_hash"))?;
+        .ok_or_else(|| {
+            anyhow::Error::new(SparkError::EvidenceLoss(
+                "integrity_hash mismatch: Missing integrity_hash".to_string(),
+            ))
+        })?;
 
     let mut package_preimage = value.clone();
     if let serde_json::Value::Object(ref mut map) = package_preimage {
@@ -677,7 +703,112 @@ pub fn verify_package_value(value: &serde_json::Value) -> anyhow::Result<()> {
     let calculated_integrity_hash = sha256_hex(package_preimage_canonical);
 
     if calculated_integrity_hash != expected_integrity_hash {
-        return Err(anyhow::anyhow!("integrity_hash mismatch"));
+        return Err(anyhow::Error::new(SparkError::ConstraintDrift(
+            "integrity_hash mismatch".to_string(),
+        )));
+    }
+
+    // Optional ledger validation
+    if let Some(ledger_val) = pkg.get("ledger") {
+        let ledger_arr = ledger_val.as_array().ok_or_else(|| {
+            anyhow::Error::new(SparkError::EvidenceLoss(
+                "ledger is not an array".to_string(),
+            ))
+        })?;
+
+        let ledger_root = pkg
+            .get("ledger_root")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| {
+                anyhow::Error::new(SparkError::EvidenceLoss(
+                    "ledger_root is missing".to_string(),
+                ))
+            })?;
+
+        if ledger_arr.is_empty() {
+            return Err(anyhow::Error::new(SparkError::EvidenceLoss(
+                "ledger is empty".to_string(),
+            )));
+        }
+
+        for (idx, entry_val) in ledger_arr.iter().enumerate() {
+            let entry = entry_val.as_object().ok_or_else(|| {
+                anyhow::Error::new(SparkError::EvidenceLoss(format!(
+                    "ledger entry at index {} is not an object",
+                    idx
+                )))
+            })?;
+
+            let _entry_hash = entry
+                .get("entry_hash")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| {
+                    anyhow::Error::new(SparkError::EvidenceLoss(format!(
+                        "ledger entry at index {} missing entry_hash",
+                        idx
+                    )))
+                })?;
+
+            let previous_hash = entry
+                .get("previous_hash")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| {
+                    anyhow::Error::new(SparkError::EvidenceLoss(format!(
+                        "ledger entry at index {} missing previous_hash",
+                        idx
+                    )))
+                })?;
+
+            if idx > 0 {
+                let prev_entry = ledger_arr[idx - 1].as_object().ok_or_else(|| {
+                    anyhow::Error::new(SparkError::EvidenceLoss(
+                        "Preceding ledger entry is not an object".to_string(),
+                    ))
+                })?;
+                let prev_entry_hash = prev_entry
+                    .get("entry_hash")
+                    .and_then(|v| v.as_str())
+                    .ok_or_else(|| {
+                        anyhow::Error::new(SparkError::EvidenceLoss(
+                            "Preceding ledger entry missing entry_hash".to_string(),
+                        ))
+                    })?;
+
+                if previous_hash != prev_entry_hash {
+                    return Err(anyhow::Error::new(SparkError::ConstraintDrift(format!(
+                        "ledger chaining mismatch: previous_hash '{}' at index {} does not match entry_hash '{}' of preceding entry",
+                        previous_hash, idx, prev_entry_hash
+                    ))));
+                }
+            }
+        }
+
+        let final_entry = ledger_arr
+            .last()
+            .ok_or_else(|| {
+                anyhow::Error::new(SparkError::EvidenceLoss("ledger is empty".to_string()))
+            })?
+            .as_object()
+            .ok_or_else(|| {
+                anyhow::Error::new(SparkError::EvidenceLoss(
+                    "Final ledger entry is not an object".to_string(),
+                ))
+            })?;
+        let final_entry_hash = final_entry
+            .get("entry_hash")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| {
+                anyhow::Error::new(SparkError::EvidenceLoss(
+                    "Final ledger entry missing entry_hash".to_string(),
+                ))
+            })?;
+
+        if ledger_root != final_entry_hash {
+            return Err(anyhow::Error::new(SparkError::ConstraintDrift(format!(
+                "ledger root anchoring mismatch: expected ledger_root '{}' to match final entry_hash '{}'",
+                ledger_root, final_entry_hash
+            ))));
+        }
     }
 
     Ok(())

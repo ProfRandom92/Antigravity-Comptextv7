@@ -1,3 +1,8 @@
+---
+name: codex-role-workflows
+description: "Apply CompText Agent Governor Policy v1 to Codex-style role, plugin, connector, and skill workflows."
+---
+
 # Skill: Codex Role Workflows
 
 ## Purpose

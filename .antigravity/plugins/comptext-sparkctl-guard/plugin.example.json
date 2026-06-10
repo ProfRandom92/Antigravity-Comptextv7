@@ -1,0 +1,20 @@
+{
+  "name": "comptext-sparkctl-guard",
+  "status": "inert",
+  "scope": "repo-local",
+  "governance": "review-gated",
+  "runtime": "not active runtime",
+  "description": "Antigravity plugin protecting CompText boundaries and ensuring human review validation",
+  "version": "1.0.0",
+  "rules": {
+    "block_remote_writes": true,
+    "require_human_review": true,
+    "untrusted_provider_output": true,
+    "repo_relative_paths_only": true
+  },
+  "monitored_paths": [
+    "./agy7rust/src/",
+    "./reports/",
+    "./artifacts/spark/"
+  ]
+}

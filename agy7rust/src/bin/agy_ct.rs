@@ -170,7 +170,12 @@ enum SchemaCommands {
 #[derive(Subcommand)]
 enum ReportCommands {
     #[command(about = "Exporter for generated pipeline JSON reports")]
-    Export,
+    Export {
+        #[arg(long, short)]
+        input: String,
+        #[arg(long, short)]
+        output: String,
+    },
 }
 
 #[derive(Subcommand)]
@@ -178,7 +183,24 @@ enum NotebookCommands {
     #[command(
         about = "Bundles context state and text renderings into a unified documentation payload"
     )]
-    Bundle,
+    Bundle {
+        #[arg(
+            short = 'c',
+            long = "input-context",
+            help = "Path to input context JSON"
+        )]
+        input_context: String,
+
+        #[arg(
+            short = 'r',
+            long = "input-render",
+            help = "Path to optional input render text"
+        )]
+        input_render: Option<String>,
+
+        #[arg(short = 'o', long = "output", help = "Path to output bundle .ipynb")]
+        output: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -201,49 +223,66 @@ fn main() -> Result<()> {
             sparkctl::handoff_check::run_handoff_check()?;
         }
         Commands::Package { subcommand } => match subcommand {
-            PackageCommands::Compress { .. } => {
-                println!("Placeholder: package compress");
+            PackageCommands::Compress { input, output } => {
+                agy7rust::commands::compress::run(input, output)?;
             }
-            PackageCommands::Inspect { .. } => {
-                println!("Placeholder: package inspect");
+            PackageCommands::Inspect { input } => {
+                agy7rust::commands::inspect::run(input)?;
             }
-            PackageCommands::Verify { .. } => {
-                println!("Placeholder: package verify");
+            PackageCommands::Verify { input } => {
+                agy7rust::commands::verify_cmd::run(input)?;
             }
-            PackageCommands::Replay { .. } => {
-                println!("Placeholder: package replay");
+            PackageCommands::Replay { input } => {
+                let options = agy7rust::commands::replay_cmd::ReplayOptions {
+                    quiet: cli.quiet,
+                    plain: cli.plain,
+                    no_color: cli.no_color,
+                };
+                agy7rust::commands::replay_cmd::run(input, options)?;
             }
-            PackageCommands::Adversarial { .. } => {
-                println!("Placeholder: package adversarial");
+            PackageCommands::Adversarial { input } => {
+                agy7rust::commands::adversarial::run(input)?;
             }
         },
         Commands::Context { subcommand } => match subcommand {
-            ContextCommands::Build { .. } => {
-                println!("Placeholder: context build");
+            ContextCommands::Build {
+                input,
+                schema,
+                output,
+            } => {
+                agy7rust::commands::context_build::run(input, schema, output)?;
             }
-            ContextCommands::Render { .. } => {
-                println!("Placeholder: context render");
+            ContextCommands::Render { input, output } => {
+                agy7rust::commands::context_render::run(input, output)?;
             }
-            ContextCommands::Validate { .. } => {
-                println!("Placeholder: context validate");
+            ContextCommands::Validate { input, schema: _ } => {
+                agy7rust::commands::context_validate::run(input)?;
             }
             ContextCommands::All => {
                 sparkctl::context_all::run_context_all()?;
             }
         },
         Commands::Schema { subcommand } => match subcommand {
-            SchemaCommands::Check { .. } => {
-                println!("Placeholder: schema check");
+            SchemaCommands::Check { input, schema } => {
+                agy7rust::commands::schema_check::run(input, schema)?;
             }
         },
         Commands::Report { subcommand } => match subcommand {
-            ReportCommands::Export => {
-                println!("Placeholder: report export");
+            ReportCommands::Export { input, output } => {
+                agy7rust::commands::report_export::run(input, output)?;
             }
         },
         Commands::Notebook { subcommand } => match subcommand {
-            NotebookCommands::Bundle => {
-                println!("Placeholder: notebook bundle");
+            NotebookCommands::Bundle {
+                input_context,
+                input_render,
+                output,
+            } => {
+                agy7rust::commands::notebook_bundle::run(
+                    input_context,
+                    input_render.as_deref(),
+                    output,
+                )?;
             }
         },
         Commands::Benchmark => {

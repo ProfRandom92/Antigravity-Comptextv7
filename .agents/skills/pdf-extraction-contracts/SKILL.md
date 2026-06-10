@@ -1,3 +1,8 @@
+---
+name: pdf-extraction-contracts
+description: "Guide work on PDF-EXTRACTION-V1 structured-data artifacts for SPARK-like administrative workflows."
+---
+
 # Skill: PDF Extraction Contracts
 
 ## Purpose

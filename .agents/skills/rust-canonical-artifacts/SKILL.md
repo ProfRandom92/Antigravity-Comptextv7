@@ -1,3 +1,8 @@
+---
+name: rust-canonical-artifacts
+description: "Keep Rust artifact packaging deterministic, testable, and honest."
+---
+
 # Skill: Rust Canonical Artifacts
 
 ## Purpose
