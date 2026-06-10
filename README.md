@@ -26,6 +26,11 @@ flowchart LR
     C --> D["package verify"]
     C --> E["package inspect"]
     C --> F["package adversarial"]
+    C --> I["context build"]
+    I --> J["context render"]
+    I --> K["notebook bundle"]
+    J --> K
+    K --> L[".ipynb Notebook"]
     A --> G["report export"]
     G --> H["Markdown Report"]
 ```
@@ -56,6 +61,7 @@ Sparkctl implementiert Mechanismen zur Absicherung synthetischer Planungsdaten.
 - **`agy-ct package replay`** — Rekonstruiert die aufgezeichnete Trace deterministisch (strikte stdout/stderr Kanaltrennung).
 - **`agy-ct package adversarial`** — Simuliert manipulierte Attribute zur Überprüfung der Manipulationserkennung.
 - **`agy-ct report export`** — Exportiert JSON-Pipeline-Berichte als formatierten Markdown-Report.
+- **`agy-ct notebook bundle`** — Bündelt Kontext-Zustände und Textrenderings in ein `.ipynb` Jupyter Notebook.
 - **`agy-ct schema check`** — Gleicht rohe Trace-Dateien gegen JSON-Schemas ab.
 - **`agy-ct context validate`** — Führt strukturelle Validierung und Leckprüfungen auf Kontextmodellen durch.
 - **`agy-ct context build`** — Erzeugt strukturierte operative Kontextmodelle.
@@ -75,7 +81,7 @@ Sparkctl implementiert Mechanismen zur Absicherung synthetischer Planungsdaten.
 | **Context** | `context render` | `context_render::run` | Wired | Token-reduzierter Text | 100% PASS |
 | **Context** | `context validate` | `context_validate::run` | Wired | Leck- und Strukturprüfungsbericht | 100% PASS |
 | **Report** | `report export` | `report_export::run` | Wired | Markdown-Export (`.md`) | 100% PASS |
-| **Notebook** | `notebook bundle` | N/A | Placeholder | Unified payload | Ausstehend |
+| **Notebook** | `notebook bundle` | `notebook_bundle::run` | Wired | `.ipynb` Jupyter Notebook | 100% PASS |
 
 ---
 
@@ -87,7 +93,7 @@ Führen Sie die folgenden sicheren lokalen Befehle im Rust-Unterverzeichnis aus:
 # In das Rust-Verzeichnis wechseln
 cd agy7rust
 
-# Testsuite ausführen (72 PASS Tests)
+# Testsuite ausführen (73 PASS Tests)
 cargo test
 
 # Berichtsexport mit einer synthetischen Beispieldokumentation ausführen
@@ -140,7 +146,7 @@ Dieses Repository nutzt klare Richtlinien für die lokale Ausführung von KI-Ent
 ## Roadmap
 
 ### Aktuell Offen (Platzhalter-Befehle):
-- **`agy-ct notebook bundle`** — Bündelt Kontext-Zustände und Textrenderings in einen zusammenhängenden Dokumentations-Payload.
+- Keine bekannten CLI-Platzhalter mehr.
 
 ### Zukünftige Schritte:
 - Erweiterung der synthetischen Planungs-Fixtures.
