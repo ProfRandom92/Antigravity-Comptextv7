@@ -783,11 +783,17 @@ pub fn verify_package_value(value: &serde_json::Value) -> anyhow::Result<()> {
             }
         }
 
-        let final_entry = ledger_arr.last().unwrap().as_object().ok_or_else(|| {
-            anyhow::Error::new(SparkError::EvidenceLoss(
-                "Final ledger entry is not an object".to_string(),
-            ))
-        })?;
+        let final_entry = ledger_arr
+            .last()
+            .ok_or_else(|| {
+                anyhow::Error::new(SparkError::EvidenceLoss("ledger is empty".to_string()))
+            })?
+            .as_object()
+            .ok_or_else(|| {
+                anyhow::Error::new(SparkError::EvidenceLoss(
+                    "Final ledger entry is not an object".to_string(),
+                ))
+            })?;
         let final_entry_hash = final_entry
             .get("entry_hash")
             .and_then(|v| v.as_str())

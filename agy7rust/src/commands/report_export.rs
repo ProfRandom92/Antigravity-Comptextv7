@@ -67,13 +67,21 @@ pub fn run(input_path: &str, output_path: &str) -> Result<()> {
         }
     }
 
-    let parent_dir = output_path_buf.parent().unwrap_or_else(|| Path::new("."));
+    let parent_dir = output_path_buf
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
     let file_name = output_path_buf
         .file_name()
         .ok_or_else(|| anyhow::anyhow!("Invalid output path filename"))?
         .to_str()
         .ok_or_else(|| anyhow::anyhow!("Filename contains invalid Unicode"))?;
-    let temp_file_name = format!(".{}.tmp", file_name);
+    let pid = std::process::id();
+    let time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let temp_file_name = format!(".{}_{}_{}.tmp", file_name, pid, time);
     let temp_path = parent_dir.join(temp_file_name);
 
     fs::write(&temp_path, &md)

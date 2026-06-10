@@ -171,7 +171,10 @@ pub fn run(
         }
     }
 
-    let parent_dir = output_path_buf.parent().unwrap_or_else(|| Path::new("."));
+    let parent_dir = output_path_buf
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
     let file_name = output_path_buf
         .file_name()
         .ok_or_else(|| anyhow::anyhow!("Invalid output path filename"))?
