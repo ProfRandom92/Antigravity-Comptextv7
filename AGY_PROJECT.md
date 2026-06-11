@@ -2,39 +2,40 @@
 
 ## 1. Zweck
 - Diese Datei dient als lokale Steuerungsdatei für die Sparkctl-Entwicklungsarbeiten mit Antigravity.
-- Sie ist kein Ersatz für `AGENTS.md`.
-- `AGENTS.md` und die Skills unter `.agents/skills/**/SKILL.md` bleiben die vorrangig verbindlichen Arbeitsregeln.
+- Sie ist kein Ersatz für AGENTS.md.
+- AGENTS.md und die Skills unter .agents/skills/00_project_system/SKILL.md bleiben die vorrangig verbindlichen Arbeitsregeln.
 - Diese Datei konkretisiert und priorisiert lediglich den aktuellen lokalen Backlog für diese Arbeitsumgebung.
 
 ---
 
 ## 2. Aktueller lokaler Stand
-- **Branch:** `docs/spark-hackathon-governance`
+- **Branch:** `docs/project-governance-sync`
 - **Letzte relevante Commits:**
-  - `dcfbd02` docs: sync alignment after context render
-  - `d00132b` feat: wire context render command
-- **Tests letzter Stand:** 69 PASS laut lokalem Audit/Teststand.
+  - `c9b9086` docs: polish README presentation
+  - `b9191af` feat: complete Sparkctl CLI command surface
+- **Tests letzter Stand:** 73 PASS dokumentiert laut lokalem Audit/Teststand in docs/SPARK_ALIGNMENT.md.
 
 ---
 
 ## 3. Wired Commands
-Folgende Befehle des CLI `agy-ct` sind vollständig verdrahtet:
-- `agy-ct package verify`
-- `agy-ct package replay`
-- `agy-ct package inspect`
-- `agy-ct schema check`
-- `agy-ct context validate`
-- `agy-ct context build`
-- `agy-ct context render`
+Folgende 11 Befehle des CLI `agy-ct` sind vollständig verdrahtet:
+- `agy-ct package verify` — wired to `verify_cmd::run`
+- `agy-ct package replay` — wired to `replay_cmd::run`
+- `agy-ct package inspect` — wired to `inspect::run`
+- `agy-ct package compress` — wired to `compress::run`
+- `agy-ct package adversarial` — wired to `adversarial::run`
+- `agy-ct report export` — wired to `report_export::run`
+- `agy-ct notebook bundle` — wired to `notebook_bundle::run`
+- `agy-ct schema check` — wired to `schema_check::run`
+- `agy-ct context validate` — wired to `context_validate::run`
+- `agy-ct context build` — wired to `context_build::run`
+- `agy-ct context render` — wired to `context_render::run`
 
 ---
 
 ## 4. Remaining Placeholders
 Folgende Befehle des CLI `agy-ct` sind noch als Platzhalter deklariert:
-- `agy-ct package compress`
-- `agy-ct package adversarial`
-- `agy-ct report export`
-- `agy-ct notebook bundle`
+- Keine bekannten CLI-Platzhalter mehr.
 
 ---
 
@@ -43,16 +44,15 @@ Folgende Befehle des CLI `agy-ct` sind noch als Platzhalter deklariert:
 - Standardmäßiger Containment-Modus: `proceed-in-sandbox`.
 - Vor Feature-Änderungen wird eine Read-only/Explore- oder Plan-only-Phase durchgeführt, falls der genaue Task-Kontext unklar ist.
 - Bei klar definierten Backlog-Tasks darf lokal implementiert, validiert und lokal committet werden.
-- **Kein Push.**
-- **Keine PR.**
-- **Kein Release.**
+- **Push und PR-Erstellung:** Nur nach expliziter menschlicher Bestätigung / Auth-Abfrage erlaubt.
+- **Verboten:** Force-Push, destruktive Git-Aktionen (Reset/Rebase), Deploys, Releases, Auslesen von Secrets.
 
 ---
 
 ## 6. Erlaubte lokale Autonomie
 - Durchführung von Read-only Audits im Workspace.
 - Änderungen sind nur an Dateien erlaubt, die explizit im Scope der aktiven Backlog-Task aufgeführt sind.
-- Ausführung der Rust-Validierung im Verzeichnis `agy7rust/`:
+- Ausführung der Rust-Validierung im Verzeichnis `agy7rust/` (bei Bedarf):
   - `cargo fmt --all --check`
   - `cargo check`
   - `cargo test`
@@ -63,18 +63,18 @@ Folgende Befehle des CLI `agy-ct` sind noch als Platzhalter deklariert:
 
 ---
 
-## 7. Verboten ohne explizite menschliche Freigabe
-- `git push`
-- PR (Pull Request) erstellen
+## 7. Verboten ohne explizite menschliche Freigabe und Bestätigung/Auth-Abfrage
+- `git push` (Erfordert Bestätigung/Auth)
+- PR (Pull Request) erstellen/ändern/mergen (Erfordert Bestätigung/Auth)
 - Release-Aktionen ausführen
 - Deploy-Vorgänge starten
-- Branch veröffentlichen (Branch publish)
-- Remote-Synchronisierung (Remote sync)
-- `git pull` / `git fetch`
-- Plugins modifizieren
+- Branch löschen (`git branch -d` / `-D`)
+- Destruktive Git-Verlauf-Operationen (`git reset`, `git rebase`, `git merge`)
+- Raw-API-Zugriffe (`gh api`)
+- Plugins modifizieren (außer im Rahmen eines genehmigten Entwurfs)
 - Hooks modifizieren
 - Skills modifizieren
-- `AGENTS.md` modifizieren
+- AGENTS.md modifizieren
 - Globale Systemeinstellungen oder User-Home-Konfigurationen ändern
 - Secrets oder Umgebungsvariablen exportieren/dumpen
 - Ordner `reports/` oder `artifacts/` committen (Ausnahme: genehmigte Dokumentenaktualisierungen)
@@ -86,89 +86,32 @@ Folgende Befehle des CLI `agy-ct` sind noch als Platzhalter deklariert:
 ## 8. Commit-Regeln
 - Lokale Commits sind erlaubt, wenn:
   - Die Task vollständig abgeschlossen ist.
-  - Alle Validierungsschritte (Formatierung, Check, Linter, Tests) fehlerfrei durchlaufen wurden.
+  - Alle Validierungsschritte (Formatierung, Check, Linter, Tests) fehlerfrei durchlaufen wurden (falls anwendbar).
   - `git status --short` ausschließlich die erlaubten Scope-Dateien als verändert anzeigt.
   - Modifikationen an `reports/performance_baseline.json` zurückgesetzt wurden.
   - Keine Berichts- oder Artefaktdateien im Commit-Set enthalten sind.
 - Commit-Messages müssen task-spezifisch sein. Zulässige Formate:
   - `feat: wire package compress command`
-  - `docs: sync alignment after package compress`
-  - `feat: wire package adversarial command`
-  - `docs: sync alignment after package adversarial`
-- **Kein Push, keine PR.**
+  - `docs: sync Antigravity governance workflow`
+- **Push und PR-Erstellung erst nach Freigabe und Auth-Bestätigung.**
 
 ---
 
 ## 9. Backlog
 
-- [ ] **Task 01: agy-ct package compress verdrahten und testen**
-  - **Scope:**
-    - `agy7rust/src/bin/agy_ct.rs`
-    - `agy7rust/tests/spark_roundtrip.rs`
-  - **Akzeptanzkriterien:**
-    - `PackageCommands::Compress` routet auf `compress::run`.
-    - Ein Success-Test läuft vollständig im Temp-Verzeichnis ab.
-    - Die Ausgabedatei `.spkg` existiert und ist nicht leer.
-    - Fehlverhalten bei fehlenden oder beschädigten Eingaben wird abgefangen und liefert einen Fehler-Exit-Code.
-    - Keine Erzeugung von Berichten oder dauerhaften Artefakten.
-    - Keine echten Daten.
-    - Rust-Güteprüfungen (`cargo fmt/check/test/clippy`) laufen fehlerfrei durch.
-    - Lokaler Commit wird erstellt.
+- [x] **Task 01: agy-ct package compress verdrahten und testen** (Erledigt / Obsolet laut README.md)
+- [x] **Task 02: docs/SPARK_ALIGNMENT.md nach package compress synchronisieren** (Erledigt / Obsolet laut README.md)
+- [x] **Task 03: agy-ct package adversarial verdrahten und testen** (Erledigt / Obsolet laut README.md)
+- [x] **Task 04: docs/SPARK_ALIGNMENT.md nach package adversarial synchronisieren** (Erledigt / Obsolet laut README.md)
+- [x] **Task 05: report export read-only analysieren** (Erledigt / Obsolet laut README.md)
+- [x] **Task 06: notebook bundle read-only analysieren** (Erledigt / Obsolet laut README.md)
 
-- [ ] **Task 02: docs/SPARK_ALIGNMENT.md nach package compress synchronisieren**
-  - **Scope:**
-    - `docs/SPARK_ALIGNMENT.md`
-  - **Akzeptanzkriterien:**
-    - `package compress` wird als "wired and functional" gelistet.
-    - Die verbleibenden Platzhalter werden aktualisiert.
-    - Der Teststatus wird auf den neuesten PASS-Wert aktualisiert.
-    - Keine neuen Claims.
-    - Lokaler Commit wird erstellt.
-
-- [ ] **Task 03: agy-ct package adversarial verdrahten und testen**
-  - **Scope:**
-    - `agy7rust/src/bin/agy_ct.rs`
-    - `agy7rust/tests/spark_roundtrip.rs`
-  - **Akzeptanzkriterien:**
-    - `PackageCommands::Adversarial` routet auf `adversarial::run`.
-    - CLI-Integrationstest läuft isoliert im Temp-Verzeichnis.
-    - Führt 5 simulierte Manipulationsprüfungen auf manipulierten `.spkg` Paketen aus und verifiziert den fehlerhaften Zustand.
-    - Keine Erzeugung von Berichten oder dauerhaften Artefakten.
-    - Keine echten Daten.
-    - Rust-Güteprüfungen laufen fehlerfrei durch.
-    - Lokaler Commit wird erstellt.
-
-- [ ] **Task 04: docs/SPARK_ALIGNMENT.md nach package adversarial synchronisieren**
-  - **Scope:**
-    - `docs/SPARK_ALIGNMENT.md`
-  - **Akzeptanzkriterien:**
-    - `package adversarial` wird als "wired and functional" gelistet.
-    - Die verbleibenden Platzhalter werden aktualisiert.
-    - Keine neuen Claims.
-    - Lokaler Commit wird erstellt.
-
-- [ ] **Task 05: report export read-only analysieren**
-  - **Scope:** Read-Only
-  - **Akzeptanzkriterien:**
-    - Realer CLI-Status geklärt.
-    - Vorhandene Backend-Logik unter `agy7rust` ermittelt.
-    - Für die Verdrahtung benötigte Dateien gelistet.
-    - Keine Code- oder Dokumentationsänderungen vorgenommen.
-
-- [ ] **Task 06: notebook bundle read-only analysieren**
-  - **Scope:** Read-Only
-  - **Akzeptanzkriterien:**
-    - Realer CLI-Status geklärt.
-    - Vorhandene Backend-Logik unter `agy7rust` ermittelt.
-    - Für die Verdrahtung benötigte Dateien gelistet.
-    - Keine Code- oder Dokumentationsänderungen vorgenommen.
-
-- [ ] **Task 07: Final Local Audit**
-  - **Scope:** Read-Only
+- [ ] **Task 07: Final Local Audit and PR Handoff Review**
+  - **Scope:** Read-Only / Documentation
   - **Akzeptanzkriterien:**
     - Workspace ist sauber.
-    - Alle wired/placeholder Befehle stimmen mit Code und Dokumenten überein.
-    - `README.md` und `docs/SPARK_ALIGNMENT.md` sind synchron.
+    - Alle wired Befehle stimmen mit Code und Dokumenten überein.
+    - README.md und docs/SPARK_ALIGNMENT.md sind synchron.
     - Berichte und Artefakte sind unverändert.
     - Eventuelle verbleibende Remote/PR-Risiken sind erfasst.
 
@@ -176,13 +119,12 @@ Folgende Befehle des CLI `agy-ct` sind noch als Platzhalter deklariert:
   - **Scope:** Read-Only bis zur Freigabe.
   - **Akzeptanzkriterien:**
     - Offene PRs berücksichtigt.
-    - Kein Push oder PR ohne explizite Freigabe.
+    - Push/PR wird nach Bestätigung / Auth-Freigabe ausgeführt.
 
 ---
 
 ## 10. Nächster Task
-- **Next:** `Task 01 — agy-ct package compress verdrahten und testen`.
-- **Vor Start von Task 01:** Read-only Prüfung, ob die Signatur von `compress::run` und der Input/Output-Kontrakt stabil sind.
+- **Next:** `Task 07 — Final Local Audit and PR Handoff Review`.
 
 ---
 
