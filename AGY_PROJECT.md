@@ -2,8 +2,8 @@
 
 ## 1. Zweck
 - Diese Datei dient als lokale Steuerungsdatei für die Sparkctl-Entwicklungsarbeiten mit Antigravity.
-- Sie ist kein Ersatz für [AGENTS.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/AGENTS.md).
-- [AGENTS.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/AGENTS.md) und die Skills unter [00_project_system.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.agent/skills/00_project_system.md) bleiben die vorrangig verbindlichen Arbeitsregeln.
+- Sie ist kein Ersatz für AGENTS.md.
+- AGENTS.md und die Skills unter .agents/skills/00_project_system/SKILL.md bleiben die vorrangig verbindlichen Arbeitsregeln.
 - Diese Datei konkretisiert und priorisiert lediglich den aktuellen lokalen Backlog für diese Arbeitsumgebung.
 
 ---
@@ -13,7 +13,7 @@
 - **Letzte relevante Commits:**
   - `c9b9086` docs: polish README presentation
   - `b9191af` feat: complete Sparkctl CLI command surface
-- **Tests letzter Stand:** 73 PASS dokumentiert laut lokalem Audit/Teststand in [SPARK_ALIGNMENT.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/docs/SPARK_ALIGNMENT.md).
+- **Tests letzter Stand:** 73 PASS dokumentiert laut lokalem Audit/Teststand in docs/SPARK_ALIGNMENT.md.
 
 ---
 
@@ -74,7 +74,7 @@ Folgende Befehle des CLI `agy-ct` sind noch als Platzhalter deklariert:
 - Plugins modifizieren (außer im Rahmen eines genehmigten Entwurfs)
 - Hooks modifizieren
 - Skills modifizieren
-- [AGENTS.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/AGENTS.md) modifizieren
+- AGENTS.md modifizieren
 - Globale Systemeinstellungen oder User-Home-Konfigurationen ändern
 - Secrets oder Umgebungsvariablen exportieren/dumpen
 - Ordner `reports/` oder `artifacts/` committen (Ausnahme: genehmigte Dokumentenaktualisierungen)
@@ -99,19 +99,19 @@ Folgende Befehle des CLI `agy-ct` sind noch als Platzhalter deklariert:
 
 ## 9. Backlog
 
-- [x] **Task 01: agy-ct package compress verdrahten und testen** (Erledigt / Obsolet laut [README.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/README.md))
-- [x] **Task 02: docs/SPARK_ALIGNMENT.md nach package compress synchronisieren** (Erledigt / Obsolet laut [README.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/README.md))
-- [x] **Task 03: agy-ct package adversarial verdrahten und testen** (Erledigt / Obsolet laut [README.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/README.md))
-- [x] **Task 04: docs/SPARK_ALIGNMENT.md nach package adversarial synchronisieren** (Erledigt / Obsolet laut [README.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/README.md))
-- [x] **Task 05: report export read-only analysieren** (Erledigt / Obsolet laut [README.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/README.md))
-- [x] **Task 06: notebook bundle read-only analysieren** (Erledigt / Obsolet laut [README.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/README.md))
+- [x] **Task 01: agy-ct package compress verdrahten und testen** (Erledigt / Obsolet laut README.md)
+- [x] **Task 02: docs/SPARK_ALIGNMENT.md nach package compress synchronisieren** (Erledigt / Obsolet laut README.md)
+- [x] **Task 03: agy-ct package adversarial verdrahten und testen** (Erledigt / Obsolet laut README.md)
+- [x] **Task 04: docs/SPARK_ALIGNMENT.md nach package adversarial synchronisieren** (Erledigt / Obsolet laut README.md)
+- [x] **Task 05: report export read-only analysieren** (Erledigt / Obsolet laut README.md)
+- [x] **Task 06: notebook bundle read-only analysieren** (Erledigt / Obsolet laut README.md)
 
 - [ ] **Task 07: Final Local Audit and PR Handoff Review**
   - **Scope:** Read-Only / Documentation
   - **Akzeptanzkriterien:**
     - Workspace ist sauber.
     - Alle wired Befehle stimmen mit Code und Dokumenten überein.
-    - [README.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/README.md) und [SPARK_ALIGNMENT.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/docs/SPARK_ALIGNMENT.md) sind synchron.
+    - README.md und docs/SPARK_ALIGNMENT.md sind synchron.
     - Berichte und Artefakte sind unverändert.
     - Eventuelle verbleibende Remote/PR-Risiken sind erfasst.
 
