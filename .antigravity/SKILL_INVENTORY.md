@@ -7,8 +7,8 @@ This inventory provides a complete comparison and registry of the skill sources 
 
 ## Skill Sources Classifications
 
-- **.agent/skills** = repo guidance source
-- **.agents/skills** = compatibility metadata
+- **.agent/skills** = repo guidance / legacy source
+- **.agents/skills** = Antigravity active workspace skill path
 - **docs/phase8a-draft-skills** = draft source
 - **.antigravity** = inert adapted workspace config
 
@@ -72,3 +72,4 @@ The following core Antigravity capabilities are available to this assistant:
 - **uv**: Python package manager helper.
 - **Scientific Databases**: ensembl-database, pubchem-database, uniprot-database, gnomad-database, clinical-trials-database, etc.
 - **Literature Search**: literature-search-arxiv, literature-search-openalex, pubmed-database, etc.
+

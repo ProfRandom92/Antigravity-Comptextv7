@@ -7,8 +7,8 @@ This file documents the conceptual mapping and legacy source classifications bet
 
 ## Skill Sources Classifications
 
-- **.agent/skills** = repo guidance source
-- **.agents/skills** = compatibility metadata
+- **.agent/skills** = repo guidance / legacy source
+- **.agents/skills** = Antigravity active workspace skill path
 - **docs/phase8a-draft-skills** = draft source
 - **.antigravity** = inert adapted workspace config
 
@@ -31,3 +31,4 @@ We map the original Codex infrastructure concepts to their Antigravity equivalen
 - **Hook Integration**: Mapped, but disabled (inert, not active runtime).
 - **Skill Discovery**: Completed; mapped to local directories and system-level capabilities.
 - **Legacy Alignment**: Legacy and draft skill sources classified and cataloged.
+

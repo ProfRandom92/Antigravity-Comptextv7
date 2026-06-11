@@ -16,8 +16,8 @@ Source / GitHub URL → Goal → Inspect → Context Pack → Policy Gate → Pr
 ## Skill Sources Classifications
 
 Within this repository:
-- **.agent/skills** = repo guidance source
-- **.agents/skills** = compatibility metadata
+- **.agent/skills** = repo guidance / legacy source
+- **.agents/skills** = Antigravity active workspace skill path
 - **docs/phase8a-draft-skills** = draft source
 - **.antigravity** = inert adapted workspace config
 
@@ -49,3 +49,4 @@ Before editing:
 2. Read `.antigravity/SKILL_INVENTORY.md` relevant to the task.
 3. Build a compact repo map.
 4. Stop for approval if the user asked for plan mode.
+
