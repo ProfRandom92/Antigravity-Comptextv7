@@ -13,8 +13,8 @@ To prevent context redundancy, follow this exact initial sequence:
 Deterministic trace packaging, replay-sidecar validation, and SPARK-style context artifact rendering for CompText.
 
 ## 3. Skill & Source Classifications
-- **.agent/skills**: Repo guidance source (15 guidelines).
-- **.agents/skills**: Compatibility metadata (9 legacy skill directories).
+- **.agent/skills**: Repo guidance / legacy source (15 guidelines).
+- **.agents/skills**: Antigravity active workspace skill path (9 compatibility skill directories).
 - **docs/phase8a-draft-skills**: Draft global skill candidates / design source only.
 - **.antigravity**: Inert adapted workspace configuration directory.
 

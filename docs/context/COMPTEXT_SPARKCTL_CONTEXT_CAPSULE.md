@@ -13,8 +13,8 @@ This capsule acts as a persistent repository data store for Antigravity config s
 - **Index**: Reference `.antigravity/SKILL_INVENTORY.md` for local and system capabilities.
 
 ## 2. Skill Source Classifications
-- `.agent/skills/` = repo guidance source
-- `.agents/skills/` = compatibility metadata
+- `.agent/skills/` = repo guidance / legacy source
+- `.agents/skills/` = Antigravity active workspace skill path
 - `docs/phase8a-draft-skills/` = draft source / design reference only
 - `.antigravity/` = inert adapted workspace config
 
@@ -33,3 +33,4 @@ This capsule acts as a persistent repository data store for Antigravity config s
 1. Apply the prompt prefix: `"Read .antigravity/START_HERE.md first."`
 2. Follow the bootstrap and inventory files for contextual queries.
 3. Obtain user approval before proposing changes to any workspace configs.
+
