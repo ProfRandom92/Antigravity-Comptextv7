@@ -29,24 +29,24 @@ Antigravity operates under a synchronized workflow allowing local autonomy combi
     *   Direct modifications to `.git/` internal metadata
     *   Execution of `agy-ct run` and `agy-ct benchmark` (which generate unreviewed outputs)
 
-### Exact Verification Run Results (Historical Reference)
+### Superseded Initial Permission Tests (Historical Reference)
 
-For context, the following baseline test results demonstrate the execution boundaries observed under initial read-only testing:
+For context, the following baseline test results demonstrate the execution boundaries observed under initial strict read-only testing before the current autonomous-but-confirmation-gated workflow was synchronized:
 
 1.  **`git status --short`** -> **ALLOWED** (Executed successfully, returning untracked files).
 2.  **`git diff --stat`** -> **ALLOWED** (Executed successfully).
 3.  **`git branch --show-current`** -> **ALLOWED** (Returned `docs/project-governance-sync`).
-4.  **`git push --dry-run origin HEAD:docs/project-governance-sync`** -> **DENIED** (Blocked by initial read-only client rule prior to confirmation authorization).
-5.  **`git commit --dry-run`** -> **DENIED** (Blocked by initial read-only client rule prior to local autonomy authorization).
-6.  **`gh pr list`** -> **DENIED** (Blocked by initial read-only client rule prior to configuration sync).
+4.  **`git push --dry-run origin HEAD:docs/project-governance-sync`** -> **DENIED** (Blocked by initial client rule prior to push confirmation authorization).
+5.  **`git commit --dry-run`** -> **DENIED** (Blocked by initial client rule prior to local autonomy authorization).
+6.  **`gh pr list`** -> **DENIED** (Blocked by initial client rule prior to configuration sync).
 
 ## 2. Existing Codex Hook Layer
 
 The repository maintains an existing local hook layer designed specifically for Codex workspaces. 
 
-*   **Hook Enablement**: Configured in [config.toml](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.codex/config.toml) with `hooks = true`.
-*   **Hook Matchers**: Configured in [hooks.json](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.codex/hooks.json) to intercept command-line execution and invoke Python scripts.
-*   **Tool Policy Checks**: Mapped to [pre_tool_use_policy.py](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.codex/hooks/pre_tool_use_policy.py), which blocks:
+*   **Hook Enablement**: Configured in `.codex/config.toml` with `hooks = true`.
+*   **Hook Matchers**: Configured in `.codex/hooks.json` to intercept command-line execution and invoke Python scripts.
+*   **Tool Policy Checks**: Mapped to `.codex/hooks/pre_tool_use_policy.py`, which blocks:
     *   `git` write commands (`commit`, `push`, `pull`, `merge`, `rebase`, `tag`, `fetch`)
     *   `gh` CLI integrations (`pr`, `issue`, `release`)
     *   Deployments and environments (`vercel`, `netlify`, etc.)
@@ -57,24 +57,22 @@ The repository maintains an existing local hook layer designed specifically for 
 > [!IMPORTANT]
 > **Codex hooks are active only for Codex runtimes.** They do not intercept or govern the Antigravity agent execution.
 >
-> The local `.antigravity` configurations (such as [settings.comptext-sparkctl.json](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.antigravity/settings.comptext-sparkctl.json)) and adapted hooks/plugins are mock templates and remain **completely inert** unless explicitly activated in a separately reviewed phase.
+> The local `.antigravity` configurations (such as `.antigravity/settings.comptext-sparkctl.json`) and adapted hooks/plugins are mock templates and remain **completely inert** unless explicitly activated in a separately reviewed phase.
 >
 > Antigravity's active runtime enforcement is managed strictly via global client-side permissions combined with human confirmation/Auth prompts. The push/PR confirmation step is enabled because the human explicitly requested this workflow for cooperative delivery.
 
-## 3. Local Hard Blocker (Git Push Configuration)
+## 3. Remote Sync Configuration (Git Push Target)
 
-To prevent accidental, unconfirmed pushes to the upstream repository, the Git remote push URL for `origin` is disabled by default:
+Under the synchronized workflow, Git remote configurations and push targets are managed as follows:
 
-*   **Fetch URL**: `https://github.com/ProfRandom92/comptext-sparkctl.git`
-*   **Push URL**: `DISABLED`
-
-Under the synchronized workflow:
-*   Local autonomous staging and commits can be made freely to keep changes scoped and trackable.
-*   Pushes to remote branches require manual override, explicit Auth prompts, or temporary push URL authorization verified by the human operator.
+*   **Fetch and Push Target**: The origin push URL points to the GitHub remote repository (`https://github.com/ProfRandom92/comptext-sparkctl.git`).
+*   **Publishing Gate**: `git push` is not hard-blocked, but is confirmation/Auth-gated.
+*   **History Integrity**: Force-push (`git push --force` or `-f`) remains strictly denied to protect the remote history.
+*   **Handoff Approval**: Human confirmation remains the absolute publication boundary before any remote branch update or PR change is merged.
 
 ## 4. Safe Workflow Execution
 
-To respect the boundaries defined in [AGENTS.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/AGENTS.md) and [06_git_handoff.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.agent/skills/06_git_handoff.md):
+To respect the boundaries defined in `AGENTS.md` and `.agent/skills/06_git_handoff.md`:
 
 1.  **Local Inspection**: Running local read-only commands (`git status`, `git diff`, etc.) is fully supported.
 2.  **Scoped Edits**: File modifications must be limited strictly to the assigned workspace directories (e.g., `docs/context/` or `agy7rust/` within task scope).
@@ -83,7 +81,7 @@ To respect the boundaries defined in [AGENTS.md](file:///C:/Users/contr/sandbox/
 
 ## 5. Claim Hygiene
 
-This documentation adheres to the rules set forth in [SKILL.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.agents/skills/09_codex_desktop_governance/SKILL.md) and [ANTIGRAVITY_MIGRATION_LEDGER.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/docs/context/ANTIGRAVITY_MIGRATION_LEDGER.md):
+This documentation adheres to the rules set forth in `.agents/skills/09_codex_desktop_governance/SKILL.md` and `docs/context/ANTIGRAVITY_MIGRATION_LEDGER.md`:
 *   No claims of production readiness or enterprise deployment.
 *   No assertions of legal certification, judicial admissibility, or forensic compliance.
 *   No declarations of EU AI Act compliance.
@@ -92,7 +90,7 @@ This documentation adheres to the rules set forth in [SKILL.md](file:///C:/Users
 
 ---
 **References**:
-*   [AGENTS.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/AGENTS.md)
-*   [06_git_handoff.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.agent/skills/06_git_handoff.md)
-*   [SKILL.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/.agents/skills/09_codex_desktop_governance/SKILL.md)
-*   [PHASE8B_CODEX_APP_PLUGIN_SCAFFOLD_DESIGN.md](file:///C:/Users/contr/sandbox/comptext-antigravity-work/comptext-sparkctl/docs/PHASE8B_CODEX_APP_PLUGIN_SCAFFOLD_DESIGN.md)
+*   `AGENTS.md`
+*   `.agent/skills/06_git_handoff.md`
+*   `.agents/skills/09_codex_desktop_governance/SKILL.md`
+*   `docs/PHASE8B_CODEX_APP_PLUGIN_SCAFFOLD_DESIGN.md`
