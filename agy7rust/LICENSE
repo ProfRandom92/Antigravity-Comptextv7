@@ -1,0 +1,11 @@
+MIT License
+
+The Rust crate in this directory is licensed under the MIT License.
+
+SPDX-License-Identifier: MIT
+
+The crate metadata in Cargo.toml declares:
+
+license = "MIT"
+
+For the canonical MIT license text, see the SPDX License List entry for MIT.
